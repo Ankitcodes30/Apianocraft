@@ -1,0 +1,511 @@
+:root {
+  color-scheme: dark;
+  --bg: #0e1116;
+  --panel: #151a21;
+  --border: #262d38;
+  --text: #e6e9ee;
+  --muted: #8b94a3;
+  --accent: #4f9cf9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    13px/1.4 system-ui,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  overflow: hidden;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 10px 14px 12px;
+  min-width: 760px;
+}
+
+.app__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  margin-right: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip--accent {
+  color: #cfe4ff;
+  border-color: #2c4a6e;
+  background: #14233a;
+}
+
+.chip--ok {
+  color: #b5f0c3;
+  border-color: #24502f;
+  background: #12261a;
+}
+
+.chip--warn {
+  color: #ffd9a3;
+  border-color: #6b4a1c;
+  background: #2a1f10;
+}
+
+.chip--bad {
+  color: #ffb3b3;
+  border-color: #6e2b31;
+  background: #2a1215;
+}
+
+.select {
+  cursor: pointer;
+  background-color: #141b26;
+}
+
+.sample-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sample-status__bar {
+  width: 90px;
+  height: 6px;
+  accent-color: var(--accent);
+}
+
+.ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: #3a4453;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn--on {
+  border-color: var(--accent);
+  color: #cfe4ff;
+  background: #14233a;
+}
+
+.kb {
+  position: relative;
+  flex: 1;
+  min-height: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.kb-whites {
+  display: flex;
+  height: 100%;
+}
+
+.ap-key {
+  position: relative;
+  cursor: pointer;
+}
+
+.ap-key--white {
+  flex: 1 1 0;
+  min-width: 0;
+  background: linear-gradient(#fbfaf7, #e9e7e1 82%, #dcd9d2);
+  border-right: 1px solid #c6c3bc;
+  color: #9aa0a8;
+  border-radius: 0 0 4px 4px;
+  transition: background-color 60ms linear;
+}
+
+.ap-key--white.ap-key--active,
+.ap-key--white:active {
+  background: linear-gradient(#cfe0ff, #9cc1ff 82%, #8ab3f5);
+}
+
+.kb-blacks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ap-key--black {
+  position: absolute;
+  top: 0;
+  height: 58%;
+  background: linear-gradient(#2b323c, #171c23 80%);
+  border: 1px solid #0a0d11;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+  color: #8b94a3;
+  pointer-events: auto;
+  transition: background-color 60ms linear;
+}
+
+.ap-key--black.ap-key--active,
+.ap-key--black:active {
+  background: linear-gradient(#3d5a80, #27405f 80%);
+}
+
+.ap-key__label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  text-align: center;
+  font-size: 9px;
+  pointer-events: none;
+}
+
+.ap-key--black .ap-key__label {
+  bottom: 4px;
+  font-size: 8px;
+  color: #77808e;
+}
+
+.ap-key--c .ap-key__label {
+  font-weight: 700;
+  color: #6a717c;
+}
+
+.errs {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 420px;
+  z-index: 50;
+}
+
+.err {
+  background: #2a1215;
+  border: 1px solid #6e2b31;
+  color: #ffb3b3;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.warn {
+  background: #2a1f10;
+  border: 1px solid #6b4a1c;
+  color: #ffd9a3;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.fatal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ---- Phase 5: minimal MIDI panel ---- */
+
+.midi-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--panel);
+  font-size: 12px;
+}
+
+.midi-led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2c3a4f;
+  transition: background 120ms;
+}
+
+.midi-led--on {
+  background: #35d07f;
+}
+
+.midi-activity {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.midi-activity__msg {
+  opacity: 0.6;
+}
+
+.midi-meter {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 6px;
+  border-radius: 3px;
+  background: #0c1119;
+  overflow: hidden;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.midi-meter__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+/* ---- Phase 6: performance XY pad ---- */
+
+.perf-pad {
+  position: relative;
+  width: 230px;
+  height: 120px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(79, 156, 249, 0.08), rgba(79, 156, 249, 0) 45%, rgba(79, 156, 249, 0) 55%, rgba(79, 156, 249, 0.08)),
+    var(--panel);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: crosshair;
+  overflow: hidden;
+}
+
+.perf-pad:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.perf-pad__center {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed rgba(139, 148, 163, 0.5);
+  pointer-events: none;
+}
+
+.perf-pad__label {
+  position: absolute;
+  font-size: 10px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.perf-pad__label--pb {
+  left: 6px;
+  top: 4px;
+}
+
+.perf-pad__label--mod {
+  right: 6px;
+  bottom: 4px;
+}
+
+.perf-pad__dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(79, 156, 249, 0.6);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.perf-pad__readout {
+  position: absolute;
+  left: 8px;
+  bottom: 5px;
+  font-size: 10px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.perf-pad__range {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  display: flex;
+  gap: 4px;
+}
+
+.perf-pad__range button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 4px;
+  font-size: 10px;
+  padding: 1px 6px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.perf-pad__range button.perf-pad__range--on {
+  border-color: var(--accent);
+  color: #cfe4ff;
+}
+
+/* ---- Phase 7: Main Tone panel ---- */
+
+.mt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 8px 10px;
+}
+
+.mt__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mt__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+.mt__row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.mt__row--effects {
+  padding-top: 2px;
+  border-top: 1px solid var(--border);
+}
+
+.mt__group-label {
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+
+.mt__ctl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.mt__slider {
+  width: 110px;
+  accent-color: var(--accent);
+}
+
+.mt__ctl .mt__slider.mt__slider--wide {
+  width: 90px;
+}
+
+.mt__out {
+  min-width: 46px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  font-size: 11px;
+}
+
+.mt__stepper {
+  gap: 4px;
+}
+
+.mt__stepper .btn {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.mt__preset {
+  padding: 2px 6px;
+  font-size: 11px;
+}
+

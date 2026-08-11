@@ -1,0 +1,921 @@
+{
+  "id": "grand-piano",
+  "name": "Grand Piano",
+  "version": "1.0.0",
+  "kind": "samples",
+  "sourceRateHz": 48000,
+  "description": "Salamander Grand Piano V3 (Yamaha C5) — subset: 30 zones x 2 velocity layers.",
+  "license": {
+    "spdx": "CC-BY-3.0",
+    "title": "Creative Commons Attribution 3.0 Unported",
+    "author": "Alexander Holm",
+    "source": "https://github.com/sfzinstruments/SalamanderGrandPiano",
+    "attribution": "Salamander Grand Piano V3 by Alexander Holm (CC BY 3.0). Yamaha C5, AKG C414 AB pair, 48 kHz 24-bit.",
+    "redistribution": "Permitted — including commercial use and public deployment — with attribution.",
+    "notice": "Derived from the Salamander Grand Piano V3 SFZ instrument (github.com/sfzinstruments/SalamanderGrandPiano)."
+  },
+  "files": [
+    {
+      "id": "A0v1",
+      "path": "grand-piano/A0v1.flac",
+      "sizeBytes": 2164885,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA0v1.flac"
+    },
+    {
+      "id": "A0v16",
+      "path": "grand-piano/A0v16.flac",
+      "sizeBytes": 2864588,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA0v16.flac"
+    },
+    {
+      "id": "C1v1",
+      "path": "grand-piano/C1v1.flac",
+      "sizeBytes": 2438456,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC1v1.flac"
+    },
+    {
+      "id": "C1v16",
+      "path": "grand-piano/C1v16.flac",
+      "sizeBytes": 2585455,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC1v16.flac"
+    },
+    {
+      "id": "D#1v1",
+      "path": "grand-piano/Ds1v1.flac",
+      "sizeBytes": 2169326,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%231v1.flac"
+    },
+    {
+      "id": "D#1v16",
+      "path": "grand-piano/Ds1v16.flac",
+      "sizeBytes": 2983375,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%231v16.flac"
+    },
+    {
+      "id": "F#1v1",
+      "path": "grand-piano/Fs1v1.flac",
+      "sizeBytes": 1768820,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%231v1.flac"
+    },
+    {
+      "id": "F#1v16",
+      "path": "grand-piano/Fs1v16.flac",
+      "sizeBytes": 2792731,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%231v16.flac"
+    },
+    {
+      "id": "A1v1",
+      "path": "grand-piano/A1v1.flac",
+      "sizeBytes": 2166601,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA1v1.flac"
+    },
+    {
+      "id": "A1v16",
+      "path": "grand-piano/A1v16.flac",
+      "sizeBytes": 2879654,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA1v16.flac"
+    },
+    {
+      "id": "C2v1",
+      "path": "grand-piano/C2v1.flac",
+      "sizeBytes": 1980907,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC2v1.flac"
+    },
+    {
+      "id": "C2v16",
+      "path": "grand-piano/C2v16.flac",
+      "sizeBytes": 2698276,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC2v16.flac"
+    },
+    {
+      "id": "D#2v1",
+      "path": "grand-piano/Ds2v1.flac",
+      "sizeBytes": 2087725,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%232v1.flac"
+    },
+    {
+      "id": "D#2v16",
+      "path": "grand-piano/Ds2v16.flac",
+      "sizeBytes": 2700194,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%232v16.flac"
+    },
+    {
+      "id": "F#2v1",
+      "path": "grand-piano/Fs2v1.flac",
+      "sizeBytes": 1846818,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%232v1.flac"
+    },
+    {
+      "id": "F#2v16",
+      "path": "grand-piano/Fs2v16.flac",
+      "sizeBytes": 2490944,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%232v16.flac"
+    },
+    {
+      "id": "A2v1",
+      "path": "grand-piano/A2v1.flac",
+      "sizeBytes": 1823625,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA2v1.flac"
+    },
+    {
+      "id": "A2v16",
+      "path": "grand-piano/A2v16.flac",
+      "sizeBytes": 2086327,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA2v16.flac"
+    },
+    {
+      "id": "C3v1",
+      "path": "grand-piano/C3v1.flac",
+      "sizeBytes": 1624899,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC3v1.flac"
+    },
+    {
+      "id": "C3v16",
+      "path": "grand-piano/C3v16.flac",
+      "sizeBytes": 1875350,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC3v16.flac"
+    },
+    {
+      "id": "D#3v1",
+      "path": "grand-piano/Ds3v1.flac",
+      "sizeBytes": 1381434,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%233v1.flac"
+    },
+    {
+      "id": "D#3v16",
+      "path": "grand-piano/Ds3v16.flac",
+      "sizeBytes": 1861439,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%233v16.flac"
+    },
+    {
+      "id": "F#3v1",
+      "path": "grand-piano/Fs3v1.flac",
+      "sizeBytes": 1664654,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%233v1.flac"
+    },
+    {
+      "id": "F#3v16",
+      "path": "grand-piano/Fs3v16.flac",
+      "sizeBytes": 1815793,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%233v16.flac"
+    },
+    {
+      "id": "A3v1",
+      "path": "grand-piano/A3v1.flac",
+      "sizeBytes": 1423583,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA3v1.flac"
+    },
+    {
+      "id": "A3v16",
+      "path": "grand-piano/A3v16.flac",
+      "sizeBytes": 1901195,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA3v16.flac"
+    },
+    {
+      "id": "C4v1",
+      "path": "grand-piano/C4v1.flac",
+      "sizeBytes": 1265676,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC4v1.flac"
+    },
+    {
+      "id": "C4v16",
+      "path": "grand-piano/C4v16.flac",
+      "sizeBytes": 1772214,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC4v16.flac"
+    },
+    {
+      "id": "D#4v1",
+      "path": "grand-piano/Ds4v1.flac",
+      "sizeBytes": 1329951,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%234v1.flac"
+    },
+    {
+      "id": "D#4v16",
+      "path": "grand-piano/Ds4v16.flac",
+      "sizeBytes": 1617165,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%234v16.flac"
+    },
+    {
+      "id": "F#4v1",
+      "path": "grand-piano/Fs4v1.flac",
+      "sizeBytes": 1199292,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%234v1.flac"
+    },
+    {
+      "id": "F#4v16",
+      "path": "grand-piano/Fs4v16.flac",
+      "sizeBytes": 1554241,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%234v16.flac"
+    },
+    {
+      "id": "A4v1",
+      "path": "grand-piano/A4v1.flac",
+      "sizeBytes": 1302933,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA4v1.flac"
+    },
+    {
+      "id": "A4v16",
+      "path": "grand-piano/A4v16.flac",
+      "sizeBytes": 1602001,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA4v16.flac"
+    },
+    {
+      "id": "C5v1",
+      "path": "grand-piano/C5v1.flac",
+      "sizeBytes": 1238975,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC5v1.flac"
+    },
+    {
+      "id": "C5v16",
+      "path": "grand-piano/C5v16.flac",
+      "sizeBytes": 1531778,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC5v16.flac"
+    },
+    {
+      "id": "D#5v1",
+      "path": "grand-piano/Ds5v1.flac",
+      "sizeBytes": 1198920,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%235v1.flac"
+    },
+    {
+      "id": "D#5v16",
+      "path": "grand-piano/Ds5v16.flac",
+      "sizeBytes": 1413841,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%235v16.flac"
+    },
+    {
+      "id": "F#5v1",
+      "path": "grand-piano/Fs5v1.flac",
+      "sizeBytes": 1040868,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%235v1.flac"
+    },
+    {
+      "id": "F#5v16",
+      "path": "grand-piano/Fs5v16.flac",
+      "sizeBytes": 1258455,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%235v16.flac"
+    },
+    {
+      "id": "A5v1",
+      "path": "grand-piano/A5v1.flac",
+      "sizeBytes": 697245,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA5v1.flac"
+    },
+    {
+      "id": "A5v16",
+      "path": "grand-piano/A5v16.flac",
+      "sizeBytes": 1170434,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA5v16.flac"
+    },
+    {
+      "id": "C6v1",
+      "path": "grand-piano/C6v1.flac",
+      "sizeBytes": 567727,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC6v1.flac"
+    },
+    {
+      "id": "C6v16",
+      "path": "grand-piano/C6v16.flac",
+      "sizeBytes": 730412,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC6v16.flac"
+    },
+    {
+      "id": "D#6v1",
+      "path": "grand-piano/Ds6v1.flac",
+      "sizeBytes": 767576,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%236v1.flac"
+    },
+    {
+      "id": "D#6v16",
+      "path": "grand-piano/Ds6v16.flac",
+      "sizeBytes": 781652,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%236v16.flac"
+    },
+    {
+      "id": "F#6v1",
+      "path": "grand-piano/Fs6v1.flac",
+      "sizeBytes": 458733,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%236v1.flac"
+    },
+    {
+      "id": "F#6v16",
+      "path": "grand-piano/Fs6v16.flac",
+      "sizeBytes": 701195,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%236v16.flac"
+    },
+    {
+      "id": "A6v1",
+      "path": "grand-piano/A6v1.flac",
+      "sizeBytes": 526856,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA6v1.flac"
+    },
+    {
+      "id": "A6v16",
+      "path": "grand-piano/A6v16.flac",
+      "sizeBytes": 724195,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA6v16.flac"
+    },
+    {
+      "id": "C7v1",
+      "path": "grand-piano/C7v1.flac",
+      "sizeBytes": 405957,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC7v1.flac"
+    },
+    {
+      "id": "C7v16",
+      "path": "grand-piano/C7v16.flac",
+      "sizeBytes": 462505,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC7v16.flac"
+    },
+    {
+      "id": "D#7v1",
+      "path": "grand-piano/Ds7v1.flac",
+      "sizeBytes": 486944,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%237v1.flac"
+    },
+    {
+      "id": "D#7v16",
+      "path": "grand-piano/Ds7v16.flac",
+      "sizeBytes": 551221,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FD%237v16.flac"
+    },
+    {
+      "id": "F#7v1",
+      "path": "grand-piano/Fs7v1.flac",
+      "sizeBytes": 585050,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%237v1.flac"
+    },
+    {
+      "id": "F#7v16",
+      "path": "grand-piano/Fs7v16.flac",
+      "sizeBytes": 565916,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FF%237v16.flac"
+    },
+    {
+      "id": "A7v1",
+      "path": "grand-piano/A7v1.flac",
+      "sizeBytes": 241393,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA7v1.flac"
+    },
+    {
+      "id": "A7v16",
+      "path": "grand-piano/A7v16.flac",
+      "sizeBytes": 384330,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FA7v16.flac"
+    },
+    {
+      "id": "C8v1",
+      "path": "grand-piano/C8v1.flac",
+      "sizeBytes": 331147,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC8v1.flac"
+    },
+    {
+      "id": "C8v16",
+      "path": "grand-piano/C8v16.flac",
+      "sizeBytes": 421807,
+      "sourceUrl": "https://github.com/sfzinstruments/SalamanderGrandPiano/blob/master/Samples%2FC8v16.flac"
+    }
+  ],
+  "zones": [
+    {
+      "sample": "A0v1",
+      "loNote": 21,
+      "hiNote": 22,
+      "rootNote": 21,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 481
+    },
+    {
+      "sample": "A0v16",
+      "loNote": 21,
+      "hiNote": 22,
+      "rootNote": 21,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 1754
+    },
+    {
+      "sample": "C1v1",
+      "loNote": 23,
+      "hiNote": 25,
+      "rootNote": 24,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 1388
+    },
+    {
+      "sample": "C1v16",
+      "loNote": 23,
+      "hiNote": 25,
+      "rootNote": 24,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 2163
+    },
+    {
+      "sample": "D#1v1",
+      "loNote": 26,
+      "hiNote": 28,
+      "rootNote": 27,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 1059
+    },
+    {
+      "sample": "D#1v16",
+      "loNote": 26,
+      "hiNote": 28,
+      "rootNote": 27,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 1318
+    },
+    {
+      "sample": "F#1v1",
+      "loNote": 29,
+      "hiNote": 31,
+      "rootNote": 30,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 971
+    },
+    {
+      "sample": "F#1v16",
+      "loNote": 29,
+      "hiNote": 31,
+      "rootNote": 30,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 1134
+    },
+    {
+      "sample": "A1v1",
+      "loNote": 32,
+      "hiNote": 34,
+      "rootNote": 33,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 356
+    },
+    {
+      "sample": "A1v16",
+      "loNote": 32,
+      "hiNote": 34,
+      "rootNote": 33,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 699
+    },
+    {
+      "sample": "C2v1",
+      "loNote": 35,
+      "hiNote": 37,
+      "rootNote": 36,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 682
+    },
+    {
+      "sample": "C2v16",
+      "loNote": 35,
+      "hiNote": 37,
+      "rootNote": 36,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 820
+    },
+    {
+      "sample": "D#2v1",
+      "loNote": 38,
+      "hiNote": 40,
+      "rootNote": 39,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 711
+    },
+    {
+      "sample": "D#2v16",
+      "loNote": 38,
+      "hiNote": 40,
+      "rootNote": 39,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 788
+    },
+    {
+      "sample": "F#2v1",
+      "loNote": 41,
+      "hiNote": 43,
+      "rootNote": 42,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 995
+    },
+    {
+      "sample": "F#2v16",
+      "loNote": 41,
+      "hiNote": 43,
+      "rootNote": 42,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 975
+    },
+    {
+      "sample": "A2v1",
+      "loNote": 44,
+      "hiNote": 46,
+      "rootNote": 45,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 894
+    },
+    {
+      "sample": "A2v16",
+      "loNote": 44,
+      "hiNote": 46,
+      "rootNote": 45,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 917
+    },
+    {
+      "sample": "C3v1",
+      "loNote": 47,
+      "hiNote": 49,
+      "rootNote": 48,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 918
+    },
+    {
+      "sample": "C3v16",
+      "loNote": 47,
+      "hiNote": 49,
+      "rootNote": 48,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 935
+    },
+    {
+      "sample": "D#3v1",
+      "loNote": 50,
+      "hiNote": 52,
+      "rootNote": 51,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 883
+    },
+    {
+      "sample": "D#3v16",
+      "loNote": 50,
+      "hiNote": 52,
+      "rootNote": 51,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 870
+    },
+    {
+      "sample": "F#3v1",
+      "loNote": 53,
+      "hiNote": 55,
+      "rootNote": 54,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 698
+    },
+    {
+      "sample": "F#3v16",
+      "loNote": 53,
+      "hiNote": 55,
+      "rootNote": 54,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 879
+    },
+    {
+      "sample": "A3v1",
+      "loNote": 56,
+      "hiNote": 58,
+      "rootNote": 57,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 714
+    },
+    {
+      "sample": "A3v16",
+      "loNote": 56,
+      "hiNote": 58,
+      "rootNote": 57,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 839
+    },
+    {
+      "sample": "C4v1",
+      "loNote": 59,
+      "hiNote": 61,
+      "rootNote": 60,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 695
+    },
+    {
+      "sample": "C4v16",
+      "loNote": 59,
+      "hiNote": 61,
+      "rootNote": 60,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 727
+    },
+    {
+      "sample": "D#4v1",
+      "loNote": 62,
+      "hiNote": 64,
+      "rootNote": 63,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 662
+    },
+    {
+      "sample": "D#4v16",
+      "loNote": 62,
+      "hiNote": 64,
+      "rootNote": 63,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 690
+    },
+    {
+      "sample": "F#4v1",
+      "loNote": 65,
+      "hiNote": 67,
+      "rootNote": 66,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 515
+    },
+    {
+      "sample": "F#4v16",
+      "loNote": 65,
+      "hiNote": 67,
+      "rootNote": 66,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 602
+    },
+    {
+      "sample": "A4v1",
+      "loNote": 68,
+      "hiNote": 70,
+      "rootNote": 69,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 609
+    },
+    {
+      "sample": "A4v16",
+      "loNote": 68,
+      "hiNote": 70,
+      "rootNote": 69,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 664
+    },
+    {
+      "sample": "C5v1",
+      "loNote": 71,
+      "hiNote": 73,
+      "rootNote": 72,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 569
+    },
+    {
+      "sample": "C5v16",
+      "loNote": 71,
+      "hiNote": 73,
+      "rootNote": 72,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 720
+    },
+    {
+      "sample": "D#5v1",
+      "loNote": 74,
+      "hiNote": 76,
+      "rootNote": 75,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 638
+    },
+    {
+      "sample": "D#5v16",
+      "loNote": 74,
+      "hiNote": 76,
+      "rootNote": 75,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 707
+    },
+    {
+      "sample": "F#5v1",
+      "loNote": 77,
+      "hiNote": 79,
+      "rootNote": 78,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 610
+    },
+    {
+      "sample": "F#5v16",
+      "loNote": 77,
+      "hiNote": 79,
+      "rootNote": 78,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 693
+    },
+    {
+      "sample": "A5v1",
+      "loNote": 80,
+      "hiNote": 82,
+      "rootNote": 81,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 599
+    },
+    {
+      "sample": "A5v16",
+      "loNote": 80,
+      "hiNote": 82,
+      "rootNote": 81,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 1522
+    },
+    {
+      "sample": "C6v1",
+      "loNote": 83,
+      "hiNote": 85,
+      "rootNote": 84,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 1071
+    },
+    {
+      "sample": "C6v16",
+      "loNote": 83,
+      "hiNote": 85,
+      "rootNote": 84,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 626
+    },
+    {
+      "sample": "D#6v1",
+      "loNote": 86,
+      "hiNote": 88,
+      "rootNote": 87,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 633
+    },
+    {
+      "sample": "D#6v16",
+      "loNote": 86,
+      "hiNote": 88,
+      "rootNote": 87,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 621
+    },
+    {
+      "sample": "F#6v1",
+      "loNote": 89,
+      "hiNote": 91,
+      "rootNote": 90,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 674
+    },
+    {
+      "sample": "F#6v16",
+      "loNote": 89,
+      "hiNote": 91,
+      "rootNote": 90,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 620
+    },
+    {
+      "sample": "A6v1",
+      "loNote": 92,
+      "hiNote": 94,
+      "rootNote": 93,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 760
+    },
+    {
+      "sample": "A6v16",
+      "loNote": 92,
+      "hiNote": 94,
+      "rootNote": 93,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 635
+    },
+    {
+      "sample": "C7v1",
+      "loNote": 95,
+      "hiNote": 97,
+      "rootNote": 96,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 556
+    },
+    {
+      "sample": "C7v16",
+      "loNote": 95,
+      "hiNote": 97,
+      "rootNote": 96,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 554
+    },
+    {
+      "sample": "D#7v1",
+      "loNote": 98,
+      "hiNote": 100,
+      "rootNote": 99,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 528
+    },
+    {
+      "sample": "D#7v16",
+      "loNote": 98,
+      "hiNote": 100,
+      "rootNote": 99,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 524
+    },
+    {
+      "sample": "F#7v1",
+      "loNote": 101,
+      "hiNote": 103,
+      "rootNote": 102,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 665
+    },
+    {
+      "sample": "F#7v16",
+      "loNote": 101,
+      "hiNote": 103,
+      "rootNote": 102,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 771
+    },
+    {
+      "sample": "A7v1",
+      "loNote": 104,
+      "hiNote": 106,
+      "rootNote": 105,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 1058
+    },
+    {
+      "sample": "A7v16",
+      "loNote": 104,
+      "hiNote": 106,
+      "rootNote": 105,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 688
+    },
+    {
+      "sample": "C8v1",
+      "loNote": 107,
+      "hiNote": 108,
+      "rootNote": 108,
+      "velLo": 1,
+      "velHi": 63,
+      "offset": 650
+    },
+    {
+      "sample": "C8v16",
+      "loNote": 107,
+      "hiNote": 108,
+      "rootNote": 108,
+      "velLo": 64,
+      "velHi": 127,
+      "offset": 716
+    }
+  ]
+}
