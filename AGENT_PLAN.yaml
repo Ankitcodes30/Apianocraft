@@ -47,37 +47,18 @@ completed_phases:
     smoke: "310/310 x3"
 
 current_work:
-  uncommitted_files:
-    - scripts/smoke-dual-tone.mjs       # untracked
-    - src/components/DualTonePanel.tsx  # untracked
-    - scripts/smoke-qwerty.mjs         # untracked
-    - src/components/KeyboardPanel.tsx  # untracked
-    - src/keyboard/QwertyManager.ts    # untracked
-    - PHASE_8_DUAL_TONE.md             # untracked
-    - src/audio/effects/MainToneChain.ts # modified: extracted ToneChain class + IR static cache
-    - src/audio/VoiceManager.ts         # modified: added custom out target routing
-    - src/audio/AudioEngine.ts          # modified: dual tone state, dual voice spawning
-    - src/audio/types.ts                # modified: dual tone diagnostics
-    - src/App.tsx                       # modified: DualTonePanel UI wiring
-    - src/testHarness.ts                # modified: dual tone test API
-    - scripts/audio-smoke.mjs          # modified: runs runDualTone
-    - scripts/smoke-phase7.mjs          # modified: level measurement stability fixes
-    - src/styles/index.css             # modified: panel styles
+  uncommitted_files: []
 
 next_phase:
-  id: "9"
-  name: "Audio Effects Polish & Mastering / Split Keyboard"
+  id: "10"
+  name: "Additional Instruments"
   status: planned
   goals:
-    - Polish dual tone routing, preset save/restore, and master bus processing.
-    - Prepare split keyboard zones if directed.
+    - Add sample/synth instrument definitions for Strings, Electric Piano, Organ, Brass, Flute.
+    - Implement multi-instrument bank switching & preloading.
+    - Extend harness & smoke tests for instrument bank switching.
 
 future_phases:
-  - id: "9"
-    name: "Split Keyboard"
-  - id: "10"
-    name: "Additional instruments"
-    candidates: [Strings, Flute, Harmonium, Trumpet, Brass, Piccolo, Grand Piano, Banjo, Saxophone, Violin]
   - id: "11"
     name: "Recording / MIDI export / performance recording"
   - id: "12"
