@@ -8,6 +8,9 @@ import { MidiPanel } from './components/MidiPanel'
 import { PerformancePad } from './components/PerformancePad'
 import { MainTonePanel } from './components/MainTonePanel'
 import { DualTonePanel } from './components/DualTonePanel'
+import { MasterPanel } from './components/MasterPanel'
+import { SplitPanel } from './components/SplitPanel'
+import { PresetPanel } from './components/PresetPanel'
 import { KeyboardPanel } from './components/KeyboardPanel'
 import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
@@ -135,8 +138,11 @@ export default function App() {
         </button>
       </section>
 
+      <PresetPanel />
       <MainTonePanel engine={engine} />
       <DualTonePanel engine={engine} />
+      <SplitPanel />
+      <MasterPanel />
 
       <PianoKeyboard engine={engine} />
       <ErrorBanner />

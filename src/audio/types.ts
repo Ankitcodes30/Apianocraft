@@ -121,6 +121,64 @@ export interface DiagnosticsSnapshot {
   dualTranspose?: number
   dualOctaveShift?: number
   dualTuningCents?: number
+  masterEQ?: MasterEQState
+  splitZone?: SplitZoneSnapshot
+}
+
+export interface MasterEQState {
+  /** Master volume 0..1 (default 1.0) */
+  volume: number
+  /** Low shelf gain in dB (-12..+12 dB, default 0) */
+  lowGainDb: number
+  /** Peaking mid gain in dB (-12..+12 dB, default 0) */
+  midGainDb: number
+  /** High shelf gain in dB (-12..+12 dB, default 0) */
+  highGainDb: number
+}
+
+export interface SplitZoneSnapshot {
+  enabled: boolean
+  splitPoint: number
+  instrument: string
+  octaveShift: number
+  transpose: number
+  tuningCents: number
+  volume: number
+  pan: number
+  tone: MainToneSnapshot
+}
+
+export interface WorkstationPreset {
+  id: string
+  name: string
+  category: 'factory' | 'user'
+  main: {
+    instrument: string
+    octaveShift: number
+    transpose: number
+    tuningCents: number
+    tone: MainToneSnapshot
+  }
+  dual: {
+    enabled: boolean
+    instrument: string
+    octaveShift: number
+    transpose: number
+    tuningCents: number
+    tone: MainToneSnapshot
+  }
+  split: {
+    enabled: boolean
+    splitPoint: number
+    instrument: string
+    octaveShift: number
+    transpose: number
+    tuningCents: number
+    volume: number
+    pan: number
+    tone: MainToneSnapshot
+  }
+  master: MasterEQState
 }
 
 /** Which sample zone a note+velocity resolves to (diagnostic/testing hook). */

@@ -8,13 +8,144 @@ import { SampleInstrument } from './samples/SampleInstrument'
 import type { SampleLoadState } from './samples/types'
 import { VoiceManager, type EnvelopeConfig } from './VoiceManager'
 import { clampNote } from './instruments/Instrument'
-import type { DiagnosticsSnapshot, EngineEvent, EngineListener, InputSource, LimiterKind, MainToneSnapshot, NoteOnRequest, SampleZoneInfo } from './types'
+import type { DiagnosticsSnapshot, EngineEvent, EngineListener, InputSource, LimiterKind, MainToneSnapshot, MasterEQState, NoteOnRequest, SampleZoneInfo, SplitZoneSnapshot, WorkstationPreset } from './types'
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 const clampFinite = (v: number, lo: number, hi: number) => (Number.isFinite(v) ? clamp(v, lo, hi) : lo)
 
 /** Fixed lead (ms) between scheduling and audio-clock start. */
 const SCHEDULING_LEAD_MS = 4
+
+export const FACTORY_PRESETS: WorkstationPreset[] = [
+  {
+    id: 'default-grand',
+    name: 'Concert Grand',
+    category: 'factory',
+    main: {
+      instrument: 'grand-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.15, reverbPreset: 'hall', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    dual: {
+      enabled: false,
+      instrument: 'demo-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.3, reverbPreset: 'hall', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    split: {
+      enabled: false,
+      splitPoint: 60,
+      instrument: 'demo-piano',
+      octaveShift: -1,
+      transpose: 0,
+      tuningCents: 0,
+      volume: 1,
+      pan: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    master: { volume: 1, lowGainDb: 0, midGainDb: 0, highGainDb: 0 },
+  },
+  {
+    id: 'warm-dual-layer',
+    name: 'Piano & Synth Dual',
+    category: 'factory',
+    main: {
+      instrument: 'grand-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 0.9, pan: -0.2, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.35, reverbPreset: 'stage', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    dual: {
+      enabled: true,
+      instrument: 'demo-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 0.6, pan: 0.2, cutoffNorm: 0.7, cutoffHz: 5000, reverbAmount: 0.5, reverbPreset: 'stage', chorusAmount: 0.2, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    split: {
+      enabled: false,
+      splitPoint: 60,
+      instrument: 'demo-piano',
+      octaveShift: -1,
+      transpose: 0,
+      tuningCents: 0,
+      volume: 1,
+      pan: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    master: { volume: 1, lowGainDb: 2, midGainDb: 0, highGainDb: 1 },
+  },
+  {
+    id: 'split-bass-keys',
+    name: 'Split Bass & Piano',
+    category: 'factory',
+    main: {
+      instrument: 'grand-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0.1, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.2, reverbPreset: 'stage', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    dual: {
+      enabled: false,
+      instrument: 'demo-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    split: {
+      enabled: true,
+      splitPoint: 60,
+      instrument: 'demo-piano',
+      octaveShift: -1,
+      transpose: 0,
+      tuningCents: 0,
+      volume: 0.9,
+      pan: -0.2,
+      tone: { volume: 0.9, pan: -0.2, cutoffNorm: 0.5, cutoffHz: 2500, reverbAmount: 0.1, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    master: { volume: 1, lowGainDb: 3, midGainDb: -1, highGainDb: 0 },
+  },
+  {
+    id: 'vintage-ep-chill',
+    name: 'Vintage EP Chill',
+    category: 'factory',
+    main: {
+      instrument: 'demo-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 0.95, cutoffHz: 16000, reverbAmount: 0.25, reverbPreset: 'room', chorusAmount: 0.4, delayAmount: 0.3, delayTime: 0.35, delayFeedback: 0.25 },
+    },
+    dual: {
+      enabled: false,
+      instrument: 'demo-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    split: {
+      enabled: false,
+      splitPoint: 60,
+      instrument: 'demo-piano',
+      octaveShift: -1,
+      transpose: 0,
+      tuningCents: 0,
+      volume: 1,
+      pan: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    master: { volume: 1, lowGainDb: 1, midGainDb: 1, highGainDb: -1 },
+  },
+]
 
 /**
  * AudioEngine — completely independent of React. One persistent AudioContext,
@@ -104,6 +235,39 @@ export class AudioEngine {
     delayFeedback: 0.3,
   }
 
+  // Master EQ nodes & targets
+  private masterGainNode: GainNode | null = null
+  private masterEqLowNode: BiquadFilterNode | null = null
+  private masterEqMidNode: BiquadFilterNode | null = null
+  private masterEqHighNode: BiquadFilterNode | null = null
+  private masterEQTargets: MasterEQState = {
+    volume: 1,
+    lowGainDb: 0,
+    midGainDb: 0,
+    highGainDb: 0,
+  }
+
+  // Split Zone state & chain
+  private lowerTone: ToneChain | null = null
+  private splitEnabled = false
+  private splitPoint = 60
+  private lowerInstrument = 'demo-piano'
+  private lowerTranspose = 0
+  private lowerOctaveShift = -1
+  private lowerTuningOffset = 0
+  private lowerToneTargets: MainToneSnapshot = {
+    volume: 1,
+    pan: 0,
+    cutoffNorm: 1,
+    cutoffHz: 20000,
+    reverbAmount: 0,
+    reverbPreset: 'room',
+    chorusAmount: 0,
+    delayAmount: 0,
+    delayTime: 0.35,
+    delayFeedback: 0.3,
+  }
+
   get isCreated(): boolean {
     return this.createdFlag
   }
@@ -161,20 +325,45 @@ export class AudioEngine {
     this.ctx = ctx
     this.createdFlag = true
 
-    // Voice bus -> master -> meter (tap) -> limiter -> destination
+    // Voice bus -> masterGain -> eqLow -> eqMid -> eqHigh -> meter & limiter -> destination
     const instrumentBus = ctx.createGain()
     const masterGain = ctx.createGain()
-    masterGain.gain.value = 0.8
+    masterGain.gain.value = 0.8 * this.masterEQTargets.volume
+    this.masterGainNode = masterGain
+
+    const eqLow = ctx.createBiquadFilter()
+    eqLow.type = 'lowshelf'
+    eqLow.frequency.value = 100
+    eqLow.gain.value = this.masterEQTargets.lowGainDb
+    this.masterEqLowNode = eqLow
+
+    const eqMid = ctx.createBiquadFilter()
+    eqMid.type = 'peaking'
+    eqMid.frequency.value = 1000
+    eqMid.Q.value = 1.0
+    eqMid.gain.value = this.masterEQTargets.midGainDb
+    this.masterEqMidNode = eqMid
+
+    const eqHigh = ctx.createBiquadFilter()
+    eqHigh.type = 'highshelf'
+    eqHigh.frequency.value = 8000
+    eqHigh.gain.value = this.masterEQTargets.highGainDb
+    this.masterEqHighNode = eqHigh
+
     const meter = ctx.createAnalyser()
     meter.fftSize = 512
     meter.smoothingTimeConstant = 0.25
     this.meter = meter
-    masterGain.connect(meter)
+
+    masterGain.connect(eqLow)
+    eqLow.connect(eqMid)
+    eqMid.connect(eqHigh)
+    eqHigh.connect(meter)
 
     this.limiter = await Limiter.create(ctx)
     this.limiterKind = this.limiter.kind
     const limiterNode = this.limiter.node
-    masterGain.connect(limiterNode)
+    eqHigh.connect(limiterNode)
     limiterNode.connect(ctx.destination)
 
     // Post-limiter tap for safety metering (read-only, passes no audio).
@@ -197,6 +386,11 @@ export class AudioEngine {
     this.dualToneInitMs = performance.now() - dt0
     this.dualTone.output.connect(masterGain)
     this.applyDualToneTargets()
+
+    // Lower Zone Tone chain: instantiated on the same context.
+    this.lowerTone = new ToneChain(ctx)
+    this.lowerTone.output.connect(masterGain)
+    this.applyLowerToneTargets()
 
     // Adaptive polyphony: generous cap scaled by CPU count, halved on pressure.
     this.baseCap = Math.min(64, Math.max(8, (navigator.hardwareConcurrency ?? 4) * 16))
@@ -263,33 +457,49 @@ export class AudioEngine {
       void this.unlock()
       return
     }
-    const effectiveMain = this.applyTuning(req.note)
-    this.voiceManager.retrigger(effectiveMain, this.envConfig.release * 0.25)
     const velocity = clamp(req.velocity, 0, 1)
     const seq = ++this.eventSeq
-    void this.spawnVoice(effectiveMain, velocity, req.source, seq, 'main')
 
-    if (this.dualEnabled) {
-      const effectiveDual = this.applyDualTuning(req.note)
-      this.voiceManager.retrigger(effectiveDual, this.envConfig.release * 0.25)
-      void this.spawnVoice(effectiveDual, velocity, req.source, seq, 'dual')
+    if (this.splitEnabled && req.note < this.splitPoint) {
+      const effectiveLower = this.applyLowerTuning(req.note)
+      this.voiceManager.retrigger(effectiveLower, this.envConfig.release * 0.25)
+      void this.spawnVoice(effectiveLower, velocity, req.source, seq, 'lower')
+    } else {
+      const effectiveMain = this.applyTuning(req.note)
+      this.voiceManager.retrigger(effectiveMain, this.envConfig.release * 0.25)
+      void this.spawnVoice(effectiveMain, velocity, req.source, seq, 'main')
+
+      if (this.dualEnabled) {
+        const effectiveDual = this.applyDualTuning(req.note)
+        this.voiceManager.retrigger(effectiveDual, this.envConfig.release * 0.25)
+        void this.spawnVoice(effectiveDual, velocity, req.source, seq, 'dual')
+      }
     }
   }
 
   noteOff(req: { note: number }): void {
     const ctx = this.ctx
     if (!ctx || !this.voiceManager || ctx.state !== 'running') return
-    const effectiveMain = this.applyTuning(req.note)
-    const releasedMain = this.voiceManager.noteOff(effectiveMain, this.sustainPedal)
-    if (releasedMain === 0 && (this.spawnsInFlight.get(effectiveMain) ?? 0) > 0) {
-      this.pendingOffs.set(effectiveMain, { sustain: this.sustainPedal, seq: ++this.eventSeq })
-    }
 
-    if (this.dualEnabled) {
-      const effectiveDual = this.applyDualTuning(req.note)
-      const releasedDual = this.voiceManager.noteOff(effectiveDual, this.sustainPedal)
-      if (releasedDual === 0 && (this.spawnsInFlight.get(effectiveDual) ?? 0) > 0) {
-        this.pendingOffs.set(effectiveDual, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+    if (this.splitEnabled && req.note < this.splitPoint) {
+      const effectiveLower = this.applyLowerTuning(req.note)
+      const releasedLower = this.voiceManager.noteOff(effectiveLower, this.sustainPedal)
+      if (releasedLower === 0 && (this.spawnsInFlight.get(effectiveLower) ?? 0) > 0) {
+        this.pendingOffs.set(effectiveLower, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+      }
+    } else {
+      const effectiveMain = this.applyTuning(req.note)
+      const releasedMain = this.voiceManager.noteOff(effectiveMain, this.sustainPedal)
+      if (releasedMain === 0 && (this.spawnsInFlight.get(effectiveMain) ?? 0) > 0) {
+        this.pendingOffs.set(effectiveMain, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+      }
+
+      if (this.dualEnabled) {
+        const effectiveDual = this.applyDualTuning(req.note)
+        const releasedDual = this.voiceManager.noteOff(effectiveDual, this.sustainPedal)
+        if (releasedDual === 0 && (this.spawnsInFlight.get(effectiveDual) ?? 0) > 0) {
+          this.pendingOffs.set(effectiveDual, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+        }
       }
     }
   }
@@ -667,6 +877,358 @@ export class AudioEngine {
     }
   }
 
+  // ---- Phase 9: Master EQ & Gain -----------------------------------------
+  setMasterVolume(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.masterEQTargets.volume = v
+    if (this.masterGainNode && this.ctx) {
+      this.masterGainNode.gain.setTargetAtTime(v * 0.8, this.ctx.currentTime, 0.02)
+    }
+  }
+
+  setMasterEqLow(gainDb: number): void {
+    const g = clampFinite(gainDb, -12, 12)
+    this.masterEQTargets.lowGainDb = g
+    if (this.masterEqLowNode && this.ctx) {
+      this.masterEqLowNode.gain.setTargetAtTime(g, this.ctx.currentTime, 0.02)
+    }
+  }
+
+  setMasterEqMid(gainDb: number): void {
+    const g = clampFinite(gainDb, -12, 12)
+    this.masterEQTargets.midGainDb = g
+    if (this.masterEqMidNode && this.ctx) {
+      this.masterEqMidNode.gain.setTargetAtTime(g, this.ctx.currentTime, 0.02)
+    }
+  }
+
+  setMasterEqHigh(gainDb: number): void {
+    const g = clampFinite(gainDb, -12, 12)
+    this.masterEQTargets.highGainDb = g
+    if (this.masterEqHighNode && this.ctx) {
+      this.masterEqHighNode.gain.setTargetAtTime(g, this.ctx.currentTime, 0.02)
+    }
+  }
+
+  masterEQState(): MasterEQState {
+    return { ...this.masterEQTargets }
+  }
+
+  // ---- Phase 9: Split Keyboard Zone -------------------------------------
+  get splitZoneEnabled(): boolean {
+    return this.splitEnabled
+  }
+
+  setSplitEnabled(enabled: boolean): void {
+    this.splitEnabled = enabled
+    if (enabled && this.ctx) {
+      void this.bank.ensureInit(this.ctx, this.lowerInstrument).catch((cause) => {
+        this.reportError(
+          new AudioEngineError(
+            'INSTRUMENT_LOAD_FAILED',
+            `Lower zone instrument "${this.lowerInstrument}" failed to load: ${cause instanceof Error ? cause.message : String(cause)}`,
+            cause,
+          ),
+        )
+      })
+    }
+    this.emit({ type: 'tuning' })
+  }
+
+  get splitPointNote(): number {
+    return this.splitPoint
+  }
+
+  setSplitPoint(note: number): void {
+    this.splitPoint = clamp(Math.round(note), 0, 127)
+    this.emit({ type: 'tuning' })
+  }
+
+  get lowerInstrumentId(): string {
+    return this.lowerInstrument
+  }
+
+  async setLowerInstrument(id: string): Promise<void> {
+    if (id === this.lowerInstrument) return
+    this.lowerInstrument = id
+    if (this.splitEnabled && this.ctx) {
+      await this.bank.ensureInit(this.ctx, id).catch((cause) => {
+        this.reportError(
+          new AudioEngineError(
+            'INSTRUMENT_LOAD_FAILED',
+            `Lower zone instrument "${id}" failed to load: ${cause instanceof Error ? cause.message : String(cause)}`,
+            cause,
+          ),
+        )
+      })
+    }
+    this.emit({ type: 'load', instrumentId: id, state: this.sampleState(id) })
+  }
+
+  get lowerTransposeSemitones(): number {
+    return this.lowerTranspose
+  }
+
+  setLowerTranspose(semitones: number): void {
+    this.lowerTranspose = clamp(Math.round(semitones), -12, 12)
+    this.emit({ type: 'tuning' })
+  }
+
+  get lowerOctave(): number {
+    return this.lowerOctaveShift
+  }
+
+  setLowerOctaveShift(octaves: number): void {
+    this.lowerOctaveShift = clamp(Math.round(octaves), -5, 5)
+    this.emit({ type: 'tuning' })
+  }
+
+  get lowerTuningCents(): number {
+    return this.lowerTuningOffset
+  }
+
+  setLowerTuningCents(cents: number): void {
+    this.lowerTuningOffset = clamp(Math.round(cents), -100, 100)
+    this.emit({ type: 'tuning' })
+  }
+
+  setLowerToneVolume(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.lowerToneTargets.volume = v
+    this.lowerTone?.setVolume(v)
+  }
+
+  setLowerTonePan(value: number): void {
+    const v = clampFinite(value, -1, 1)
+    this.lowerToneTargets.pan = v
+    this.lowerTone?.setPan(v)
+  }
+
+  setLowerToneCutoff(normalized: number): void {
+    const n = clampFinite(normalized, 0, 1)
+    this.lowerToneTargets.cutoffNorm = n
+    this.lowerToneTargets.cutoffHz = Math.round(100 * Math.pow(200, n))
+    this.lowerTone?.setCutoff(n)
+  }
+
+  setLowerToneReverbAmount(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.lowerToneTargets.reverbAmount = v
+    this.lowerTone?.setReverbAmount(v)
+  }
+
+  setLowerToneReverbPreset(id: string): void {
+    if (!REVERB_PRESET_IDS.includes(id as ReverbPresetId)) return
+    this.lowerToneTargets.reverbPreset = id as ReverbPresetId
+    this.lowerTone?.setReverbPreset(id as ReverbPresetId)
+  }
+
+  setLowerToneChorusAmount(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.lowerToneTargets.chorusAmount = v
+    this.lowerTone?.setChorusAmount(v)
+  }
+
+  setLowerToneDelayAmount(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.lowerToneTargets.delayAmount = v
+    this.lowerTone?.setDelayAmount(v)
+  }
+
+  setLowerToneDelayTime(seconds: number): void {
+    const s = clampFinite(seconds, 0, 1)
+    this.lowerToneTargets.delayTime = s
+    this.lowerTone?.setDelayTime(s)
+  }
+
+  setLowerToneDelayFeedback(value: number): void {
+    const v = clampFinite(value, 0, 0.85)
+    this.lowerToneTargets.delayFeedback = v
+    this.lowerTone?.setDelayFeedback(v)
+  }
+
+  splitZoneState(): SplitZoneSnapshot {
+    return {
+      enabled: this.splitEnabled,
+      splitPoint: this.splitPoint,
+      instrument: this.lowerInstrument,
+      octaveShift: this.lowerOctaveShift,
+      transpose: this.lowerTranspose,
+      tuningCents: this.lowerTuningOffset,
+      volume: this.lowerToneTargets.volume,
+      pan: this.lowerToneTargets.pan,
+      tone: { ...this.lowerToneTargets },
+    }
+  }
+
+  private applyLowerToneTargets(): void {
+    const t = this.lowerToneTargets
+    const c = this.lowerTone
+    if (!c) return
+    c.setVolume(t.volume)
+    c.setPan(t.pan)
+    c.setCutoff(t.cutoffNorm)
+    c.setReverbAmount(t.reverbAmount)
+    c.setReverbPreset(t.reverbPreset)
+    c.setChorusAmount(t.chorusAmount)
+    c.setDelayAmount(t.delayAmount)
+    c.setDelayTime(t.delayTime)
+    c.setDelayFeedback(t.delayFeedback)
+  }
+
+  // ---- Phase 9: Preset Management ---------------------------------------
+  exportPreset(): WorkstationPreset {
+    return {
+      id: `export-${Date.now()}`,
+      name: 'Current Workstation State',
+      category: 'user',
+      main: {
+        instrument: this.instrument,
+        octaveShift: this.octaveShift,
+        transpose: this.transpose,
+        tuningCents: this.tuningOffset,
+        tone: this.mainToneState(),
+      },
+      dual: {
+        enabled: this.dualEnabled,
+        instrument: this.dualInstrument,
+        octaveShift: this.dualOctaveShift,
+        transpose: this.dualTranspose,
+        tuningCents: this.dualTuningOffset,
+        tone: this.dualToneState(),
+      },
+      split: {
+        enabled: this.splitEnabled,
+        splitPoint: this.splitPoint,
+        instrument: this.lowerInstrument,
+        octaveShift: this.lowerOctaveShift,
+        transpose: this.lowerTranspose,
+        tuningCents: this.lowerTuningOffset,
+        volume: this.lowerToneTargets.volume,
+        pan: this.lowerToneTargets.pan,
+        tone: { ...this.lowerToneTargets },
+      },
+      master: this.masterEQState(),
+    }
+  }
+
+  async importPreset(preset: WorkstationPreset): Promise<void> {
+    await this.setInstrument(preset.main.instrument)
+    this.setOctaveShift(preset.main.octaveShift)
+    this.setTranspose(preset.main.transpose)
+    this.setTuningCents(preset.main.tuningCents)
+    this.setMainToneVolume(preset.main.tone.volume)
+    this.setMainTonePan(preset.main.tone.pan)
+    this.setMainToneCutoff(preset.main.tone.cutoffNorm)
+    this.setMainToneReverbAmount(preset.main.tone.reverbAmount)
+    this.setMainToneReverbPreset(preset.main.tone.reverbPreset)
+    this.setMainToneChorusAmount(preset.main.tone.chorusAmount)
+    this.setMainToneDelayAmount(preset.main.tone.delayAmount)
+    this.setMainToneDelayTime(preset.main.tone.delayTime)
+    this.setMainToneDelayFeedback(preset.main.tone.delayFeedback)
+
+    await this.setDualInstrument(preset.dual.instrument)
+    this.setDualToneEnabled(preset.dual.enabled)
+    this.setDualOctaveShift(preset.dual.octaveShift)
+    this.setDualTranspose(preset.dual.transpose)
+    this.setDualTuningCents(preset.dual.tuningCents)
+    this.setDualToneVolume(preset.dual.tone.volume)
+    this.setDualTonePan(preset.dual.tone.pan)
+    this.setDualToneCutoff(preset.dual.tone.cutoffNorm)
+    this.setDualToneReverbAmount(preset.dual.tone.reverbAmount)
+    this.setDualToneReverbPreset(preset.dual.tone.reverbPreset)
+    this.setDualToneChorusAmount(preset.dual.tone.chorusAmount)
+    this.setDualToneDelayAmount(preset.dual.tone.delayAmount)
+    this.setDualToneDelayTime(preset.dual.tone.delayTime)
+    this.setDualToneDelayFeedback(preset.dual.tone.delayFeedback)
+
+    await this.setLowerInstrument(preset.split.instrument)
+    this.setSplitEnabled(preset.split.enabled)
+    this.setSplitPoint(preset.split.splitPoint)
+    this.setLowerOctaveShift(preset.split.octaveShift)
+    this.setLowerTranspose(preset.split.transpose)
+    this.setLowerTuningCents(preset.split.tuningCents)
+    this.setLowerToneVolume(preset.split.volume)
+    this.setLowerTonePan(preset.split.pan)
+    this.setLowerToneCutoff(preset.split.tone.cutoffNorm)
+    this.setLowerToneReverbAmount(preset.split.tone.reverbAmount)
+    this.setLowerToneReverbPreset(preset.split.tone.reverbPreset)
+    this.setLowerToneChorusAmount(preset.split.tone.chorusAmount)
+    this.setLowerToneDelayAmount(preset.split.tone.delayAmount)
+    this.setLowerToneDelayTime(preset.split.tone.delayTime)
+    this.setLowerToneDelayFeedback(preset.split.tone.delayFeedback)
+
+    this.setMasterVolume(preset.master.volume)
+    this.setMasterEqLow(preset.master.lowGainDb)
+    this.setMasterEqMid(preset.master.midGainDb)
+    this.setMasterEqHigh(preset.master.highGainDb)
+
+    this.emit({ type: 'tuning' })
+  }
+
+  getPresets(): WorkstationPreset[] {
+    const userJson = typeof localStorage !== 'undefined' ? localStorage.getItem('apiano_user_presets') : null
+    let userPresets: WorkstationPreset[] = []
+    if (userJson) {
+      try {
+        userPresets = JSON.parse(userJson)
+      } catch {
+        userPresets = []
+      }
+    }
+    return [...FACTORY_PRESETS, ...userPresets]
+  }
+
+  async loadPreset(presetId: string): Promise<boolean> {
+    const preset = this.getPresets().find((p) => p.id === presetId)
+    if (!preset) return false
+    await this.importPreset(preset)
+    return true
+  }
+
+  saveUserPreset(name: string): WorkstationPreset {
+    const current = this.exportPreset()
+    const id = `user-${Date.now()}`
+    const preset: WorkstationPreset = {
+      ...current,
+      id,
+      name: name.trim() || 'Custom Preset',
+      category: 'user',
+    }
+    const userJson = typeof localStorage !== 'undefined' ? localStorage.getItem('apiano_user_presets') : null
+    let userPresets: WorkstationPreset[] = []
+    if (userJson) {
+      try {
+        userPresets = JSON.parse(userJson)
+      } catch {
+        userPresets = []
+      }
+    }
+    userPresets.push(preset)
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('apiano_user_presets', JSON.stringify(userPresets))
+    }
+    return preset
+  }
+
+  deleteUserPreset(presetId: string): boolean {
+    if (typeof localStorage === 'undefined') return false
+    const userJson = localStorage.getItem('apiano_user_presets')
+    if (!userJson) return false
+    try {
+      let userPresets: WorkstationPreset[] = JSON.parse(userJson)
+      const initialCount = userPresets.length
+      userPresets = userPresets.filter((p) => p.id !== presetId)
+      if (userPresets.length !== initialCount) {
+        localStorage.setItem('apiano_user_presets', JSON.stringify(userPresets))
+        return true
+      }
+    } catch {
+      return false
+    }
+    return false
+  }
+
   async setInstrument(id: string): Promise<void> {
     if (id === this.instrument) return
     if (this.ctx) {
@@ -842,6 +1404,8 @@ export class AudioEngine {
       dualTranspose: this.dualTranspose,
       dualOctaveShift: this.dualOctaveShift,
       dualTuningCents: this.dualTuningOffset,
+      masterEQ: this.masterEQState(),
+      splitZone: this.splitZoneState(),
     }
   }
 
@@ -871,13 +1435,19 @@ export class AudioEngine {
     velocity: number,
     source: InputSource,
     spawnSeq: number,
-    layer: 'main' | 'dual' = 'main',
+    layer: 'main' | 'dual' | 'lower' = 'main',
   ): Promise<void> {
     const ctx = this.ctx
     const vm = this.voiceManager
     if (!ctx || !vm) return
-    const instId = layer === 'main' ? this.instrument : this.dualInstrument
-    const destNode = layer === 'main' ? this.mainTone?.input : this.dualTone?.input
+    const instId =
+      layer === 'main' ? this.instrument : layer === 'dual' ? this.dualInstrument : this.lowerInstrument
+    const destNode =
+      layer === 'main'
+        ? this.mainTone?.input
+        : layer === 'dual'
+        ? this.dualTone?.input
+        : this.lowerTone?.input
     if (!destNode) return
 
     this.pendingLoads++
@@ -891,7 +1461,12 @@ export class AudioEngine {
       this.noteTiming.count++
       this.noteTiming.maxBufferReadyMs = Math.max(this.noteTiming.maxBufferReadyMs, bufferReadyMs)
       if (ctx.state !== 'running') return
-      const centsOffset = layer === 'main' ? this.tuningOffset : this.tuningOffset + this.dualTuningOffset
+      const centsOffset =
+        layer === 'main'
+          ? this.tuningOffset
+          : layer === 'dual'
+          ? this.tuningOffset + this.dualTuningOffset
+          : this.lowerTuningOffset
       const tuningFactor = Math.pow(2, centsOffset / 1200)
       if (
         vm.start(sampled.buffer, note, velocity, {
@@ -950,6 +1525,10 @@ export class AudioEngine {
     return clampNote(
       note + this.transpose + this.octaveShift * 12 + this.dualTranspose + this.dualOctaveShift * 12,
     )
+  }
+
+  private applyLowerTuning(note: number): number {
+    return clampNote(note + this.lowerTranspose + this.lowerOctaveShift * 12)
   }
 
   private noteStarted(note: number): void {

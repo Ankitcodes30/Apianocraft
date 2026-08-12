@@ -11,18 +11,19 @@ project:
   description: Low-latency browser piano / digital keyboard workstation, fully client-side.
 
 current_phase:
-  id: "8"
-  name: "Dual Tone Layering"
+  id: "9"
+  name: "Master Bus Processing, Presets & Split Keyboard"
   status: implemented_and_verified_3x_uncommitted
   detail: |
-    Dual Tone Layering (ToneChain refactor, custom voice routing, AudioEngine dual-layer noteOn/noteOff,
-    DualTonePanel UI, 291/291 smoke checks passing on 3 consecutive runs).
+    Master 3-band EQ, Master volume, Split Keyboard zone routing, ToneChain lower layer,
+    Workstation presets (factory + LocalStorage user presets), MasterPanel, SplitPanel, PresetPanel UI,
+    310/310 smoke checks passing on 3 consecutive runs.
 
 last_verified_checkpoint:
-  commit: "7d8535f"
-  message: "chore: checkpoint verified phase 7 audio engine"
+  commit: "3a425bb"
+  message: "chore: checkpoint verified phase 8 dual tone layering"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 230 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 291 }
 
 completed_phases:
   - id: "4A"
@@ -43,6 +44,9 @@ completed_phases:
   - id: "8"
     name: "Dual Tone Layering"
     smoke: "291/291 x3"
+  - id: "9"
+    name: "Master Bus Processing, Presets & Split Keyboard"
+    smoke: "310/310 x3"
 
 current_work:
   uncommitted_files:

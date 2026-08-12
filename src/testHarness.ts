@@ -1,5 +1,5 @@
 import type { AudioEngine } from './audio/AudioEngine'
-import type { DiagnosticsSnapshot, MainToneSnapshot, SampleZoneInfo } from './audio/types'
+import type { DiagnosticsSnapshot, MainToneSnapshot, MasterEQState, SampleZoneInfo, SplitZoneSnapshot, WorkstationPreset } from './audio/types'
 import type { SampleLoadState } from './audio/samples/types'
 import type { MidiManager, MidiStats, MidiSupport } from './midi/MidiManager'
 import type { MainToneAudioRead, MainToneIrStats, ReverbPresetId } from './audio/effects/MainToneChain'
@@ -151,6 +151,20 @@ export interface TestApi {
   dualToneAudio(): MainToneAudioRead | null
   dualToneIr(): MainToneIrStats
   dualToneActive(): { reverb: boolean; delay: boolean }
+  // ---- Phase 9: Master EQ, Split, & Presets ------------------------------
+  masterSetVolume(vol: number): void
+  masterSetEQ(low: number, mid: number, high: number): void
+  masterGetEQ(): MasterEQState
+  splitSetEnabled(enabled: boolean): void
+  splitSetPoint(note: number): void
+  splitSetLowerInstrument(id: string): Promise<void>
+  splitSetLowerOctave(oct: number): void
+  splitSetLowerTranspose(tr: number): void
+  splitGetState(): SplitZoneSnapshot
+  presetGetList(): WorkstationPreset[]
+  presetLoad(id: string): Promise<boolean>
+  presetSave(name: string): WorkstationPreset
+  presetDelete(id: string): boolean
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
@@ -504,6 +518,24 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     dualToneAudio: () => engine.dualToneAudioRead(),
     dualToneIr: () => engine.dualToneIrStats() ?? { generated: 0, switches: 0, preset: 'room', presetSeconds: 0 },
     dualToneActive: () => engine.dualToneActive(),
+    // ---- Phase 9: Master EQ, Split, & Presets ------------------------------
+    masterSetVolume: (vol) => engine.setMasterVolume(vol),
+    masterSetEQ: (low, mid, high) => {
+      engine.setMasterEqLow(low)
+      engine.setMasterEqMid(mid)
+      engine.setMasterEqHigh(high)
+    },
+    masterGetEQ: () => engine.masterEQState(),
+    splitSetEnabled: (enabled) => engine.setSplitEnabled(enabled),
+    splitSetPoint: (note) => engine.setSplitPoint(note),
+    splitSetLowerInstrument: (id) => engine.setLowerInstrument(id),
+    splitSetLowerOctave: (oct) => engine.setLowerOctaveShift(oct),
+    splitSetLowerTranspose: (tr) => engine.setLowerTranspose(tr),
+    splitGetState: () => engine.splitZoneState(),
+    presetGetList: () => engine.getPresets(),
+    presetLoad: (id) => engine.loadPreset(id),
+    presetSave: (name) => engine.saveUserPreset(name),
+    presetDelete: (id) => engine.deleteUserPreset(id),
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have

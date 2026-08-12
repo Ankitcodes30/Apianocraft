@@ -6,15 +6,15 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 8 — Dual Tone Layering** (implemented, verified 3x, **ready for checkpoint commit**) |
-| Latest Git checkpoint | `7d8535f` `chore: checkpoint verified phase 7 audio engine` (HEAD, branch `main`) |
-| Working tree | Modified engine/UI/harness files + untracked Dual Tone & QWERTY additions — see below |
+| Current phase | **Phase 9 — Master Bus Processing, Presets & Split Keyboard** (implemented, verified 3x, **ready for checkpoint commit**) |
+| Latest Git checkpoint | `3a425bb` `chore: checkpoint verified phase 8 dual tone layering` (HEAD, branch `main`) |
+| Working tree | Modified engine/UI/harness/docs + untracked Phase 9 additions — ready for commit |
 | typecheck | ✓ (verified 0 errors) |
-| lint | ✓ (verified 0 warnings) |
-| build | ✓ (verified 0 errors) |
-| smoke | **291/291 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
-| Next action | Obtain user approval to commit Phase 8 checkpoint |
-| Next phase | **Phase 9 — Audio Effects Polish & Mastering** |
+| lint | ✓ (verified 0 errors, 0 warnings) |
+| build | ✓ (verified 0 errors, PWA SW generated) |
+| smoke | **310/310 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
+| Next action | Standing by for user approval to commit Phase 9 checkpoint |
+| Next phase | **Phase 10 — Additional Instruments** |
 
 ## Implemented features
 
