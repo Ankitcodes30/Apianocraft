@@ -11,17 +11,17 @@ project:
   description: Low-latency browser piano / digital keyboard workstation, fully client-side.
 
 current_phase:
-  id: "12"
-  name: "Workstation Tools (Metronome & Chord Assist)"
+  id: "13"
+  name: "Production Hardening & PWA Deployment"
   status: planning
   detail: |
-    Phase 11 Performance Recording & Capture committed (e13a71a). Standing by for Phase 12 instructions.
+    Phase 12 Workstation Tools committed (bb3751d). Preparing Phase 13 production deployment audit & hardening.
 
 last_verified_checkpoint:
-  commit: "e13a71a"
-  message: "chore: checkpoint verified phase 11 performance recording & capture"
+  commit: "bb3751d"
+  message: "chore: checkpoint verified phase 12 workstation tools (metronome & chord assist)"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 341 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 350 }
 
 completed_phases:
   - id: "4A"
@@ -51,6 +51,9 @@ completed_phases:
   - id: "11"
     name: "Recording & Performance Capture"
     smoke: "341/341 x3"
+  - id: "12"
+    name: "Workstation Tools (Metronome & Chord Assist)"
+    smoke: "349/349 x3"
 
 current_work:
   uncommitted_files: []

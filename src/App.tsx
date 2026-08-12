@@ -12,6 +12,7 @@ import { MasterPanel } from './components/MasterPanel'
 import { SplitPanel } from './components/SplitPanel'
 import { PresetPanel } from './components/PresetPanel'
 import { RecorderPanel } from './components/RecorderPanel'
+import { WorkstationToolsPanel } from './components/WorkstationToolsPanel'
 import { KeyboardPanel } from './components/KeyboardPanel'
 import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
@@ -139,6 +140,7 @@ export default function App() {
         </button>
       </section>
 
+      <WorkstationToolsPanel />
       <RecorderPanel />
       <PresetPanel />
       <MainTonePanel engine={engine} />

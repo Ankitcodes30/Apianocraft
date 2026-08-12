@@ -7,6 +7,7 @@ import type { NoteBusEvent } from './midi/NoteEventBus'
 import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
 import { getQwertyManager } from './keyboard/QwertyManager'
+import { detectChord } from './audio/tools/ChordDetector'
 
 export interface MidiDeviceView {
   id: string
@@ -174,6 +175,12 @@ export interface TestApi {
   recordingClear(): void
   recordingGetSnapshot(): import('./audio/recorder/PerformanceRecorder').TransportSnapshot
   recordingExportMidi(): Uint8Array
+  // ---- Phase 12: Workstation Tools (Metronome & Chord Assist) ------------
+  metronomeStart(): void
+  metronomeStop(): void
+  metronomeSetBpm(bpm: number): void
+  metronomeGetSnapshot(): import('./audio/tools/Metronome').MetronomeSnapshot
+  chordDetectNotes(notes: number[]): import('./audio/tools/ChordDetector').ChordResult | null
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
@@ -554,6 +561,12 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     recordingClear: () => engine.clearRecording(),
     recordingGetSnapshot: () => engine.getRecorderSnapshot(),
     recordingExportMidi: () => engine.exportMidi(),
+    // ---- Phase 12: Workstation Tools (Metronome & Chord Assist) ------------
+    metronomeStart: () => engine.startMetronome(),
+    metronomeStop: () => engine.stopMetronome(),
+    metronomeSetBpm: (bpm) => engine.setMetronomeBpm(bpm),
+    metronomeGetSnapshot: () => engine.getMetronomeSnapshot(),
+    chordDetectNotes: (notes) => detectChord(notes),
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have

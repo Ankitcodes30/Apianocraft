@@ -855,4 +855,160 @@ input:checked + .toggle-slider:before {
   50% { opacity: 0.5; }
 }
 
+/* Workstation Tools Panel & Scale Highlights */
+.tools-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tools-panel__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.tools-panel__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .tools-panel__body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tools-section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+
+.metronome-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metronome-tempo-display {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.bpm-val {
+  font-family: monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.bpm-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.metronome-section__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-metronome {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.btn-metronome.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-tap-tempo {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.btn-tap-tempo:active {
+  transform: scale(0.95);
+}
+
+.tool-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.tool-field.slider-field {
+  flex: 1;
+  min-width: 100px;
+}
+
+.chord-display-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  background: var(--bg-card);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.chord-badge {
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.scale-guide-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Keyboard scale degree highlights */
+[data-scale-highlight="root"] {
+  box-shadow: inset 0 -8px 0 0 #3b82f6 !important;
+}
+
+[data-scale-highlight="degree"] {
+  box-shadow: inset 0 -6px 0 0 #60a5fa !important;
+}
+
 

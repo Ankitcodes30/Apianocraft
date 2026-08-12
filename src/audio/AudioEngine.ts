@@ -19,6 +19,7 @@ import { PerformanceRecorder } from './recorder/PerformanceRecorder'
 import { encodeMidiFile } from './recorder/MidiEncoder'
 import { AudioBufferTap } from './recorder/WavEncoder'
 import type { TransportSnapshot } from './recorder/PerformanceRecorder'
+import { Metronome, type MetronomeSnapshot, type TimeSignature } from './tools/Metronome'
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 const clampFinite = (v: number, lo: number, hi: number) => (Number.isFinite(v) ? clamp(v, lo, hi) : lo)
@@ -244,6 +245,7 @@ export class AudioEngine {
   private envConfig: EnvelopeConfig = { attack: 0.004, decay: 0.25, sustainLevel: 0.8, release: 0.3 }
   private recorder = new PerformanceRecorder()
   private audioTap: AudioBufferTap | null = null
+  private metronome = new Metronome()
 
   private createdFlag = false
   private createPromise: Promise<void> | null = null
@@ -368,6 +370,7 @@ export class AudioEngine {
     }
     this.ctx = ctx
     this.createdFlag = true
+    this.metronome.init(ctx)
 
     // Voice bus -> masterGain -> eqLow -> eqMid -> eqHigh -> meter & limiter -> destination
     const instrumentBus = ctx.createGain()
@@ -703,6 +706,44 @@ export class AudioEngine {
       return this.audioTap.stop()
     }
     return new Uint8Array(0)
+  }
+
+  // ---- Phase 12: Metronome -----------------------------------------------
+  startMetronome(): void {
+    if (this.ctx && this.ctx.state === 'suspended') void this.unlock()
+    this.metronome.start()
+  }
+
+  stopMetronome(): void {
+    this.metronome.stop()
+  }
+
+  setMetronomeBpm(bpm: number): void {
+    this.metronome.setBpm(bpm)
+  }
+
+  setMetronomeTimeSignature(sig: TimeSignature): void {
+    this.metronome.setTimeSignature(sig)
+  }
+
+  setMetronomeAccent(accent: boolean): void {
+    this.metronome.setAccentBeat1(accent)
+  }
+
+  setMetronomeVolume(vol: number): void {
+    this.metronome.setVolume(vol)
+  }
+
+  tapTempoMetronome(): number {
+    return this.metronome.tapTempo()
+  }
+
+  getMetronomeSnapshot(): MetronomeSnapshot {
+    return this.metronome.getSnapshot()
+  }
+
+  subscribeMetronome(listener: (snap: MetronomeSnapshot) => void): () => void {
+    return this.metronome.subscribe(listener)
   }
 
   // ---- Phase 7: Main Tone controls + effects -----------------------------

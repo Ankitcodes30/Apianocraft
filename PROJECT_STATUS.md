@@ -6,15 +6,15 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 11 — Recording & Performance Capture** (completed & committed) |
-| Latest Git checkpoint | `e13a71a` `chore: checkpoint verified phase 11 performance recording & capture` (HEAD, branch `main`) |
+| Current phase | **Phase 12 — Workstation Tools (Metronome & Chord Assist)** (completed & committed) |
+| Latest Git checkpoint | `bb3751d` `chore: checkpoint verified phase 12 workstation tools (metronome & chord assist)` (HEAD, branch `main`) |
 | Working tree | Clean |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |
 | build | ✓ (verified 0 errors, PWA SW generated) |
-| smoke | **341/341 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
-| Next action | Standing by for Phase 12 instruction |
-| Next phase | **Phase 12 — Workstation Tools (Metronome & Chord Assist)** |
+| smoke | **350/350 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
+| Next action | Begin Phase 13 planning (Production Hardening & PWA Deployment) |
+| Next phase | **Phase 13 — Production Hardening & PWA Deployment** |
 
 ## Implemented features
 
