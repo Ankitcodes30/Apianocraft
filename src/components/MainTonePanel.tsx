@@ -90,7 +90,19 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
     <section className="mt" aria-label="Main tone controls">
       <div className="mt__head">
         <span className="mt__title">MAIN TONE</span>
-        <span className="chip">Instrument: {out.instrument}</span>
+        <select
+          className="chip select"
+          aria-label="Main Tone Instrument"
+          data-instrument-select
+          value={out.instrument}
+          onChange={(e) => void engine.setInstrument(e.target.value)}
+        >
+          {engine.getInstruments().map((i) => (
+            <option key={i.id} value={i.id}>
+              {i.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="mt__row">

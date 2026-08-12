@@ -44,7 +44,10 @@ export async function runDualTone(page, assert) {
   await waitForVoices(page, 0, 'active')
 
   // 3. Enable Dual Tone
-  await page.evaluate(() => window.__apiano.dualToneEnable(true))
+  await page.evaluate(async () => {
+    await window.__apiano.dualToneInstrument('demo-piano')
+    window.__apiano.dualToneEnable(true)
+  })
   state = await page.evaluate(() => window.__apiano.dualToneState())
   assert('Dual tone enabled via API', state.enabled === true)
 

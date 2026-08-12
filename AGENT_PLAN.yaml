@@ -12,14 +12,16 @@ project:
 
 current_phase:
   id: "10"
-  name: "Additional Instruments"
-  status: planning
+  name: "Additional Instrument Bank"
+  status: implemented_and_verified_3x_uncommitted
   detail: |
-    Phase 9 Master Bus Processing, Presets & Split Keyboard committed (375cf2e). Preparing Phase 10 plan.
+    Electric Piano, Synth Pad, Drawbar Organ, String Ensemble, Synth Brass, Synth Bass procedural timbres,
+    InstrumentBank registration, dynamic UI dropdowns on Main/Dual/Split panels,
+    332/332 smoke checks passing on 3 consecutive runs.
 
 last_verified_checkpoint:
-  commit: "375cf2e"
-  message: "chore: checkpoint verified phase 9 master bus, presets & split keyboard"
+  commit: "0400daa"
+  message: "docs: update status and plan for phase 9 checkpoint"
   branch: main
   verified: { typecheck: true, lint: true, build: true, smoke: 310 }
 
@@ -45,6 +47,9 @@ completed_phases:
   - id: "9"
     name: "Master Bus Processing, Presets & Split Keyboard"
     smoke: "310/310 x3"
+  - id: "10"
+    name: "Additional Instrument Bank"
+    smoke: "332/332 x3"
 
 current_work:
   uncommitted_files: []

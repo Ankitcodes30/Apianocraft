@@ -3,6 +3,12 @@ import { Limiter } from './effects/Limiter'
 import { ToneChain, REVERB_PRESET_IDS } from './effects/MainToneChain'
 import type { MainToneAudioRead, MainToneIrStats, ReverbPresetId } from './effects/MainToneChain'
 import { SynthInstrument } from './instruments/SynthInstrument'
+import { SynthEPianoInstrument } from './instruments/SynthEPianoInstrument'
+import { SynthPadInstrument } from './instruments/SynthPadInstrument'
+import { SynthOrganInstrument } from './instruments/SynthOrganInstrument'
+import { SynthStringsInstrument } from './instruments/SynthStringsInstrument'
+import { SynthBrassInstrument } from './instruments/SynthBrassInstrument'
+import { SynthBassInstrument } from './instruments/SynthBassInstrument'
 import { InstrumentBank } from './instruments/InstrumentBank'
 import { SampleInstrument } from './samples/SampleInstrument'
 import type { SampleLoadState } from './samples/types'
@@ -30,7 +36,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     },
     dual: {
       enabled: false,
-      instrument: 'demo-piano',
+      instrument: 'synth-pad',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
@@ -39,7 +45,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     split: {
       enabled: false,
       splitPoint: 60,
-      instrument: 'demo-piano',
+      instrument: 'synth-bass',
       octaveShift: -1,
       transpose: 0,
       tuningCents: 0,
@@ -51,7 +57,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
   },
   {
     id: 'warm-dual-layer',
-    name: 'Piano & Synth Dual',
+    name: 'Piano & Warm Pad Dual',
     category: 'factory',
     main: {
       instrument: 'grand-piano',
@@ -62,7 +68,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     },
     dual: {
       enabled: true,
-      instrument: 'demo-piano',
+      instrument: 'synth-pad',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
@@ -71,7 +77,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     split: {
       enabled: false,
       splitPoint: 60,
-      instrument: 'demo-piano',
+      instrument: 'synth-bass',
       octaveShift: -1,
       transpose: 0,
       tuningCents: 0,
@@ -94,7 +100,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     },
     dual: {
       enabled: false,
-      instrument: 'demo-piano',
+      instrument: 'synth-pad',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
@@ -103,7 +109,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     split: {
       enabled: true,
       splitPoint: 60,
-      instrument: 'demo-piano',
+      instrument: 'synth-bass',
       octaveShift: -1,
       transpose: 0,
       tuningCents: 0,
@@ -118,7 +124,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     name: 'Vintage EP Chill',
     category: 'factory',
     main: {
-      instrument: 'demo-piano',
+      instrument: 'electric-piano',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
@@ -126,7 +132,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     },
     dual: {
       enabled: false,
-      instrument: 'demo-piano',
+      instrument: 'string-ensemble',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
@@ -135,7 +141,7 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     split: {
       enabled: false,
       splitPoint: 60,
-      instrument: 'demo-piano',
+      instrument: 'synth-bass',
       octaveShift: -1,
       transpose: 0,
       tuningCents: 0,
@@ -144,6 +150,38 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
       tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
     },
     master: { volume: 1, lowGainDb: 1, midGainDb: 1, highGainDb: -1 },
+  },
+  {
+    id: 'lush-strings-piano',
+    name: 'Grand Piano & Strings',
+    category: 'factory',
+    main: {
+      instrument: 'grand-piano',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.4, reverbPreset: 'hall', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    dual: {
+      enabled: true,
+      instrument: 'string-ensemble',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 0.65, pan: 0.1, cutoffNorm: 0.8, cutoffHz: 8000, reverbAmount: 0.5, reverbPreset: 'hall', chorusAmount: 0.3, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    split: {
+      enabled: false,
+      splitPoint: 60,
+      instrument: 'synth-bass',
+      octaveShift: -1,
+      transpose: 0,
+      tuningCents: 0,
+      volume: 1,
+      pan: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    master: { volume: 1, lowGainDb: 1, midGainDb: 0, highGainDb: 2 },
   },
 ]
 
@@ -413,6 +451,12 @@ export class AudioEngine {
     })
 
     this.bank.register(new SynthInstrument())
+    this.bank.register(new SynthEPianoInstrument())
+    this.bank.register(new SynthPadInstrument())
+    this.bank.register(new SynthOrganInstrument())
+    this.bank.register(new SynthStringsInstrument())
+    this.bank.register(new SynthBrassInstrument())
+    this.bank.register(new SynthBassInstrument())
     this.registerSampleInstrument('grand-piano')
 
     ctx.addEventListener('statechange', () => {

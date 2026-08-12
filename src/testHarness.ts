@@ -165,6 +165,8 @@ export interface TestApi {
   presetLoad(id: string): Promise<boolean>
   presetSave(name: string): WorkstationPreset
   presetDelete(id: string): boolean
+  // ---- Phase 10: Additional Instrument Bank ------------------------------
+  getAvailableInstruments(): { id: string; name: string; kind: 'synth' | 'samples' }[]
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
@@ -536,6 +538,8 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     presetLoad: (id) => engine.loadPreset(id),
     presetSave: (name) => engine.saveUserPreset(name),
     presetDelete: (id) => engine.deleteUserPreset(id),
+    // ---- Phase 10: Additional Instrument Bank ------------------------------
+    getAvailableInstruments: () => engine.getInstruments(),
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have

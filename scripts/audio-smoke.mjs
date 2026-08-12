@@ -15,6 +15,7 @@ import { runPhase7 } from './smoke-phase7.mjs'
 import { runQwerty } from './smoke-qwerty.mjs'
 import { runDualTone } from './smoke-dual-tone.mjs'
 import { runPhase9 } from './smoke-phase9.mjs'
+import { runPhase10 } from './smoke-phase10.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PORT = 5199
@@ -1688,6 +1689,9 @@ async function main() {
 
     // ---- Phase 9: Master EQ, Split Keyboard & Presets -------------------------
     await runPhase9(page, (name, ok, extra) => check(name, ok, extra))
+
+    // ---- Phase 10: Additional Instrument Bank --------------------------------
+    await runPhase10(page, (name, ok, extra) => check(name, ok, extra))
 
     // 10. console clean
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
