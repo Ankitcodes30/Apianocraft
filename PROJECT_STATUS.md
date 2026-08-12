@@ -6,15 +6,15 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 10 — Additional Instrument Bank** (completed & committed) |
-| Latest Git checkpoint | `39bb51b` `chore: checkpoint verified phase 10 additional instrument bank` (HEAD, branch `main`) |
-| Working tree | Clean |
+| Current phase | **Phase 11 — Recording & Performance Capture** (implemented, verified 3x, **ready for checkpoint commit**) |
+| Latest Git checkpoint | `1b70327` `docs: update status and plan for phase 10 checkpoint` (HEAD, branch `main`) |
+| Working tree | Modified engine/UI/harness/docs + untracked Phase 11 additions — ready for commit |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |
 | build | ✓ (verified 0 errors, PWA SW generated) |
-| smoke | **332/332 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
-| Next action | Plan and implement Phase 11 — Recording / Performance Recording |
-| Next phase | **Phase 11 — Recording / Performance Recording** |
+| smoke | **341/341 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
+| Next action | Standing by for user approval to commit Phase 11 checkpoint |
+| Next phase | **Phase 12 — Workstation Tools (Metronome & Chord Assist)** |
 
 ## Implemented features
 

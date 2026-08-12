@@ -16,6 +16,7 @@ import { runQwerty } from './smoke-qwerty.mjs'
 import { runDualTone } from './smoke-dual-tone.mjs'
 import { runPhase9 } from './smoke-phase9.mjs'
 import { runPhase10 } from './smoke-phase10.mjs'
+import { runPhase11 } from './smoke-phase11.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PORT = 5199
@@ -1692,6 +1693,9 @@ async function main() {
 
     // ---- Phase 10: Additional Instrument Bank --------------------------------
     await runPhase10(page, (name, ok, extra) => check(name, ok, extra))
+
+    // ---- Phase 11: Recording & Performance Capture ---------------------------
+    await runPhase11(page, (name, ok, extra) => check(name, ok, extra))
 
     // 10. console clean
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))

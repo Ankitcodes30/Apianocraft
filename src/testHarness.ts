@@ -167,6 +167,13 @@ export interface TestApi {
   presetDelete(id: string): boolean
   // ---- Phase 10: Additional Instrument Bank ------------------------------
   getAvailableInstruments(): { id: string; name: string; kind: 'synth' | 'samples' }[]
+  // ---- Phase 11: Recording & Transport -----------------------------------
+  recordingStart(): void
+  recordingStop(): void
+  recordingPlay(): void
+  recordingClear(): void
+  recordingGetSnapshot(): import('./audio/recorder/PerformanceRecorder').TransportSnapshot
+  recordingExportMidi(): Uint8Array
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
@@ -540,6 +547,13 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     presetDelete: (id) => engine.deleteUserPreset(id),
     // ---- Phase 10: Additional Instrument Bank ------------------------------
     getAvailableInstruments: () => engine.getInstruments(),
+    // ---- Phase 11: Recording & Transport -----------------------------------
+    recordingStart: () => engine.startRecording(),
+    recordingStop: () => engine.stopRecording(),
+    recordingPlay: () => engine.startPlayback(),
+    recordingClear: () => engine.clearRecording(),
+    recordingGetSnapshot: () => engine.getRecorderSnapshot(),
+    recordingExportMidi: () => engine.exportMidi(),
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have

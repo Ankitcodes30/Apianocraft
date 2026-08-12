@@ -12,14 +12,16 @@ project:
 
 current_phase:
   id: "11"
-  name: "Recording / Performance Recording"
-  status: planning
+  name: "Recording & Performance Capture"
+  status: implemented_and_verified_3x_uncommitted
   detail: |
-    Phase 10 Additional Instrument Bank committed (39bb51b). Preparing Phase 11 plan.
+    PerformanceRecorder event timeline, MidiEncoder SMF Type 0 binary export (.mid),
+    WavEncoder 16-bit PCM WAV audio export (.wav), RecorderPanel transport controls,
+    341/341 smoke checks passing on 3 consecutive runs.
 
 last_verified_checkpoint:
-  commit: "39bb51b"
-  message: "chore: checkpoint verified phase 10 additional instrument bank"
+  commit: "1b70327"
+  message: "docs: update status and plan for phase 10 checkpoint"
   branch: main
   verified: { typecheck: true, lint: true, build: true, smoke: 332 }
 
@@ -48,6 +50,9 @@ completed_phases:
   - id: "10"
     name: "Additional Instrument Bank"
     smoke: "332/332 x3"
+  - id: "11"
+    name: "Recording & Performance Capture"
+    smoke: "341/341 x3"
 
 current_work:
   uncommitted_files: []

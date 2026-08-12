@@ -15,6 +15,10 @@ import type { SampleLoadState } from './samples/types'
 import { VoiceManager, type EnvelopeConfig } from './VoiceManager'
 import { clampNote } from './instruments/Instrument'
 import type { DiagnosticsSnapshot, EngineEvent, EngineListener, InputSource, LimiterKind, MainToneSnapshot, MasterEQState, NoteOnRequest, SampleZoneInfo, SplitZoneSnapshot, WorkstationPreset } from './types'
+import { PerformanceRecorder } from './recorder/PerformanceRecorder'
+import { encodeMidiFile } from './recorder/MidiEncoder'
+import { AudioBufferTap } from './recorder/WavEncoder'
+import type { TransportSnapshot } from './recorder/PerformanceRecorder'
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
 const clampFinite = (v: number, lo: number, hi: number) => (Number.isFinite(v) ? clamp(v, lo, hi) : lo)
@@ -238,6 +242,8 @@ export class AudioEngine {
   private totalStopped = 0
   private limiterKind: LimiterKind = 'none'
   private envConfig: EnvelopeConfig = { attack: 0.004, decay: 0.25, sustainLevel: 0.8, release: 0.3 }
+  private recorder = new PerformanceRecorder()
+  private audioTap: AudioBufferTap | null = null
 
   private createdFlag = false
   private createPromise: Promise<void> | null = null
@@ -502,6 +508,7 @@ export class AudioEngine {
       return
     }
     const velocity = clamp(req.velocity, 0, 1)
+    this.recorder.recordEvent({ type: 'noteOn', note: req.note, velocity, source: req.source })
     const seq = ++this.eventSeq
 
     if (this.splitEnabled && req.note < this.splitPoint) {
@@ -524,6 +531,7 @@ export class AudioEngine {
   noteOff(req: { note: number }): void {
     const ctx = this.ctx
     if (!ctx || !this.voiceManager || ctx.state !== 'running') return
+    this.recorder.recordEvent({ type: 'noteOff', note: req.note })
 
     if (this.splitEnabled && req.note < this.splitPoint) {
       const effectiveLower = this.applyLowerTuning(req.note)
@@ -554,11 +562,13 @@ export class AudioEngine {
 
   sustainOn(): void {
     this.sustainPedal = true
+    this.recorder.recordEvent({ type: 'sustain', sustain: true })
     this.emit({ type: 'tuning' })
   }
 
   sustainOff(): void {
     this.sustainPedal = false
+    this.recorder.recordEvent({ type: 'sustain', sustain: false })
     this.voiceManager?.sustainReleaseAll()
     this.emit({ type: 'tuning' })
   }
@@ -620,6 +630,7 @@ export class AudioEngine {
   setPitchBend(value: number): void {
     this.pitchBend = clamp(value, -1, 1)
     this.pitchBendCents = this.pitchBend * this.pitchBendRange * 100
+    this.recorder.recordEvent({ type: 'pitchBend', value: this.pitchBend })
     const vm = this.voiceManager
     const ctx = this.ctx
     if (vm && ctx) vm.setPitchBend(this.pitchBendCents, ctx.currentTime)
@@ -638,6 +649,60 @@ export class AudioEngine {
 
   setModulation(value: number): void {
     this.modulation = clamp(value, 0, 1)
+    this.recorder.recordEvent({ type: 'modulation', value: this.modulation })
+  }
+
+  // ---- Phase 11: Recording & Transport -----------------------------------
+  startRecording(): void {
+    if (this.ctx && this.masterGainNode) {
+      this.audioTap = new AudioBufferTap(this.ctx, this.masterGainNode)
+      this.audioTap.start()
+    }
+    this.recorder.startRecording()
+  }
+
+  stopRecording(): void {
+    this.recorder.stopRecording()
+  }
+
+  startPlayback(onComplete?: () => void): void {
+    this.recorder.startPlayback(
+      {
+        noteOn: (note, velocity, source) => this.noteOn({ note, velocity, source }),
+        noteOff: (note) => this.noteOff({ note }),
+        setSustainPedal: (down) => (down ? this.sustainOn() : this.sustainOff()),
+        setPitchBend: (val) => this.setPitchBend(val),
+        setModulation: (val) => this.setModulation(val),
+      },
+      onComplete,
+    )
+  }
+
+  stopPlayback(): void {
+    this.recorder.stopPlayback()
+  }
+
+  clearRecording(): void {
+    this.recorder.clear()
+  }
+
+  getRecorderSnapshot(): TransportSnapshot {
+    return this.recorder.getSnapshot()
+  }
+
+  subscribeRecorder(listener: (snap: TransportSnapshot) => void): () => void {
+    return this.recorder.subscribe(listener)
+  }
+
+  exportMidi(): Uint8Array {
+    return encodeMidiFile(this.recorder.getEvents())
+  }
+
+  exportWav(): Uint8Array {
+    if (this.audioTap) {
+      return this.audioTap.stop()
+    }
+    return new Uint8Array(0)
   }
 
   // ---- Phase 7: Main Tone controls + effects -----------------------------
