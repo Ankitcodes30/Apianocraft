@@ -12,6 +12,8 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import puppeteer from 'puppeteer-core'
 import { runPhase7 } from './smoke-phase7.mjs'
+import { runQwerty } from './smoke-qwerty.mjs'
+import { runDualTone } from './smoke-dual-tone.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PORT = 5199
@@ -1676,6 +1678,12 @@ async function main() {
 
     // ---- Phase 7: Main Tone controls + audio effects ----------------------
     await runPhase7({ page, check })
+
+    // ---- Phase 7.5: QWERTY computer keyboard input -------------------------
+    await runQwerty({ page, check })
+
+    // ---- Phase 8: Dual Tone layering ----------------------------------------
+    await runDualTone(page, (name, ok, extra) => check(name, ok, extra))
 
     // 10. console clean
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))

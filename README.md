@@ -20,10 +20,11 @@ npm run smoke      # automated audio engine test against the production build
                    # (requires: npm run build first, and Chrome/Edge installed)
 ```
 
-## Architecture (Phase 3 — multisampled instruments)
+## Architecture (Phase 7.5 — QWERTY input, effects, MIDI, performance pad)
 
 ```
-Input (mouse/touch today; QWERTY + MIDI in later phases)
+Input (mouse/touch, QWERTY, MIDI)
+  -> NoteEventBus (normalized events; input adapters never touch the engine)
   -> AudioEngine.noteOn/noteOff   (React is NOT in this path)
   -> VoiceManager (adaptive polyphony cap, voice stealing)
   -> Voice (per-note AudioBufferSource + gain envelope on the audio clock)
@@ -52,6 +53,21 @@ Input (mouse/touch today; QWERTY + MIDI in later phases)
   (128 MB budget) -> raw bytes in IndexedDB -> network.
 - Instrument picker in the header switches instruments and shows live sample
   load progress.
+
+## Computer Keyboard (QWERTY, Phase 7.5)
+
+- `src/keyboard/QwertyManager.ts` is an input adapter like `MidiManager`:
+  it emits normalized `NoteEventBus` events (`source: 'keyboard'`) and never
+  calls the engine directly.
+- Layout: `A W S E D F T G Y H U J` = C4..B4, `Z` = octave down, `X` =
+  octave up (QWERTY-local octave, -4..+4). The emitted note flows through
+  the existing transpose / octave / tuning / bend / sustain pipeline.
+- A computer keyboard has no real velocity, so notes use a fixed velocity
+  (0.7, configurable via `QwertyManager.setVelocity`) — nothing fake.
+- Safety: OS key-repeat and duplicate keydowns never re-trigger; keys typed
+  into `input`/`textarea`/`select`/`contenteditable` never play notes;
+  Ctrl/Cmd/Alt combinations are ignored; window blur and tab-hide release
+  only the QWERTY-held notes (MIDI/mouse notes are untouched).
 
 ## Instruments
 

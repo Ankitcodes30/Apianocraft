@@ -1,6 +1,6 @@
 import { AudioEngineError } from './errors'
 import { Limiter } from './effects/Limiter'
-import { MainToneChain, REVERB_PRESET_IDS } from './effects/MainToneChain'
+import { ToneChain, REVERB_PRESET_IDS } from './effects/MainToneChain'
 import type { MainToneAudioRead, MainToneIrStats, ReverbPresetId } from './effects/MainToneChain'
 import { SynthInstrument } from './instruments/SynthInstrument'
 import { InstrumentBank } from './instruments/InstrumentBank'
@@ -24,8 +24,10 @@ const SCHEDULING_LEAD_MS = 4
 export class AudioEngine {
   private ctx: AudioContext | null = null
   private limiter: Limiter | null = null
-  private mainTone: MainToneChain | null = null
+  private mainTone: ToneChain | null = null
   private mainToneInitMs = 0
+  private dualTone: ToneChain | null = null
+  private dualToneInitMs = 0
   private outputMeter: AnalyserNode | null = null
   private voiceManager: VoiceManager | null = null
   private bank = new InstrumentBank()
@@ -36,13 +38,23 @@ export class AudioEngine {
   private noteCounts = new Map<number, number>()
   private pendingLoads = 0
   private spawnsInFlight = new Map<number, number>()
-  private pendingOffs = new Set<number>()
+  private pendingOffs = new Map<number, { sustain: boolean; seq: number }>()
+  /** Monotonic input ordering so pending releases never leak into later respawns. */
+  private eventSeq = 0
 
   private transpose = 0
   private octaveShift = 0
   private tuningOffset = 0
   private sustainPedal = false
   private instrument = 'demo-piano'
+
+  // Dual Tone state
+  private dualEnabled = false
+  private dualInstrument = 'grand-piano'
+  private dualTranspose = 0
+  private dualOctaveShift = 0
+  private dualTuningOffset = 0
+
   private pitchBend = 0
   private pitchBendCents = 0
   private pitchBendRange = 2
@@ -66,6 +78,20 @@ export class AudioEngine {
 
   /** Main Tone effect targets (engine-tracked so reads are deterministic). */
   private mainToneTargets: MainToneSnapshot = {
+    volume: 1,
+    pan: 0,
+    cutoffNorm: 1,
+    cutoffHz: 20000,
+    reverbAmount: 0,
+    reverbPreset: 'room',
+    chorusAmount: 0,
+    delayAmount: 0,
+    delayTime: 0.35,
+    delayFeedback: 0.3,
+  }
+
+  /** Dual Tone effect targets. */
+  private dualToneTargets: MainToneSnapshot = {
     volume: 1,
     pan: 0,
     cutoffNorm: 1,
@@ -159,11 +185,18 @@ export class AudioEngine {
 
     // Shared Main Tone chain: one per context, every voice flows through it.
     const t0 = performance.now()
-    this.mainTone = new MainToneChain(ctx)
+    this.mainTone = new ToneChain(ctx)
     this.mainToneInitMs = performance.now() - t0
     instrumentBus.connect(this.mainTone.input)
     this.mainTone.output.connect(masterGain)
     this.applyMainToneTargets()
+
+    // Dual Tone chain: instantiated on the same context.
+    const dt0 = performance.now()
+    this.dualTone = new ToneChain(ctx)
+    this.dualToneInitMs = performance.now() - dt0
+    this.dualTone.output.connect(masterGain)
+    this.applyDualToneTargets()
 
     // Adaptive polyphony: generous cap scaled by CPU count, halved on pressure.
     this.baseCap = Math.min(64, Math.max(8, (navigator.hardwareConcurrency ?? 4) * 16))
@@ -230,21 +263,34 @@ export class AudioEngine {
       void this.unlock()
       return
     }
-    const effective = this.applyTuning(req.note)
-    this.voiceManager.retrigger(effective, this.envConfig.release * 0.25)
+    const effectiveMain = this.applyTuning(req.note)
+    this.voiceManager.retrigger(effectiveMain, this.envConfig.release * 0.25)
     const velocity = clamp(req.velocity, 0, 1)
-    void this.spawnVoice(effective, velocity, req.source)
+    const seq = ++this.eventSeq
+    void this.spawnVoice(effectiveMain, velocity, req.source, seq, 'main')
+
+    if (this.dualEnabled) {
+      const effectiveDual = this.applyDualTuning(req.note)
+      this.voiceManager.retrigger(effectiveDual, this.envConfig.release * 0.25)
+      void this.spawnVoice(effectiveDual, velocity, req.source, seq, 'dual')
+    }
   }
 
   noteOff(req: { note: number }): void {
     const ctx = this.ctx
     if (!ctx || !this.voiceManager || ctx.state !== 'running') return
-    const effective = this.applyTuning(req.note)
-    const released = this.voiceManager.noteOff(effective, this.sustainPedal)
-    // Key released before its sample was ready: remember so the voice can be
-    // cut short (or sustain-held) the moment it starts.
-    if (released === 0 && (this.spawnsInFlight.get(effective) ?? 0) > 0) {
-      this.pendingOffs.add(effective)
+    const effectiveMain = this.applyTuning(req.note)
+    const releasedMain = this.voiceManager.noteOff(effectiveMain, this.sustainPedal)
+    if (releasedMain === 0 && (this.spawnsInFlight.get(effectiveMain) ?? 0) > 0) {
+      this.pendingOffs.set(effectiveMain, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+    }
+
+    if (this.dualEnabled) {
+      const effectiveDual = this.applyDualTuning(req.note)
+      const releasedDual = this.voiceManager.noteOff(effectiveDual, this.sustainPedal)
+      if (releasedDual === 0 && (this.spawnsInFlight.get(effectiveDual) ?? 0) > 0) {
+        this.pendingOffs.set(effectiveDual, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+      }
     }
   }
 
@@ -463,6 +509,164 @@ export class AudioEngine {
     c.setDelayFeedback(t.delayFeedback)
   }
 
+  private applyDualToneTargets(): void {
+    const t = this.dualToneTargets
+    const c = this.dualTone
+    if (!c) return
+    c.setVolume(t.volume)
+    c.setPan(t.pan)
+    c.setCutoff(t.cutoffNorm)
+    c.setReverbAmount(t.reverbAmount)
+    c.setReverbPreset(t.reverbPreset)
+    c.setChorusAmount(t.chorusAmount)
+    c.setDelayAmount(t.delayAmount)
+    c.setDelayTime(t.delayTime)
+    c.setDelayFeedback(t.delayFeedback)
+  }
+
+  // ---- Phase 8: Dual Tone -----------------------------------------------
+  get dualToneEnabled(): boolean {
+    return this.dualEnabled
+  }
+
+  setDualToneEnabled(enabled: boolean): void {
+    this.dualEnabled = enabled
+    if (enabled && this.ctx) {
+      void this.bank.ensureInit(this.ctx, this.dualInstrument).catch((cause) => {
+        this.reportError(
+          new AudioEngineError(
+            'INSTRUMENT_LOAD_FAILED',
+            `Dual instrument "${this.dualInstrument}" failed to load: ${cause instanceof Error ? cause.message : String(cause)}`,
+            cause,
+          ),
+        )
+      })
+    }
+    this.emit({ type: 'tuning' })
+  }
+
+  get dualInstrumentId(): string {
+    return this.dualInstrument
+  }
+
+  async setDualInstrument(id: string): Promise<void> {
+    if (id === this.dualInstrument) return
+    this.dualInstrument = id
+    if (this.dualEnabled && this.ctx) {
+      await this.bank.ensureInit(this.ctx, id).catch((cause) => {
+        this.reportError(
+          new AudioEngineError(
+            'INSTRUMENT_LOAD_FAILED',
+            `Dual instrument "${id}" failed to load: ${cause instanceof Error ? cause.message : String(cause)}`,
+            cause,
+          ),
+        )
+      })
+    }
+    this.emit({ type: 'load', instrumentId: id, state: this.sampleState(id) })
+  }
+
+  get dualTransposeSemitones(): number {
+    return this.dualTranspose
+  }
+
+  setDualTranspose(semitones: number): void {
+    this.dualTranspose = clamp(Math.round(semitones), -12, 12)
+    this.emit({ type: 'tuning' })
+  }
+
+  get dualOctave(): number {
+    return this.dualOctaveShift
+  }
+
+  setDualOctaveShift(octaves: number): void {
+    this.dualOctaveShift = clamp(Math.round(octaves), -5, 5)
+    this.emit({ type: 'tuning' })
+  }
+
+  get dualTuningCents(): number {
+    return this.dualTuningOffset
+  }
+
+  setDualTuningCents(cents: number): void {
+    this.dualTuningOffset = clamp(Math.round(cents), -100, 100)
+    this.emit({ type: 'tuning' })
+  }
+
+  setDualToneVolume(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.dualToneTargets.volume = v
+    this.dualTone?.setVolume(v)
+  }
+
+  setDualTonePan(value: number): void {
+    const v = clampFinite(value, -1, 1)
+    this.dualToneTargets.pan = v
+    this.dualTone?.setPan(v)
+  }
+
+  setDualToneCutoff(normalized: number): void {
+    const n = clampFinite(normalized, 0, 1)
+    this.dualToneTargets.cutoffNorm = n
+    this.dualToneTargets.cutoffHz = Math.round(100 * Math.pow(200, n))
+    this.dualTone?.setCutoff(n)
+  }
+
+  setDualToneReverbAmount(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.dualToneTargets.reverbAmount = v
+    this.dualTone?.setReverbAmount(v)
+  }
+
+  setDualToneReverbPreset(id: string): void {
+    if (!REVERB_PRESET_IDS.includes(id as ReverbPresetId)) return
+    this.dualToneTargets.reverbPreset = id as ReverbPresetId
+    this.dualTone?.setReverbPreset(id as ReverbPresetId)
+  }
+
+  setDualToneChorusAmount(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.dualToneTargets.chorusAmount = v
+    this.dualTone?.setChorusAmount(v)
+  }
+
+  setDualToneDelayAmount(value: number): void {
+    const v = clampFinite(value, 0, 1)
+    this.dualToneTargets.delayAmount = v
+    this.dualTone?.setDelayAmount(v)
+  }
+
+  setDualToneDelayTime(seconds: number): void {
+    const s = clampFinite(seconds, 0, 1)
+    this.dualToneTargets.delayTime = s
+    this.dualTone?.setDelayTime(s)
+  }
+
+  setDualToneDelayFeedback(value: number): void {
+    const v = clampFinite(value, 0, 0.85)
+    this.dualToneTargets.delayFeedback = v
+    this.dualTone?.setDelayFeedback(v)
+  }
+
+  dualToneState(): MainToneSnapshot {
+    return { ...this.dualToneTargets }
+  }
+
+  dualToneAudioRead(): MainToneAudioRead | null {
+    return this.dualTone?.audioRead() ?? null
+  }
+
+  dualToneIrStats(): MainToneIrStats | null {
+    return this.dualTone?.irStats() ?? null
+  }
+
+  dualToneActive(): { reverb: boolean; delay: boolean } {
+    return {
+      reverb: this.dualTone?.isReverbActive ?? false,
+      delay: this.dualTone?.isDelayActive ?? false,
+    }
+  }
+
   async setInstrument(id: string): Promise<void> {
     if (id === this.instrument) return
     if (this.ctx) {
@@ -631,6 +835,13 @@ export class AudioEngine {
       },
       mainTone: this.mainTone ? { ...this.mainToneTargets } : undefined,
       mainToneInitMs: this.mainToneInitMs,
+      dualTone: this.dualTone ? { ...this.dualToneTargets } : undefined,
+      dualToneInitMs: this.dualToneInitMs,
+      dualEnabled: this.dualEnabled,
+      dualInstrument: this.dualInstrument,
+      dualTranspose: this.dualTranspose,
+      dualOctaveShift: this.dualOctaveShift,
+      dualTuningCents: this.dualTuningOffset,
     }
   }
 
@@ -655,28 +866,42 @@ export class AudioEngine {
     this.listeners.clear()
   }
 
-  private async spawnVoice(note: number, velocity: number, source: InputSource): Promise<void> {
+  private async spawnVoice(
+    note: number,
+    velocity: number,
+    source: InputSource,
+    spawnSeq: number,
+    layer: 'main' | 'dual' = 'main',
+  ): Promise<void> {
     const ctx = this.ctx
     const vm = this.voiceManager
     if (!ctx || !vm) return
+    const instId = layer === 'main' ? this.instrument : this.dualInstrument
+    const destNode = layer === 'main' ? this.mainTone?.input : this.dualTone?.input
+    if (!destNode) return
+
     this.pendingLoads++
     this.spawnsInFlight.set(note, (this.spawnsInFlight.get(note) ?? 0) + 1)
     const inputAt = performance.now()
     try {
-      const sampled = await this.bank.getBuffer(ctx, this.instrument, note, velocity)
+      const sampled = await this.bank.getBuffer(ctx, instId, note, velocity)
       const bufferReadyMs = performance.now() - inputAt
       this.noteTiming.lastBufferReadyMs = bufferReadyMs
       this.noteTiming.sumBufferReadyMs += bufferReadyMs
       this.noteTiming.count++
       this.noteTiming.maxBufferReadyMs = Math.max(this.noteTiming.maxBufferReadyMs, bufferReadyMs)
       if (ctx.state !== 'running') return
-      const tuningFactor = Math.pow(2, this.tuningOffset / 1200)
-      if (vm.start(sampled.buffer, note, velocity, {
-        playbackRate: sampled.playbackRate * tuningFactor,
-        startOffset: sampled.startOffset,
-        gainDb: sampled.gainDb,
-        pitchBendCents: this.pitchBendCents,
-      })) {
+      const centsOffset = layer === 'main' ? this.tuningOffset : this.tuningOffset + this.dualTuningOffset
+      const tuningFactor = Math.pow(2, centsOffset / 1200)
+      if (
+        vm.start(sampled.buffer, note, velocity, {
+          playbackRate: sampled.playbackRate * tuningFactor,
+          startOffset: sampled.startOffset,
+          gainDb: sampled.gainDb,
+          pitchBendCents: this.pitchBendCents,
+          out: destNode,
+        })
+      ) {
         this.noteTiming.lastStartMs = performance.now() - inputAt
         if (source === 'midi') {
           const ms = performance.now() - inputAt
@@ -687,17 +912,21 @@ export class AudioEngine {
         }
         this.totalStarted++
         this.noteStarted(note)
-        if (this.pendingOffs.has(note)) {
+        const pending = this.pendingOffs.get(note)
+        // Only a release that happened *after* this spawn was requested may
+        // cut/hold it; a respawn requested after the release stays alive.
+        if (pending && pending.seq > spawnSeq) {
           // The key was released before the sample was ready: release right
-          // away with a short tail, or hold it if the sustain pedal is down.
-          vm.noteOff(note, this.sustainPedal, 0.03)
+          // away with a short tail, or hold it if the sustain pedal was down
+          // at release time (never at spawn-completion time).
+          vm.noteOff(note, pending.sustain, 0.03)
         }
       }
     } catch (cause) {
       this.reportError(
         new AudioEngineError(
           'INSTRUMENT_LOAD_FAILED',
-          `Instrument "${this.instrument}" failed to load: ${cause instanceof Error ? cause.message : String(cause)}`,
+          `Instrument "${instId}" failed to load: ${cause instanceof Error ? cause.message : String(cause)}`,
           cause,
         ),
       )
@@ -715,6 +944,12 @@ export class AudioEngine {
 
   private applyTuning(note: number): number {
     return clampNote(note + this.transpose + this.octaveShift * 12)
+  }
+
+  private applyDualTuning(note: number): number {
+    return clampNote(
+      note + this.transpose + this.octaveShift * 12 + this.dualTranspose + this.dualOctaveShift * 12,
+    )
   }
 
   private noteStarted(note: number): void {

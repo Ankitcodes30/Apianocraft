@@ -113,6 +113,14 @@ export interface DiagnosticsSnapshot {
   mainTone?: MainToneSnapshot
   /** Wall time to build the shared effects chain + IRs, in ms. */
   mainToneInitMs?: number
+  /** Dual Tone effect targets (present after the audio context is created). */
+  dualTone?: MainToneSnapshot
+  dualToneInitMs?: number
+  dualEnabled?: boolean
+  dualInstrument?: string
+  dualTranspose?: number
+  dualOctaveShift?: number
+  dualTuningCents?: number
 }
 
 /** Which sample zone a note+velocity resolves to (diagnostic/testing hook). */

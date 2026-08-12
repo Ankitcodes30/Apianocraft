@@ -1,0 +1,115 @@
+project:
+  name: Apianocraft
+  type: browser_piano_workstation
+  stack:
+    - React 19
+    - TypeScript 5.8
+    - Vite 6
+    - Web Audio API
+    - PWA (vite-plugin-pwa)
+    - puppeteer-core (headless smoke tests)
+  description: Low-latency browser piano / digital keyboard workstation, fully client-side.
+
+current_phase:
+  id: "8"
+  name: "Dual Tone Layering"
+  status: implemented_and_verified_3x_uncommitted
+  detail: |
+    Dual Tone Layering (ToneChain refactor, custom voice routing, AudioEngine dual-layer noteOn/noteOff,
+    DualTonePanel UI, 291/291 smoke checks passing on 3 consecutive runs).
+
+last_verified_checkpoint:
+  commit: "7d8535f"
+  message: "chore: checkpoint verified phase 7 audio engine"
+  branch: main
+  verified: { typecheck: true, lint: true, build: true, smoke: 230 }
+
+completed_phases:
+  - id: "4A"
+    name: "Audio engine (voices, pools, sustain, velocities, tuning)"
+    smoke: "99/99 x3"
+  - id: "5"
+    name: "MIDI input"
+    smoke: "152/152 x3"
+  - id: "6"
+    name: "Performance XY pad (pitch bend + modulation)"
+    smoke: "177/177 x3"
+  - id: "7"
+    name: "Main Tone controls + audio effects (reverb/chorus/delay/limiter)"
+    smoke: "230/230"
+  - id: "7.5"
+    name: "QWERTY computer keyboard input"
+    smoke: "272/272"
+  - id: "8"
+    name: "Dual Tone Layering"
+    smoke: "291/291 x3"
+
+current_work:
+  uncommitted_files:
+    - scripts/smoke-dual-tone.mjs       # untracked
+    - src/components/DualTonePanel.tsx  # untracked
+    - scripts/smoke-qwerty.mjs         # untracked
+    - src/components/KeyboardPanel.tsx  # untracked
+    - src/keyboard/QwertyManager.ts    # untracked
+    - PHASE_8_DUAL_TONE.md             # untracked
+    - src/audio/effects/MainToneChain.ts # modified: extracted ToneChain class + IR static cache
+    - src/audio/VoiceManager.ts         # modified: added custom out target routing
+    - src/audio/AudioEngine.ts          # modified: dual tone state, dual voice spawning
+    - src/audio/types.ts                # modified: dual tone diagnostics
+    - src/App.tsx                       # modified: DualTonePanel UI wiring
+    - src/testHarness.ts                # modified: dual tone test API
+    - scripts/audio-smoke.mjs          # modified: runs runDualTone
+    - scripts/smoke-phase7.mjs          # modified: level measurement stability fixes
+    - src/styles/index.css             # modified: panel styles
+
+next_phase:
+  id: "9"
+  name: "Audio Effects Polish & Mastering / Split Keyboard"
+  status: planned
+  goals:
+    - Polish dual tone routing, preset save/restore, and master bus processing.
+    - Prepare split keyboard zones if directed.
+
+future_phases:
+  - id: "9"
+    name: "Split Keyboard"
+  - id: "10"
+    name: "Additional instruments"
+    candidates: [Strings, Flute, Harmonium, Trumpet, Brass, Piccolo, Grand Piano, Banjo, Saxophone, Violin]
+  - id: "11"
+    name: "Recording / MIDI export / performance recording"
+  - id: "12"
+    name: "Presets / chord tools / metronome / scale tools / advanced performance features"
+  - id: "13"
+    name: "Production hardening / PWA / offline behavior / deployment"
+
+architecture_rules:
+  - "One persistent AudioContext."
+  - "Audio engine independent of React; React never on the note hot path."
+  - "No unnecessary audio nodes per note; no effect-chain rebuilds on parameter changes."
+  - "Schedule with AudioContext.currentTime; use AudioParam automation."
+  - "No arbitrary sleeps to solve audio timing problems; wait on engine state."
+  - "Preserve pending-load/pending-off correctness; dropped notes must never become stuck or accidentally sustained."
+  - "Voice pooling and adaptive polyphony remain bounded."
+  - "Sample buffers shared via SampleBank/decode cache; no duplicate decoding."
+  - "UI communicates through normalized events/state abstractions, never by directly driving the engine."
+
+performance_rules:
+  - "baseCap = min(64, max(8, hardwareConcurrency * 16)); cap halves under drops/steals, doubles back when healthy."
+  - "Voice stealing: release-phase voices first, then sustain-held, then longest-sounding."
+  - "Same-note presses retrigger with fast release (env.release * 0.25); release tail 0.03s for cut-off pending offs."
+  - "Decoded LRU cache budget ~128 MB (DEFAULT_MAX_DECODED_BYTES)."
+  - "Limiter worklet clock()/level() are the trusted render-thread measurement path."
+
+testing_rules:
+  - "Never weaken existing assertions."
+  - "Add regression tests for real bugs (prove fail pre-fix, pass post-fix)."
+  - "Prefer deterministic render-thread measurements over fragile transient analyser timing."
+  - "Smoke: run npm run build first, then npm run smoke (headless Chrome/Edge, port 5199)."
+  - "Phase completion: typecheck, lint, build, full smoke, then 3 consecutive green smoke runs."
+
+git_rules:
+  - "HEAD at 7d8535f (Phase 7 checkpoint) with uncommitted Phase 7.5 and Phase 8 work in the tree."
+  - "Never reset user work, delete unrelated changes, force push, rewrite history silently, or commit secrets / node_modules / dist / temp debug scripts."
+  - "Before commits: git status, git diff, git diff --cached. After: git status."
+  - "Never push unless explicitly instructed."

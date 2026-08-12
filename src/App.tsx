@@ -7,8 +7,11 @@ import { ErrorBanner } from './components/ErrorBanner'
 import { MidiPanel } from './components/MidiPanel'
 import { PerformancePad } from './components/PerformancePad'
 import { MainTonePanel } from './components/MainTonePanel'
+import { DualTonePanel } from './components/DualTonePanel'
+import { KeyboardPanel } from './components/KeyboardPanel'
 import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
+import { getQwertyManager } from './keyboard/QwertyManager'
 import { pushError } from './utils/ErrorBus'
 import { installTestHarness } from './testHarness'
 
@@ -76,11 +79,15 @@ export default function App() {
     })
     const midi = getMidiManager(bus)
     void midi.start()
+    // Phase 7.5: QWERTY computer keyboard — same bus, source 'keyboard'.
+    const qwerty = getQwertyManager(bus)
+    qwerty.start()
 
     return () => {
       alive = false
       unsub()
       unsubBus()
+      qwerty.stop()
       window.removeEventListener('pointerdown', unlockOnGesture)
     }
   }, [engine])
@@ -114,6 +121,7 @@ export default function App() {
       <section className="ctl" aria-label="Performance controls">
         <PerformancePad engine={engine} />
         <MidiPanel midi={getMidiManager(getNoteEventBus())} engine={engine} />
+        <KeyboardPanel qwerty={getQwertyManager(getNoteEventBus())} />
         <button
           type="button"
           className={`btn${tuning.sustain ? ' btn--on' : ''}`}
@@ -128,6 +136,7 @@ export default function App() {
       </section>
 
       <MainTonePanel engine={engine} />
+      <DualTonePanel engine={engine} />
 
       <PianoKeyboard engine={engine} />
       <ErrorBanner />

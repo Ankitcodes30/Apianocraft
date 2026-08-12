@@ -1,15 +1,15 @@
 /**
- * MainToneChain — the shared Main Tone effects chain.
+ * ToneChain — reusable effects chain for Main Tone and Dual Tone.
  *
- * Built exactly once per AudioContext; every voice flows through it, so no
- * effect node is ever allocated per note. Reverb IRs are synthesized once at
- * construction and cached; preset switches only swap a cached AudioBuffer.
+ * Built per chain per AudioContext; every voice flows through its assigned chain,
+ * so no effect node is ever allocated per note. Reverb IRs are synthesized once
+ * per AudioContext and cached statically across all ToneChain instances.
  *
  * Topology (stereo from the pan stage onward; Mono input is up-mixed by the
  * pan node):
  *
  *   input (voice bus)
- *    → volume (Gain)            [Main Tone volume]
+ *    → volume (Gain)            [Tone volume]
  *    → pan (StereoPanner, or equal-power gain fallback)
  *    → cutoff (Biquad low-pass)
  *    → chorus (serial: stereo split → L/R LFO-modulated delays + dry → merge)
@@ -17,10 +17,6 @@
  *    → reverb send (Gain) → Convolver(IR) → wet ───┤→ sum → output
  *    → delay send (Gain) → Delay(≤1 s) → damp → feedback(≤0.85) → loop ↺
  *    → delay wet (Gain) ───────────────────────────┘
- *
- * Reverb + delay are send/bus effects (parallel, cheap to reuse for a Dual
- * Tone later); chorus is serial. All parameter changes use
- * AudioParam.setTargetAtTime so automation is smooth and click-free.
  */
 export type ReverbPresetId = 'room' | 'hall' | 'stage' | 'cathedral'
 
@@ -45,7 +41,7 @@ export const REVERB_PRESETS: ReverbPresetDef[] = [
 export const REVERB_PRESET_IDS: ReverbPresetId[] = REVERB_PRESETS.map((p) => p.id)
 
 /** Live AudioParam reads for tests (evidence of smooth automation). */
-export interface MainToneAudioRead {
+export interface ToneChainAudioRead {
   volume: number
   pan: number
   cutoffHz: number
@@ -55,8 +51,9 @@ export interface MainToneAudioRead {
   delayTime: number
   feedback: number
 }
+export type MainToneAudioRead = ToneChainAudioRead
 
-export interface MainToneIrStats {
+export interface ToneChainIrStats {
   /** How many IRs were ever generated (cache-size proof). */
   generated: number
   /** How many times the preset was switched (cache hits). */
@@ -64,6 +61,7 @@ export interface MainToneIrStats {
   preset: ReverbPresetId
   presetSeconds: number
 }
+export type MainToneIrStats = ToneChainIrStats
 
 const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v))
 const clampFinite = (v: number, lo: number, hi: number): number => (Number.isFinite(v) ? clamp(v, lo, hi) : lo)
@@ -71,13 +69,6 @@ const clampFinite = (v: number, lo: number, hi: number): number => (Number.isFin
 /** AudioParam automation tau: ~5× tau to settle, ~100 ms. */
 const TAU_S = 0.02
 
-/**
- * Models AudioParam.setTargetAtTime on the JS side for diagnostics.
- * The audio thread applies exactly `target + (start - target)·e^(-t/tau)`,
- * so this mirror is deterministic and converged reads are exact once
- * 5× tau has elapsed. `AudioParam.getValueAtTime` is not implemented in
- * this browser, so this is the only way to evidence automation progress.
- */
 interface AutomationTrack {
   prev: number
   target: number
@@ -89,6 +80,49 @@ const CUTOFF_MAX_HZ = 20000
 const CHORUS_DEPTH_MAX_S = 0.004
 const DELAY_FEEDBACK_MAX = 0.85
 const DELAY_DAMP_HZ = 3600
+
+/** Shared static IR cache keyed by BaseAudioContext instance to avoid duplicate generation. */
+const staticIrCache = new Map<BaseAudioContext, { irs: Map<ReverbPresetId, AudioBuffer>; generated: number }>()
+
+function getSharedIrs(ctx: BaseAudioContext): { irs: Map<ReverbPresetId, AudioBuffer>; generated: number } {
+  let entry = staticIrCache.get(ctx)
+  if (!entry) {
+    const irs = new Map<ReverbPresetId, AudioBuffer>()
+    let generated = 0
+    for (const p of REVERB_PRESETS) {
+      irs.set(p.id, makeIR(ctx, p))
+      generated++
+    }
+    entry = { irs, generated }
+    staticIrCache.set(ctx, entry)
+  }
+  return entry
+}
+
+/** Procedural stereo IR — one-pole-damped noise with exponential decay. */
+function makeIR(ctx: BaseAudioContext, preset: ReverbPresetDef): AudioBuffer {
+  const sr = ctx.sampleRate
+  const len = Math.max(128, Math.floor(sr * preset.seconds))
+  const buf = ctx.createBuffer(2, len, sr)
+  const tau = preset.decayRate * sr
+  const damp = clamp(preset.damping, 0.1, 0.99)
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buf.getChannelData(ch)
+    let lp = 0
+    for (let i = 0; i < len; i++) {
+      lp = lp * damp + (Math.random() * 2 - 1) * (1 - damp)
+      data[i] = lp * Math.exp(-i / tau)
+    }
+    let peak = 0
+    for (let i = 0; i < len; i++) {
+      const a = Math.abs(data[i])
+      if (a > peak) peak = a
+    }
+    const g = peak > 1e-9 ? 0.9 / peak : 0
+    for (let i = 0; i < len; i++) data[i] *= g
+  }
+  return buf
+}
 
 /** Equal-power stereo panner fallback when StereoPannerNode is missing. */
 class PanFallback {
@@ -115,14 +149,13 @@ class PanFallback {
     this.r.gain.setTargetAtTime(Math.sin(theta), now, TAU_S)
   }
 
-  /** Inverse of the equal-power law, used for diagnostics. */
   readPan(): number {
     const r = clamp(this.r.gain.value, 0, 1)
     return clamp((4 * Math.asin(r)) / Math.PI - 1, -1, 1)
   }
 }
 
-export class MainToneChain {
+export class ToneChain {
   readonly input: GainNode
   readonly output: GainNode
 
@@ -139,7 +172,7 @@ export class MainToneChain {
   private readonly delayNode: DelayNode
   private readonly feedbackGain: GainNode
   private readonly dampFilter: BiquadFilterNode
-  private readonly irs = new Map<ReverbPresetId, AudioBuffer>()
+  private readonly irs: Map<ReverbPresetId, AudioBuffer>
   private preset: ReverbPresetId = 'room'
   private irGenerated = 0
   private irSwitches = 0
@@ -150,7 +183,7 @@ export class MainToneChain {
   constructor(private readonly ctx: BaseAudioContext) {
     this.input = ctx.createGain()
 
-    // Volume — Main Tone level, automated smoothly.
+    // Volume — level, automated smoothly.
     this.volumeGain = ctx.createGain()
     this.volumeGain.gain.value = 1
 
@@ -160,14 +193,13 @@ export class MainToneChain {
     if (this.panner instanceof StereoPannerNode) this.panner.pan.value = 0
     this.panNode = this.panner instanceof StereoPannerNode ? this.panner : this.panner.node
 
-    // Cutoff — low-pass, log-mapped 100 Hz..20 kHz by the engine/UI layer.
+    // Cutoff — low-pass, log-mapped 100 Hz..20 kHz.
     this.filter = ctx.createBiquadFilter()
     this.filter.type = 'lowpass'
     this.filter.frequency.value = CUTOFF_MAX_HZ
     this.filter.Q.value = 0.71
 
     // Chorus — serial; stereo split with per-channel LFO-modulated delays.
-    // Plain nodes (no worklet): two DelayNodes modulated by slow oscillators.
     const chorusSplit = ctx.createChannelSplitter(2)
     const chorusMerge = ctx.createChannelMerger(2)
     const dryL = ctx.createGain()
@@ -205,11 +237,10 @@ export class MainToneChain {
     const chorusOut = ctx.createGain()
     chorusMerge.connect(chorusOut)
 
-    // Reverb — send/bus; IRs pre-generated once and cached for every preset.
-    for (const p of REVERB_PRESETS) {
-      this.irs.set(p.id, this.makeIR(p))
-      this.irGenerated++
-    }
+    // Reverb — send/bus; IRs retrieved from shared static cache.
+    const shared = getSharedIrs(ctx)
+    this.irs = shared.irs
+    this.irGenerated = shared.generated
     this.convolver = ctx.createConvolver()
     this.convolver.normalize = false
     this.convolver.buffer = this.irs.get('room') ?? null
@@ -246,31 +277,6 @@ export class MainToneChain {
     delayWet.connect(this.output)
   }
 
-  /** Procedural stereo IR — one-pole-damped noise with exponential decay. */
-  private makeIR(preset: ReverbPresetDef): AudioBuffer {
-    const sr = this.ctx.sampleRate
-    const len = Math.max(128, Math.floor(sr * preset.seconds))
-    const buf = this.ctx.createBuffer(2, len, sr)
-    const tau = preset.decayRate * sr
-    const damp = clamp(preset.damping, 0.1, 0.99)
-    for (let ch = 0; ch < 2; ch++) {
-      const data = buf.getChannelData(ch)
-      let lp = 0
-      for (let i = 0; i < len; i++) {
-        lp = lp * damp + (Math.random() * 2 - 1) * (1 - damp)
-        data[i] = lp * Math.exp(-i / tau)
-      }
-      let peak = 0
-      for (let i = 0; i < len; i++) {
-        const a = Math.abs(data[i])
-        if (a > peak) peak = a
-      }
-      const g = peak > 1e-9 ? 0.9 / peak : 0
-      for (let i = 0; i < len; i++) data[i] *= g
-    }
-    return buf
-  }
-
   // ------------------------------------------------------------------ volume
   readonly setVolume = (value: number): void => {
     const v = clampFinite(value, 0, 1)
@@ -290,7 +296,7 @@ export class MainToneChain {
   }
 
   // ------------------------------------------------------------------ cutoff
-  /** Normalized 0..1, log-mapped to 100 Hz..20 kHz by the engine. */
+  /** Normalized 0..1, log-mapped to 100 Hz..20 kHz. */
   readonly setCutoff = (normalized: number): void => {
     const n = clampFinite(normalized, 0, 1)
     const hz = CUTOFF_MIN_HZ * Math.pow(CUTOFF_MAX_HZ / CUTOFF_MIN_HZ, n)
@@ -326,7 +332,6 @@ export class MainToneChain {
     const now = this.ctx.currentTime
     this.track('chorus', v, TAU_S)
     this.chorusWet.gain.setTargetAtTime(v, now, TAU_S)
-    // LFO depth in seconds; ±4 ms at full amount.
     this.depthL.gain.setTargetAtTime(v * CHORUS_DEPTH_MAX_S, now, TAU_S)
     this.depthR.gain.setTargetAtTime(v * CHORUS_DEPTH_MAX_S, now, TAU_S)
   }
@@ -352,7 +357,7 @@ export class MainToneChain {
     this.delayNode.delayTime.setTargetAtTime(s, this.ctx.currentTime, TAU_S * 1.5)
   }
 
-  /** Feedback level 0..0.85 — hard-bounded so a runaway is impossible. */
+  /** Feedback level 0..0.85 — hard-bounded. */
   readonly setDelayFeedback = (value: number): void => {
     const v = clampFinite(value, 0, DELAY_FEEDBACK_MAX)
     this.track('feedback', v, TAU_S)
@@ -385,7 +390,7 @@ export class MainToneChain {
 
   // ---------------------------------------------------------------- readings
   /** Modeled AudioParam state at the current audio-clock time. */
-  audioRead(): MainToneAudioRead {
+  audioRead(): ToneChainAudioRead {
     return {
       volume: this.read('volume', 1),
       pan: this.read('pan', 0),
@@ -399,7 +404,7 @@ export class MainToneChain {
   }
 
   /** IR cache bookkeeping — proof that presets reuse pre-generated IRs. */
-  irStats(): MainToneIrStats {
+  irStats(): ToneChainIrStats {
     return {
       generated: this.irGenerated,
       switches: this.irSwitches,
@@ -417,3 +422,6 @@ export class MainToneChain {
     return this.delayConnected
   }
 }
+
+export { ToneChain as MainToneChain }
+

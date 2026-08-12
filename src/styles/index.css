@@ -286,6 +286,17 @@ body {
   font-size: 12px;
 }
 
+.kbd-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.kbd-panel__map {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
 .midi-led {
   width: 10px;
   height: 10px;

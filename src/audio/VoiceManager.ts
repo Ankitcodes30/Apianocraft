@@ -100,6 +100,7 @@ export class VoiceManager {
       gainDb?: number
       env?: Partial<EnvelopeConfig>
       pitchBendCents?: number
+      out?: AudioNode
     } = {},
   ): boolean {
     const voice = this.acquire()
@@ -123,7 +124,7 @@ export class VoiceManager {
       startOffset: opts.startOffset ?? 0,
       gainDb: opts.gainDb,
       pitchBendCents: opts.pitchBendCents,
-      out: this.deps.bus,
+      out: opts.out ?? this.deps.bus,
       env: { ...this.deps.env, ...opts.env },
       when: this.deps.ctx.currentTime + 0.004,
     })

@@ -3,8 +3,10 @@ import type { DiagnosticsSnapshot, MainToneSnapshot, SampleZoneInfo } from './au
 import type { SampleLoadState } from './audio/samples/types'
 import type { MidiManager, MidiStats, MidiSupport } from './midi/MidiManager'
 import type { MainToneAudioRead, MainToneIrStats, ReverbPresetId } from './audio/effects/MainToneChain'
+import type { NoteBusEvent } from './midi/NoteEventBus'
 import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
+import { getQwertyManager } from './keyboard/QwertyManager'
 
 export interface MidiDeviceView {
   id: string
@@ -108,11 +110,59 @@ export interface TestApi {
   mainToneActive(): { reverb: boolean; delay: boolean }
   /** Max |sample| measured post-limiter over the window (safety checks). */
   peakOut(ms?: number): Promise<number>
+  // ---- Phase 7.5: QWERTY computer keyboard ---------------------------
+  /** Last NoteEventBus events from every source (bounded ring). */
+  busEvents(): NoteBusEvent[]
+  /** Dispatch a keydown/keyup (target defaults to document.body). */
+  qwertyKey(
+    type: 'down' | 'up',
+    key: string,
+    opts?: { target?: Element; repeat?: boolean; ctrl?: boolean; alt?: boolean; meta?: boolean; shift?: boolean },
+  ): void
+  /** QWERTY adapter snapshot: octave, velocity, held keys, panel renders. */
+  qwertyState(): { started: boolean; octave: number; velocity: number; heldKeys: string[]; renders: number }
+  /** Set the QWERTY-local octave (also reachable via Z/X keys). */
+  qwertySetOctave(octave: number): void
+  /** Fixed velocity for QWERTY notes. */
+  qwertyVelocity(value: number): void
+  /** Release all QWERTY-held notes (panic path). */
+  qwertyReleaseAll(): void
+  /** Simulate window blur (safety release path). */
+  qwertyBlur(): void
+  /** Override document visibility and dispatch visibilitychange. */
+  qwertyVisibility(hidden: boolean): void
+  // ---- Phase 8: Dual Tone -----------------------------------------------
+  dualToneEnable(enabled: boolean): void
+  dualToneInstrument(id: string): Promise<void>
+  dualToneSet(
+    kind: 'volume' | 'pan' | 'cutoff' | 'reverb' | 'chorus' | 'delay-amt' | 'delay-time' | 'delay-fb',
+    value: number,
+  ): void
+  dualTonePreset(id: ReverbPresetId): void
+  dualToneClick(selector: string): void
+  dualToneState(): MainToneSnapshot & {
+    octave: number
+    transpose: number
+    tuning: number
+    instrument: string
+    enabled: boolean
+    renders: number
+  }
+  dualToneAudio(): MainToneAudioRead | null
+  dualToneIr(): MainToneIrStats
+  dualToneActive(): { reverb: boolean; delay: boolean }
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
 export function installTestHarness(engine: AudioEngine): TestApi {
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+  /** Bounded bus-event ring so tests can assert source/note/velocity. */
+  const busLog: NoteBusEvent[] = []
+  getNoteEventBus().subscribe((e) => {
+    busLog.push(e)
+    if (busLog.length > 500) busLog.shift()
+  })
 
   /** Wait until every load and voice has settled, instead of a fixed sleep.
    *  Async sample loads queue serially, so storm duration varies with load. */
@@ -312,8 +362,6 @@ export function installTestHarness(engine: AudioEngine): TestApi {
       }[kind]
       const el = document.querySelector(sel)
       if (!(el instanceof HTMLInputElement)) return
-      // Use the prototype setter so React's value tracker sees the change
-      // (the same trick React Testing Library uses for native inputs).
       Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(el, String(value))
       el.dispatchEvent(new Event('input', { bubbles: true }))
     },
@@ -369,6 +417,93 @@ export function installTestHarness(engine: AudioEngine): TestApi {
       }
       return peak
     },
+    // ---- Phase 7.5: QWERTY computer keyboard ---------------------------
+    busEvents: () => [...busLog],
+    qwertyKey: (type, key, opts = {}) => {
+      const target = opts.target ?? document.body
+      target.dispatchEvent(
+        new KeyboardEvent(type === 'down' ? 'keydown' : 'keyup', {
+          key,
+          repeat: Boolean(opts.repeat),
+          ctrlKey: Boolean(opts.ctrl),
+          altKey: Boolean(opts.alt),
+          metaKey: Boolean(opts.meta),
+          shiftKey: Boolean(opts.shift),
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+    },
+    qwertyState: () => {
+      const s = getQwertyManager(getNoteEventBus()).getState()
+      const w = window as unknown as { __apiano?: { qwertyRenders?: { count: number } } }
+      return { ...s, renders: w.__apiano?.qwertyRenders?.count ?? -1 }
+    },
+    qwertySetOctave: (octave) => getQwertyManager(getNoteEventBus()).setOctave(octave),
+    qwertyVelocity: (value) => getQwertyManager(getNoteEventBus()).setVelocity(value),
+    qwertyReleaseAll: () => getQwertyManager(getNoteEventBus()).releaseAll(),
+    qwertyBlur: () => window.dispatchEvent(new Event('blur')),
+    qwertyVisibility: (hidden) => {
+      Object.defineProperty(document, 'hidden', { value: hidden, configurable: true })
+      Object.defineProperty(document, 'visibilityState', { value: hidden ? 'hidden' : 'visible', configurable: true })
+      document.dispatchEvent(new Event('visibilitychange'))
+    },
+    // ---- Phase 8: Dual Tone -----------------------------------------------
+    dualToneEnable: (enabled) => engine.setDualToneEnabled(enabled),
+    dualToneInstrument: (id) => engine.setDualInstrument(id),
+    dualToneSet: (kind, value) => {
+      const sel = {
+        volume: '[data-dual-vol]',
+        pan: '[data-dual-pan]',
+        cutoff: '[data-dual-cutoff]',
+        reverb: '[data-dual-reverb]',
+        chorus: '[data-dual-chorus]',
+        'delay-amt': '[data-dual-delay-amt]',
+        'delay-time': '[data-dual-delay-time]',
+        'delay-fb': '[data-dual-delay-fb]',
+      }[kind]
+      const el = document.querySelector(sel)
+      if (!(el instanceof HTMLInputElement)) return
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(el, String(value))
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+    },
+    dualTonePreset: (id) => {
+      const el = document.querySelector('[data-dual-reverb-preset]')
+      if (!(el instanceof HTMLSelectElement)) return
+      el.value = id
+      el.dispatchEvent(new Event('change', { bubbles: true }))
+    },
+    dualToneClick: (selector) => {
+      const el = document.querySelector(selector)
+      if (el instanceof HTMLElement) el.click()
+    },
+    dualToneState: () => {
+      const d = engine.getDiagnostics()
+      const w = window as unknown as { __apiano?: { dualToneRenders?: { count: number } } }
+      return {
+        ...(d.dualTone ?? {
+          volume: 1,
+          pan: 0,
+          cutoffNorm: 1,
+          cutoffHz: 20000,
+          reverbAmount: 0,
+          reverbPreset: 'room',
+          chorusAmount: 0,
+          delayAmount: 0,
+          delayTime: 0.35,
+          delayFeedback: 0.3,
+        }),
+        octave: d.dualOctaveShift ?? 0,
+        transpose: d.dualTranspose ?? 0,
+        tuning: d.dualTuningCents ?? 0,
+        instrument: d.dualInstrument ?? 'grand-piano',
+        enabled: d.dualEnabled ?? false,
+        renders: w.__apiano?.dualToneRenders?.count ?? -1,
+      }
+    },
+    dualToneAudio: () => engine.dualToneAudioRead(),
+    dualToneIr: () => engine.dualToneIrStats() ?? { generated: 0, switches: 0, preset: 'room', presetSeconds: 0 },
+    dualToneActive: () => engine.dualToneActive(),
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have
