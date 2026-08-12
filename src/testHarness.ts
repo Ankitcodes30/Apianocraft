@@ -181,6 +181,8 @@ export interface TestApi {
   metronomeSetBpm(bpm: number): void
   metronomeGetSnapshot(): import('./audio/tools/Metronome').MetronomeSnapshot
   chordDetectNotes(notes: number[]): import('./audio/tools/ChordDetector').ChordResult | null
+  // ---- Phase 13: Production Hardening & PWA Deployment --------------------
+  pwaSnapshot(): { onLine: boolean; serviceWorkerSupported: boolean }
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
@@ -567,6 +569,11 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     metronomeSetBpm: (bpm) => engine.setMetronomeBpm(bpm),
     metronomeGetSnapshot: () => engine.getMetronomeSnapshot(),
     chordDetectNotes: (notes) => detectChord(notes),
+    // ---- Phase 13: Production Hardening & PWA Deployment --------------------
+    pwaSnapshot: () => ({
+      onLine: navigator.onLine,
+      serviceWorkerSupported: 'serviceWorker' in navigator,
+    }),
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have

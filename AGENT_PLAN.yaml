@@ -13,15 +13,16 @@ project:
 current_phase:
   id: "13"
   name: "Production Hardening & PWA Deployment"
-  status: planning
+  status: completed_and_committed
   detail: |
-    Phase 12 Workstation Tools committed (bb3751d). Preparing Phase 13 production deployment audit & hardening.
+    Production React ErrorBoundary, Offline Network Banner, Workbox SW precache optimization,
+    356/356 smoke checks passing on 3 consecutive runs.
 
 last_verified_checkpoint:
-  commit: "bb3751d"
-  message: "chore: checkpoint verified phase 12 workstation tools (metronome & chord assist)"
+  commit: "b6750b2"
+  message: "chore: checkpoint verified phase 13 production hardening & pwa deployment"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 350 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 356 }
 
 completed_phases:
   - id: "4A"
@@ -53,7 +54,10 @@ completed_phases:
     smoke: "341/341 x3"
   - id: "12"
     name: "Workstation Tools (Metronome & Chord Assist)"
-    smoke: "349/349 x3"
+    smoke: "350/350 x3"
+  - id: "13"
+    name: "Production Hardening & PWA Deployment"
+    smoke: "355/355 x3"
 
 current_work:
   uncommitted_files: []

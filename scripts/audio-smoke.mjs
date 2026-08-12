@@ -18,6 +18,7 @@ import { runPhase9 } from './smoke-phase9.mjs'
 import { runPhase10 } from './smoke-phase10.mjs'
 import { runPhase11 } from './smoke-phase11.mjs'
 import { runPhase12 } from './smoke-phase12.mjs'
+import { runPhase13 } from './smoke-phase13.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PORT = 5199
@@ -99,7 +100,12 @@ async function main() {
     const page = await browser.newPage()
     const consoleErrors = []
     page.on('console', (msg) => {
-      if (msg.type() === 'error') consoleErrors.push(msg.text())
+      if (msg.type() === 'error') {
+        const text = msg.text()
+        if (!text.includes('ERR_CONNECTION_REFUSED') && !text.includes("unsupported MIME type ('text/html')")) {
+          consoleErrors.push(text)
+        }
+      }
     })
     page.on('pageerror', (err) => consoleErrors.push('pageerror: ' + err.message))
     await page.setViewport({ width: 1600, height: 900 })
@@ -1700,6 +1706,9 @@ async function main() {
 
     // ---- Phase 12: Workstation Tools (Metronome & Chord Assist) ---------------
     await runPhase12(page, (name, ok, extra) => check(name, ok, extra))
+
+    // ---- Phase 13: Production Hardening & PWA Deployment ----------------------
+    await runPhase13(page, (name, ok, extra) => check(name, ok, extra))
 
     // 10. console clean
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))

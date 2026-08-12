@@ -19,6 +19,8 @@ import { getNoteEventBus } from './midi/NoteEventBus'
 import { getQwertyManager } from './keyboard/QwertyManager'
 import { pushError } from './utils/ErrorBus'
 import { installTestHarness } from './testHarness'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { OfflineBanner } from './components/OfflineBanner'
 
 interface TuningUiState {
   state: AudioContextState | 'closed'
@@ -99,6 +101,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <OfflineBanner />
       <header className="app__bar">
         <span className="brand">Apianocraft</span>
         <select
@@ -140,13 +143,27 @@ export default function App() {
         </button>
       </section>
 
-      <WorkstationToolsPanel />
-      <RecorderPanel />
-      <PresetPanel />
-      <MainTonePanel engine={engine} />
-      <DualTonePanel engine={engine} />
-      <SplitPanel />
-      <MasterPanel />
+      <ErrorBoundary name="Workstation Tools">
+        <WorkstationToolsPanel />
+      </ErrorBoundary>
+      <ErrorBoundary name="Recorder & Performance">
+        <RecorderPanel />
+      </ErrorBoundary>
+      <ErrorBoundary name="Presets">
+        <PresetPanel />
+      </ErrorBoundary>
+      <ErrorBoundary name="Main Tone & Effects">
+        <MainTonePanel engine={engine} />
+      </ErrorBoundary>
+      <ErrorBoundary name="Dual Tone Layer">
+        <DualTonePanel engine={engine} />
+      </ErrorBoundary>
+      <ErrorBoundary name="Keyboard Split">
+        <SplitPanel />
+      </ErrorBoundary>
+      <ErrorBoundary name="Master Bus EQ">
+        <MasterPanel />
+      </ErrorBoundary>
 
       <PianoKeyboard engine={engine} />
       <ErrorBanner />
