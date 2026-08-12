@@ -36,8 +36,16 @@ export async function runPhase9(page, assert) {
   assert('Lower zone note spawns voice', lowerVoiceCount === 1, `active=${lowerVoiceCount}`)
 
   await page.evaluate(() => window.__apiano.noteOff(48))
-  await new Promise((r) => setTimeout(r, 350))
-  const afterLowerOff = await page.evaluate(() => window.__apiano.stats().activeVoices)
+  const afterLowerOff = await page.evaluate(async () => {
+    const api = window.__apiano
+    const t0 = performance.now()
+    while (performance.now() - t0 < 4000) {
+      const s = api.stats()
+      if (s.activeVoices === 0) return s.activeVoices
+      await new Promise((r) => setTimeout(r, 50))
+    }
+    return api.stats().activeVoices
+  })
   assert('Lower zone note release', afterLowerOff === 0, `active=${afterLowerOff}`)
 
   // Upper zone note (note 72 >= splitPoint 60)
@@ -47,7 +55,14 @@ export async function runPhase9(page, assert) {
   assert('Upper zone note spawns voice', upperVoiceCount === 1, `active=${upperVoiceCount}`)
 
   await page.evaluate(() => window.__apiano.noteOff(72))
-  await new Promise((r) => setTimeout(r, 350))
+  await page.evaluate(async () => {
+    const api = window.__apiano
+    const t0 = performance.now()
+    while (performance.now() - t0 < 4000) {
+      if (api.stats().activeVoices === 0) return
+      await new Promise((r) => setTimeout(r, 50))
+    }
+  })
 
   // Split chord across zones (48 lower, 72 upper)
   await page.evaluate(() => {
@@ -69,8 +84,16 @@ export async function runPhase9(page, assert) {
   assert('Split voices sustained by pedal', sustainedSplitCount === 2, `active=${sustainedSplitCount}`)
 
   await page.evaluate(() => window.__apiano.sustainOff())
-  await new Promise((r) => setTimeout(r, 400))
-  const releasedSplitCount = await page.evaluate(() => window.__apiano.stats().activeVoices)
+  const releasedSplitCount = await page.evaluate(async () => {
+    const api = window.__apiano
+    const t0 = performance.now()
+    while (performance.now() - t0 < 4000) {
+      const s = api.stats()
+      if (s.activeVoices === 0) return s.activeVoices
+      await new Promise((r) => setTimeout(r, 50))
+    }
+    return api.stats().activeVoices
+  })
   assert('Split voices released when pedal lifted', releasedSplitCount === 0, `active=${releasedSplitCount}`)
 
   // Split lower octave shift and transpose

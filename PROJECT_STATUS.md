@@ -6,14 +6,14 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 9 — Master Bus Processing, Presets & Split Keyboard** (implemented, verified 3x, **ready for checkpoint commit**) |
-| Latest Git checkpoint | `3a425bb` `chore: checkpoint verified phase 8 dual tone layering` (HEAD, branch `main`) |
-| Working tree | Modified engine/UI/harness/docs + untracked Phase 9 additions — ready for commit |
+| Current phase | **Phase 9 — Master Bus Processing, Presets & Split Keyboard** (completed & committed) |
+| Latest Git checkpoint | `375cf2e` `chore: checkpoint verified phase 9 master bus, presets & split keyboard` (HEAD, branch `main`) |
+| Working tree | Clean |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |
 | build | ✓ (verified 0 errors, PWA SW generated) |
 | smoke | **310/310 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
-| Next action | Standing by for user approval to commit Phase 9 checkpoint |
+| Next action | Plan and implement Phase 10 — Additional Instruments |
 | Next phase | **Phase 10 — Additional Instruments** |
 
 ## Implemented features

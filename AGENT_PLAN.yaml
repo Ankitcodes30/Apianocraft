@@ -11,19 +11,17 @@ project:
   description: Low-latency browser piano / digital keyboard workstation, fully client-side.
 
 current_phase:
-  id: "9"
-  name: "Master Bus Processing, Presets & Split Keyboard"
-  status: implemented_and_verified_3x_uncommitted
+  id: "10"
+  name: "Additional Instruments"
+  status: planning
   detail: |
-    Master 3-band EQ, Master volume, Split Keyboard zone routing, ToneChain lower layer,
-    Workstation presets (factory + LocalStorage user presets), MasterPanel, SplitPanel, PresetPanel UI,
-    310/310 smoke checks passing on 3 consecutive runs.
+    Phase 9 Master Bus Processing, Presets & Split Keyboard committed (375cf2e). Preparing Phase 10 plan.
 
 last_verified_checkpoint:
-  commit: "3a425bb"
-  message: "chore: checkpoint verified phase 8 dual tone layering"
+  commit: "375cf2e"
+  message: "chore: checkpoint verified phase 9 master bus, presets & split keyboard"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 291 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 310 }
 
 completed_phases:
   - id: "4A"
