@@ -11,19 +11,17 @@ project:
   description: Low-latency browser piano / digital keyboard workstation, fully client-side.
 
 current_phase:
-  id: "10"
-  name: "Additional Instrument Bank"
-  status: implemented_and_verified_3x_uncommitted
+  id: "11"
+  name: "Recording / Performance Recording"
+  status: planning
   detail: |
-    Electric Piano, Synth Pad, Drawbar Organ, String Ensemble, Synth Brass, Synth Bass procedural timbres,
-    InstrumentBank registration, dynamic UI dropdowns on Main/Dual/Split panels,
-    332/332 smoke checks passing on 3 consecutive runs.
+    Phase 10 Additional Instrument Bank committed (39bb51b). Preparing Phase 11 plan.
 
 last_verified_checkpoint:
-  commit: "0400daa"
-  message: "docs: update status and plan for phase 9 checkpoint"
+  commit: "39bb51b"
+  message: "chore: checkpoint verified phase 10 additional instrument bank"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 310 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 332 }
 
 completed_phases:
   - id: "4A"

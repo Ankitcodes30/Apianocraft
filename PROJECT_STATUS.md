@@ -6,14 +6,14 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 10 — Additional Instrument Bank** (implemented, verified 3x, **ready for checkpoint commit**) |
-| Latest Git checkpoint | `0400daa` `docs: update status and plan for phase 9 checkpoint` (HEAD, branch `main`) |
-| Working tree | Modified engine/UI/harness/docs + untracked Phase 10 additions — ready for commit |
+| Current phase | **Phase 10 — Additional Instrument Bank** (completed & committed) |
+| Latest Git checkpoint | `39bb51b` `chore: checkpoint verified phase 10 additional instrument bank` (HEAD, branch `main`) |
+| Working tree | Clean |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |
 | build | ✓ (verified 0 errors, PWA SW generated) |
 | smoke | **332/332 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
-| Next action | Standing by for user approval to commit Phase 10 checkpoint |
+| Next action | Plan and implement Phase 11 — Recording / Performance Recording |
 | Next phase | **Phase 11 — Recording / Performance Recording** |
 
 ## Implemented features
