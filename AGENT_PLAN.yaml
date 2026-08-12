@@ -11,19 +11,17 @@ project:
   description: Low-latency browser piano / digital keyboard workstation, fully client-side.
 
 current_phase:
-  id: "11"
-  name: "Recording & Performance Capture"
-  status: implemented_and_verified_3x_uncommitted
+  id: "12"
+  name: "Workstation Tools (Metronome & Chord Assist)"
+  status: planning
   detail: |
-    PerformanceRecorder event timeline, MidiEncoder SMF Type 0 binary export (.mid),
-    WavEncoder 16-bit PCM WAV audio export (.wav), RecorderPanel transport controls,
-    341/341 smoke checks passing on 3 consecutive runs.
+    Phase 11 Performance Recording & Capture committed (e13a71a). Standing by for Phase 12 instructions.
 
 last_verified_checkpoint:
-  commit: "1b70327"
-  message: "docs: update status and plan for phase 10 checkpoint"
+  commit: "e13a71a"
+  message: "chore: checkpoint verified phase 11 performance recording & capture"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 332 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 341 }
 
 completed_phases:
   - id: "4A"

@@ -6,14 +6,14 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 11 — Recording & Performance Capture** (implemented, verified 3x, **ready for checkpoint commit**) |
-| Latest Git checkpoint | `1b70327` `docs: update status and plan for phase 10 checkpoint` (HEAD, branch `main`) |
-| Working tree | Modified engine/UI/harness/docs + untracked Phase 11 additions — ready for commit |
+| Current phase | **Phase 11 — Recording & Performance Capture** (completed & committed) |
+| Latest Git checkpoint | `e13a71a` `chore: checkpoint verified phase 11 performance recording & capture` (HEAD, branch `main`) |
+| Working tree | Clean |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |
 | build | ✓ (verified 0 errors, PWA SW generated) |
 | smoke | **341/341 ✓** — verified 3 consecutive runs (0 failures across all 3 runs) |
-| Next action | Standing by for user approval to commit Phase 11 checkpoint |
+| Next action | Standing by for Phase 12 instruction |
 | Next phase | **Phase 12 — Workstation Tools (Metronome & Chord Assist)** |
 
 ## Implemented features
