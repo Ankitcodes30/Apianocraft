@@ -19,8 +19,8 @@ current_phase:
     356/356 smoke checks passing on 3 consecutive runs.
 
 last_verified_checkpoint:
-  commit: "b6750b2"
-  message: "chore: checkpoint verified phase 13 production hardening & pwa deployment"
+  commit: "740f0c2"
+  message: "docs: finalize production release readiness"
   branch: main
   verified: { typecheck: true, lint: true, build: true, smoke: 356 }
 

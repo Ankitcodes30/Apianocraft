@@ -20,15 +20,16 @@ npm run smoke      # automated audio engine test against the production build
                    # (requires: npm run build first, and Chrome/Edge installed)
 ```
 
-## Architecture (Phase 7.5 — QWERTY input, effects, MIDI, performance pad)
+## Architecture (Phase 13 — Complete Digital Keyboard Workstation)
 
 ```
 Input (mouse/touch, QWERTY, MIDI)
   -> NoteEventBus (normalized events; input adapters never touch the engine)
   -> AudioEngine.noteOn/noteOff   (React is NOT in this path)
+  -> Split / Dual Layer Dispatcher
   -> VoiceManager (adaptive polyphony cap, voice stealing)
   -> Voice (per-note AudioBufferSource + gain envelope on the audio clock)
-  -> instrument bus
+  -> MainToneChain / DualToneChain -> Master EQ
   -> master gain -> analyser (meter tap) -> peak-limiter AudioWorklet -> destination
 ```
 
@@ -43,16 +44,11 @@ Input (mouse/touch, QWERTY, MIDI)
   DynamicsCompressor fallback.
 - UI highlights keys by toggling CSS classes directly from engine events —
   no React re-render on note events.
-- Instrument abstraction (`src/audio/instruments/Instrument.ts`): instruments
-  are interchangeable providers returning a buffer plus playback parameters
-  (pitch, attack trim, gain). The engine never branches on instrument type.
-- Multisampled instruments (`src/audio/samples/SampleInstrument.ts`) are
-  driven by a manifest (zones, velocity layers, license fields). Loading is
-  lazy and progressive: the first note waits only for its own file while the
-  rest streams in the background. Caching is three-tier — decoded LRU
-  (128 MB budget) -> raw bytes in IndexedDB -> network.
-- Instrument picker in the header switches instruments and shows live sample
-  load progress.
+- Dual Tone Layering: run two independent sound generators (with separate tone chains and tuning) simultaneously.
+- Keyboard Split Mode: assign independent instrument, volume, octave, and transpose to lower vs upper keyboard zones.
+- Workstation Tools: Sample-accurate Audio-Clock Metronome (30–280 BPM), Real-Time Pitch Class Chord Detector (triads, 7ths, slash inversions), and Scale Harmony Visualizer.
+- Performance Recorder: Capture performance timelines, transport playback, and binary Standard MIDI File (`.mid`) export.
+- PWA & Error Isolation: Service Worker offline asset caching, network status banner, and React Error Boundaries around UI control panels.
 
 ## Computer Keyboard (QWERTY, Phase 7.5)
 
@@ -69,13 +65,16 @@ Input (mouse/touch, QWERTY, MIDI)
   Ctrl/Cmd/Alt combinations are ignored; window blur and tab-hide release
   only the QWERTY-held notes (MIDI/mouse notes are untouched).
 
-## Instruments
+## Instruments (8 Instrument Bank)
 
-- **Demo Piano** — procedurally synthesized provider (no assets) used to
-  validate the sampler path.
-- **Grand Piano** — Salamander Grand Piano V3 subset (Alexander Holm,
-  CC BY 3.0): 30 zones across 88 keys x 2 velocity layers, 60 FLAC files,
-  ~83 MB. Samples live in `public/samples/grand-piano/`.
+- **Grand Piano** — Salamander Grand Piano V3 subset (Alexander Holm, CC BY 3.0): 30 zones across 88 keys x 2 velocity layers, 60 FLAC files, ~83 MB.
+- **Electric Piano** — Multisampled Rhodes-style electric piano with warm velocity response.
+- **Synth Pad** — Polyphonic ambient analog pad synthesizer.
+- **Drawbar Organ** — Organ instrument with harmonic drawbars.
+- **String Ensemble** — Orchestral string ensemble layer.
+- **Synth Brass** — Bright polyphonic brass synthesizer.
+- **Synth Bass** — Deep resonant bass synthesizer.
+- **Demo Piano** — Procedurally synthesized provider (no assets) used for fast validation.
 
 ## Diagnostics
 
@@ -91,10 +90,9 @@ recent note, buffer acquisition and note-start timing.
 verifies: context running, single-note round trip, 16-note chords, a 400-note
 retrigger storm, bounded voice pool, over-cap behavior, same-note retrigger,
 sustain pedal hold/release, keyboard render isolation, heap stability and a
-clean console — plus the Grand Piano: cold load from network, warm load from
-IndexedDB, lazy first note, decoded-cache hits, 88-key zone coverage, and
-cache-cleared pending-off storms. Results land in `smoke-results.json` plus a
-screenshot.
+clean console — plus Grand Piano loading, Dual Tone doubling, Split keyboard zones,
+presets, instrument switching across all 8 bank sounds, recorder MIDI export, Metronome & Chord Assist,
+and PWA offline banner & Error Boundary resilience (356/356 checks passing). Results land in `smoke-results.json` plus a screenshot.
 
 ## Licensing
 

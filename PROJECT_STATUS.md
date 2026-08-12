@@ -6,8 +6,8 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 13 — Production Hardening & PWA Deployment** (completed & committed) |
-| Latest Git checkpoint | `b6750b2` `chore: checkpoint verified phase 13 production hardening & pwa deployment` (HEAD, branch `main`) |
+| Current phase | **Phase 13 — Production Hardening & PWA Deployment** (release finalized & committed) |
+| Latest Git checkpoint | `740f0c2` `docs: finalize production release readiness` (HEAD, branch `main`) |
 | Working tree | Clean |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |
