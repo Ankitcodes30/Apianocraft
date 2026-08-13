@@ -6,8 +6,8 @@
 
 | Item | State |
 |---|---|
-| Current phase | **Phase 13 — Production Hardening & PWA Deployment** (release finalized & committed) |
-| Latest Git checkpoint | `740f0c2` `docs: finalize production release readiness` (HEAD, branch `main`) |
+| Current phase | **Phase 13 — Production Hardening & PWA Deployment** (real-browser bugfixes verified & committed) |
+| Latest Git checkpoint | `7fe1d72` `fix: correct limiter worklet delay indexing and body vertical scrollability` (HEAD, branch `main`) |
 | Working tree | Clean |
 | typecheck | ✓ (verified 0 errors) |
 | lint | ✓ (verified 0 errors, 0 warnings) |

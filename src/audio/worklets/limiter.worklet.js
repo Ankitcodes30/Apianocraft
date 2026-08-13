@@ -42,7 +42,6 @@ class PeakLimiterProcessor extends AudioWorkletProcessor {
 
     const chCount = Math.min(this.delayBufs.length, output.length)
     const n = output[0].length
-    const readIdx = (this.idx + 1) % this.delayLen
 
     for (let i = 0; i < n; i++) {
       // Peak across channels
@@ -56,6 +55,7 @@ class PeakLimiterProcessor extends AudioWorkletProcessor {
       if (target < this.gain) this.gain = target + (this.gain - target) * attackC
       else this.gain = target + (this.gain - target) * releaseC
 
+      const readIdx = (this.idx + 1) % this.delayLen
       for (let c = 0; c < chCount; c++) {
         const inCh = input[c] || input[0]
         const outCh = output[c]
@@ -66,8 +66,8 @@ class PeakLimiterProcessor extends AudioWorkletProcessor {
         const a = Math.abs(v)
         if (a > this.windowPeak) this.windowPeak = a
       }
+      this.idx = readIdx
     }
-    this.idx = readIdx
     this.samplesProcessed += n
     // Render-thread progress + level clock for diagnostics: the page can read
     // the exact position of the rendered stream and the peak amplitude of each

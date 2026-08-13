@@ -183,6 +183,7 @@ export interface TestApi {
   chordDetectNotes(notes: number[]): import('./audio/tools/ChordDetector').ChordResult | null
   // ---- Phase 13: Production Hardening & PWA Deployment --------------------
   pwaSnapshot(): { onLine: boolean; serviceWorkerSupported: boolean }
+  waveformSmoothness(note?: number): Promise<{ isSmooth: boolean; zeroDiffRatio: number }>
 }
 
 /** Dev/test hook: lets the audio smoke test drive and inspect the engine. */
@@ -574,6 +575,24 @@ export function installTestHarness(engine: AudioEngine): TestApi {
       onLine: navigator.onLine,
       serviceWorkerSupported: 'serviceWorker' in navigator,
     }),
+    async waveformSmoothness(note = 60) {
+      const meter = engine.analyser
+      if (!meter) return { isSmooth: false, zeroDiffRatio: 1 }
+      engine.noteOn({ note, velocity: 0.8, source: 'programmatic' })
+      await sleep(100)
+      const buf = new Float32Array(meter.fftSize)
+      meter.getFloatTimeDomainData(buf)
+      engine.noteOff({ note })
+      await drain()
+      let zeroDiffs = 0
+      for (let i = 0; i < buf.length - 1; i++) {
+        if (Math.abs(buf[i + 1] - buf[i]) < 1e-7) {
+          zeroDiffs++
+        }
+      }
+      const zeroDiffRatio = zeroDiffs / (buf.length - 1)
+      return { isSmooth: zeroDiffRatio < 0.25, zeroDiffRatio }
+    },
   }
 
   // Merge, never replace: other modules (e.g. PianoKeyboard) may already have

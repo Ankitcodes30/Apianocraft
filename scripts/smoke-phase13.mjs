@@ -27,6 +27,17 @@ export async function runPhase13(page, assert) {
   const errorBoundariesActive = await page.evaluate(() => document.querySelectorAll('[data-error-boundary]').length)
   assert('Zero UI Error Boundaries triggered in healthy app state', errorBoundariesActive === 0, `active=${errorBoundariesActive}`)
 
+  // 4. Limiter Audio Waveform Smoothness (No Step/Click Repeating Artifacts)
+  const waveSmooth = await page.evaluate(() => window.__apiano.waveformSmoothness(60))
+  assert('Audio output waveform is continuous and smooth (no step-click artifacts)', waveSmooth.isSmooth === true, `zeroDiffRatio=${waveSmooth.zeroDiffRatio.toFixed(3)}`)
+
+  // 5. Page Layout Vertical Scrollability
+  const isScrollable = await page.evaluate(() => {
+    const style = getComputedStyle(document.body)
+    return style.overflowY === 'auto' || style.overflowY === 'visible' || style.overflow === 'auto'
+  })
+  assert('Page layout body allows vertical scrolling', isScrollable === true, `scrollable=${isScrollable}`)
+
   const finalSnap = await page.evaluate(() => window.__apiano.stats())
   assert('Final Phase 13 engine state clean', finalSnap.activeVoices === 0, `active=${finalSnap.activeVoices}`)
 

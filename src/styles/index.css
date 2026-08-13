@@ -28,7 +28,7 @@ body {
     Roboto,
     'Helvetica Neue',
     sans-serif;
-  overflow: hidden;
+  overflow-y: auto;
   overscroll-behavior: none;
   user-select: none;
   -webkit-user-select: none;
@@ -39,7 +39,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 100%;
+  min-height: 100%;
   padding: 10px 14px 12px;
   min-width: 760px;
 }

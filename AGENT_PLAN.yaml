@@ -19,8 +19,8 @@ current_phase:
     356/356 smoke checks passing on 3 consecutive runs.
 
 last_verified_checkpoint:
-  commit: "740f0c2"
-  message: "docs: finalize production release readiness"
+  commit: "7fe1d72"
+  message: "fix: correct limiter worklet delay indexing and body vertical scrollability"
   branch: main
   verified: { typecheck: true, lint: true, build: true, smoke: 356 }
 
