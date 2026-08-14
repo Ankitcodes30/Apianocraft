@@ -100,6 +100,8 @@ export class VoiceManager {
       gainDb?: number
       env?: Partial<EnvelopeConfig>
       pitchBendCents?: number
+      portamentoFromRate?: number
+      portamentoTimeMs?: number
       out?: AudioNode
     } = {},
   ): boolean {
@@ -124,6 +126,8 @@ export class VoiceManager {
       startOffset: opts.startOffset ?? 0,
       gainDb: opts.gainDb,
       pitchBendCents: opts.pitchBendCents,
+      portamentoFromRate: opts.portamentoFromRate,
+      portamentoTimeMs: opts.portamentoTimeMs,
       out: opts.out ?? this.deps.bus,
       env: { ...this.deps.env, ...opts.env },
       when: this.deps.ctx.currentTime + 0.004,

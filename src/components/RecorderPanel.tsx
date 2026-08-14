@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { getEngine } from '../audio/AudioEngine'
 import type { TransportSnapshot } from '../audio/recorder/PerformanceRecorder'
+import { Card, CardHeader, CardContent } from './ui/card'
+import { Button } from './ui/button'
+import { Badge } from './ui/badge'
 
 function formatTimecode(ms: number): string {
   const totalSec = Math.floor(ms / 1000)
@@ -77,81 +80,97 @@ export const RecorderPanel: React.FC = () => {
   }
 
   return (
-    <section className="recorder-panel" aria-label="Performance Recorder Controls">
-      <div className="recorder-panel__head">
-        <span className="recorder-panel__title">RECORDER / TRANSPORT</span>
-        <div className="recorder-panel__timecode" data-timecode>
+    <Card className="recorder-panel border-border" aria-label="Performance Recorder Controls">
+      <CardHeader className="recorder-panel__head flex flex-row items-center justify-between space-y-0 p-3">
+        <span className="recorder-panel__title font-bold text-xs tracking-wider text-foreground">
+          RECORDER / TRANSPORT
+        </span>
+        <Badge variant="outline" className="recorder-panel__timecode font-mono text-xs px-2 py-0.5" data-timecode>
           {formatTimecode(snap.recordedTimeMs)}
+        </Badge>
+      </CardHeader>
+
+      <CardContent className="p-3 pt-0 flex flex-col gap-3">
+        <div className="recorder-panel__controls flex gap-2 flex-wrap items-center">
+          <Button
+            type="button"
+            variant={snap.state === 'recording' ? 'panic' : 'outline'}
+            size="sm"
+            className={`btn-transport btn-record ${snap.state === 'recording' ? 'active' : ''}`}
+            onClick={handleRecordToggle}
+            aria-label={snap.state === 'recording' ? 'Stop Recording' : 'Record'}
+            data-btn-record
+          >
+            <span className="rec-dot inline-block w-2 h-2 rounded-full bg-red-500 mr-1 animate-pulse" />
+            {snap.state === 'recording' ? 'Rec...' : 'Record'}
+          </Button>
+
+          <Button
+            type="button"
+            variant={snap.state === 'playing' ? 'on' : 'outline'}
+            size="sm"
+            className={`btn-transport btn-play ${snap.state === 'playing' ? 'active' : ''}`}
+            onClick={handlePlayToggle}
+            disabled={snap.eventCount === 0 || snap.state === 'recording'}
+            aria-label={snap.state === 'playing' ? 'Pause Playback' : 'Play'}
+            data-btn-play
+          >
+            ▶ {snap.state === 'playing' ? 'Playing' : 'Play'}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="btn-transport btn-stop"
+            onClick={handleStop}
+            disabled={snap.state === 'idle'}
+            aria-label="Stop Transport"
+            data-btn-stop
+          >
+            ■ Stop
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="btn-transport btn-clear"
+            onClick={handleClear}
+            disabled={snap.eventCount === 0}
+            aria-label="Clear Recorded Events"
+            data-btn-clear
+          >
+            Clear ({snap.eventCount})
+          </Button>
         </div>
-      </div>
 
-      <div className="recorder-panel__controls">
-        <button
-          type="button"
-          className={`btn-transport btn-record ${snap.state === 'recording' ? 'active' : ''}`}
-          onClick={handleRecordToggle}
-          aria-label={snap.state === 'recording' ? 'Stop Recording' : 'Record'}
-          data-btn-record
-        >
-          <span className="rec-dot" />
-          {snap.state === 'recording' ? 'Rec...' : 'Record'}
-        </button>
+        <div className="recorder-panel__export flex gap-2 flex-wrap items-center">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="btn-export btn-export-midi text-xs"
+            onClick={handleExportMidi}
+            disabled={snap.eventCount === 0}
+            data-export-midi
+          >
+            Export MIDI (.mid)
+          </Button>
 
-        <button
-          type="button"
-          className={`btn-transport btn-play ${snap.state === 'playing' ? 'active' : ''}`}
-          onClick={handlePlayToggle}
-          disabled={snap.eventCount === 0 || snap.state === 'recording'}
-          aria-label={snap.state === 'playing' ? 'Pause Playback' : 'Play'}
-          data-btn-play
-        >
-          ▶ {snap.state === 'playing' ? 'Playing' : 'Play'}
-        </button>
-
-        <button
-          type="button"
-          className="btn-transport btn-stop"
-          onClick={handleStop}
-          disabled={snap.state === 'idle'}
-          aria-label="Stop Transport"
-          data-btn-stop
-        >
-          ■ Stop
-        </button>
-
-        <button
-          type="button"
-          className="btn-transport btn-clear"
-          onClick={handleClear}
-          disabled={snap.eventCount === 0}
-          aria-label="Clear Recorded Events"
-          data-btn-clear
-        >
-          Clear ({snap.eventCount})
-        </button>
-      </div>
-
-      <div className="recorder-panel__export">
-        <button
-          type="button"
-          className="btn-export btn-export-midi"
-          onClick={handleExportMidi}
-          disabled={snap.eventCount === 0}
-          data-export-midi
-        >
-          Export MIDI (.mid)
-        </button>
-
-        <button
-          type="button"
-          className="btn-export btn-export-wav"
-          onClick={handleExportWav}
-          disabled={snap.eventCount === 0}
-          data-export-wav
-        >
-          Export Audio (.wav)
-        </button>
-      </div>
-    </section>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="btn-export btn-export-wav text-xs"
+            onClick={handleExportWav}
+            disabled={snap.eventCount === 0}
+            data-export-wav
+          >
+            Export Audio (.wav)
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -2,10 +2,8 @@ import type { InputSource } from '../audio/types'
 
 /**
  * Normalized input event bus — the single gateway between input sources
- * (MIDI today, others later) and the audio engine. Engine-agnostic: the
+ * (MIDI, QWERTY, UI taps) and the audio engine. Engine-agnostic: the
  * engine subscribes, sources never touch AudioEngine directly.
- *
- *   MIDI input → MidiManager → NoteEventBus → existing engine
  */
 
 export type NoteBusEvent =

@@ -1,14 +1,22 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   build: {
     // The limiter AudioWorklet must be a real file: data: URLs are rejected by
     // AudioWorklet.addModule (non-JS MIME), and inline assets break it.
     assetsInlineLimit: 0,
   },
   plugins: [
+    tailwindcss(),
     react(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -38,3 +46,4 @@ export default defineConfig({
     }),
   ],
 })
+

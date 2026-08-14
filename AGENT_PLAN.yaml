@@ -11,18 +11,20 @@ project:
   description: Low-latency browser piano / digital keyboard workstation, fully client-side.
 
 current_phase:
-  id: "13"
-  name: "Production Hardening & PWA Deployment"
-  status: completed_and_committed
+  id: "14"
+  name: "Instrument Library Expansion & 38-Key QWERTY Keyboard Redesign"
+  status: completed_and_verified
   detail: |
-    Production React ErrorBoundary, Offline Network Banner, Workbox SW precache optimization,
-    356/356 smoke checks passing on 3 consecutive runs.
+    Implemented 38-key continuous chromatic QWERTY piano keyboard (MIDI 48..85, C3..C#6) with Sargam mode (C# = Sa),
+    3 range sections (-1 / 0 / +1), zero modifier requirements, 10 new expressive instrument classes,
+    and 360/360 smoke checks passing across 3 consecutive runs.
+    Produced FRONTEND_REDESIGN_PLAN.md (Implementation-Ready UI Redesign Strategy).
 
 last_verified_checkpoint:
-  commit: "7fe1d72"
-  message: "fix: correct limiter worklet delay indexing and body vertical scrollability"
+  commit: "04a6cec"
+  message: "docs: finalize production release readiness"
   branch: main
-  verified: { typecheck: true, lint: true, build: true, smoke: 356 }
+  verified: { typecheck: true, lint: true, build: true, smoke: 360 }
 
 completed_phases:
   - id: "4A"
@@ -57,55 +59,10 @@ completed_phases:
     smoke: "350/350 x3"
   - id: "13"
     name: "Production Hardening & PWA Deployment"
-    smoke: "355/355 x3"
-
-current_work:
-  uncommitted_files: []
-
-next_phase:
-  id: "10"
-  name: "Additional Instruments"
-  status: planned
-  goals:
-    - Add sample/synth instrument definitions for Strings, Electric Piano, Organ, Brass, Flute.
-    - Implement multi-instrument bank switching & preloading.
-    - Extend harness & smoke tests for instrument bank switching.
-
-future_phases:
-  - id: "11"
-    name: "Recording / MIDI export / performance recording"
-  - id: "12"
-    name: "Presets / chord tools / metronome / scale tools / advanced performance features"
-  - id: "13"
-    name: "Production hardening / PWA / offline behavior / deployment"
-
-architecture_rules:
-  - "One persistent AudioContext."
-  - "Audio engine independent of React; React never on the note hot path."
-  - "No unnecessary audio nodes per note; no effect-chain rebuilds on parameter changes."
-  - "Schedule with AudioContext.currentTime; use AudioParam automation."
-  - "No arbitrary sleeps to solve audio timing problems; wait on engine state."
-  - "Preserve pending-load/pending-off correctness; dropped notes must never become stuck or accidentally sustained."
-  - "Voice pooling and adaptive polyphony remain bounded."
-  - "Sample buffers shared via SampleBank/decode cache; no duplicate decoding."
-  - "UI communicates through normalized events/state abstractions, never by directly driving the engine."
-
-performance_rules:
-  - "baseCap = min(64, max(8, hardwareConcurrency * 16)); cap halves under drops/steals, doubles back when healthy."
-  - "Voice stealing: release-phase voices first, then sustain-held, then longest-sounding."
-  - "Same-note presses retrigger with fast release (env.release * 0.25); release tail 0.03s for cut-off pending offs."
-  - "Decoded LRU cache budget ~128 MB (DEFAULT_MAX_DECODED_BYTES)."
-  - "Limiter worklet clock()/level() are the trusted render-thread measurement path."
-
-testing_rules:
-  - "Never weaken existing assertions."
-  - "Add regression tests for real bugs (prove fail pre-fix, pass post-fix)."
-  - "Prefer deterministic render-thread measurements over fragile transient analyser timing."
-  - "Smoke: run npm run build first, then npm run smoke (headless Chrome/Edge, port 5199)."
-  - "Phase completion: typecheck, lint, build, full smoke, then 3 consecutive green smoke runs."
-
-git_rules:
-  - "HEAD at 7d8535f (Phase 7 checkpoint) with uncommitted Phase 7.5 and Phase 8 work in the tree."
-  - "Never reset user work, delete unrelated changes, force push, rewrite history silently, or commit secrets / node_modules / dist / temp debug scripts."
-  - "Before commits: git status, git diff, git diff --cached. After: git status."
-  - "Never push unless explicitly instructed."
+    smoke: "356/356 x3"
+  - id: "14"
+    name: "Instrument Library Expansion & 38-Key QWERTY Keyboard Redesign"
+    smoke: "360/360 x3"
+  - id: "21"
+    name: "Mouse Performance Pitch + Modulation Control"
+    smoke: "381/381 x3"

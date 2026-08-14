@@ -4,16 +4,7 @@ import { PianoKeyboard } from './components/PianoKeyboard'
 import { EngineStatus } from './components/EngineStatus'
 import { SampleStatus } from './components/SampleStatus'
 import { ErrorBanner } from './components/ErrorBanner'
-import { MidiPanel } from './components/MidiPanel'
-import { PerformancePad } from './components/PerformancePad'
-import { MainTonePanel } from './components/MainTonePanel'
-import { DualTonePanel } from './components/DualTonePanel'
-import { MasterPanel } from './components/MasterPanel'
-import { SplitPanel } from './components/SplitPanel'
-import { PresetPanel } from './components/PresetPanel'
-import { RecorderPanel } from './components/RecorderPanel'
-import { WorkstationToolsPanel } from './components/WorkstationToolsPanel'
-import { KeyboardPanel } from './components/KeyboardPanel'
+import { WorkstationInspector } from './components/WorkstationInspector'
 import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
 import { getQwertyManager } from './keyboard/QwertyManager'
@@ -21,6 +12,11 @@ import { pushError } from './utils/ErrorBus'
 import { installTestHarness } from './testHarness'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { OfflineBanner } from './components/OfflineBanner'
+import { ThemeSelector } from './components/ThemeSelector'
+import { MousePerformanceToggle } from './components/MousePerformanceToggle'
+import { BrandLogo } from './components/BrandLogo'
+import { Button } from './components/ui/button'
+import { Badge } from './components/ui/badge'
 
 interface TuningUiState {
   state: AudioContextState | 'closed'
@@ -58,8 +54,6 @@ export default function App() {
     window.addEventListener('pointerdown', unlockOnGesture)
     installTestHarness(engine)
 
-    // Phase 5: normalized event bus -> engine. MIDI never touches the engine
-    // directly; it emits bus events and this adapter forwards them.
     const bus = getNoteEventBus()
     const unsubBus = bus.subscribe((e) => {
       switch (e.kind) {
@@ -86,7 +80,6 @@ export default function App() {
     })
     const midi = getMidiManager(bus)
     void midi.start()
-    // Phase 7.5: QWERTY computer keyboard — same bus, source 'keyboard'.
     const qwerty = getQwertyManager(bus)
     qwerty.start()
 
@@ -100,25 +93,52 @@ export default function App() {
   }, [engine])
 
   return (
-    <div className="app">
+    <div className="app font-sans">
       <OfflineBanner />
-      <header className="app__bar">
-        <span className="brand">Apianocraft</span>
-        <select
-          className="chip select"
-          aria-label="Instrument"
-          value={instrumentId}
-          disabled={!ready}
-          onChange={(e) => void engine.setInstrument(e.target.value)}
+
+      {/* Top Performance Dock */}
+      <header className="app__bar flex items-center gap-3 px-3 py-1.5 bg-card border border-border rounded-lg shadow-sm">
+        {/* Professional Studio Brand Logo Mark & Wordmark */}
+        <BrandLogo />
+
+        {/* Synchronized Compact Active Instrument Display */}
+        <Badge
+          variant="secondary"
+          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-foreground/90 border border-border/80 shadow-xs"
+          title="Active Main Tone Instrument (controlled via Main Tone panel)"
         >
-          {engine.getInstruments().map((i) => (
-            <option key={i.id} value={i.id}>
-              {i.name}
-            </option>
-          ))}
-        </select>
-        <SampleStatus engine={engine} instrumentId={instrumentId} />
-        <EngineStatus engine={engine} />
+          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Main Tone:</span>
+          <span>{engine.getInstruments().find((i) => i.id === instrumentId)?.name ?? instrumentId}</span>
+        </Badge>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <Button
+            type="button"
+            variant={tuning.sustain ? 'on' : 'outline'}
+            size="sm"
+            onClick={() => engine.toggleSustain()}
+            disabled={!ready}
+            title="Toggle Sustain Pedal (Spacebar)"
+            className={tuning.sustain ? 'btn--on' : ''}
+          >
+            Sustain {tuning.sustain ? 'ON' : 'OFF'}
+          </Button>
+          <Button
+            type="button"
+            variant="panic"
+            size="sm"
+            onClick={() => engine.releaseAll()}
+            disabled={!ready}
+            title="Panic / All Notes Off (Escape)"
+            className="btn--panic"
+          >
+            Panic
+          </Button>
+          <MousePerformanceToggle />
+          <ThemeSelector />
+          <SampleStatus engine={engine} instrumentId={instrumentId} />
+          <EngineStatus engine={engine} />
+        </div>
       </header>
 
       {tuning.state === 'suspended' && (
@@ -126,46 +146,18 @@ export default function App() {
       )}
       {bootError && <div className="warn">Startup problem: {bootError}</div>}
 
-      <section className="ctl" aria-label="Performance controls">
-        <PerformancePad engine={engine} />
-        <MidiPanel midi={getMidiManager(getNoteEventBus())} engine={engine} />
-        <KeyboardPanel qwerty={getQwertyManager(getNoteEventBus())} />
-        <button
-          type="button"
-          className={`btn${tuning.sustain ? ' btn--on' : ''}`}
-          onClick={() => engine.toggleSustain()}
-          disabled={!ready}
-        >
-          Sustain {tuning.sustain ? 'ON' : 'OFF'}
-        </button>
-        <button type="button" className="btn" onClick={() => engine.releaseAll()} disabled={!ready}>
-          Panic
-        </button>
-      </section>
-
-      <ErrorBoundary name="Workstation Tools">
-        <WorkstationToolsPanel />
-      </ErrorBoundary>
-      <ErrorBoundary name="Recorder & Performance">
-        <RecorderPanel />
-      </ErrorBoundary>
-      <ErrorBoundary name="Presets">
-        <PresetPanel />
-      </ErrorBoundary>
-      <ErrorBoundary name="Main Tone & Effects">
-        <MainTonePanel engine={engine} />
-      </ErrorBoundary>
-      <ErrorBoundary name="Dual Tone Layer">
-        <DualTonePanel engine={engine} />
-      </ErrorBoundary>
-      <ErrorBoundary name="Keyboard Split">
-        <SplitPanel />
-      </ErrorBoundary>
-      <ErrorBoundary name="Master Bus EQ">
-        <MasterPanel />
+      {/* Workstation Tabbed Inspector */}
+      <ErrorBoundary name="Workstation Inspector">
+        <WorkstationInspector engine={engine} />
       </ErrorBoundary>
 
-      <PianoKeyboard engine={engine} />
+      {/* Piano Keyboard Centerpiece Viewport */}
+      <main className="app-piano-container flex-1 flex flex-col min-h-[200px]" aria-label="Piano keyboard surface">
+        <ErrorBoundary name="Piano Keyboard">
+          <PianoKeyboard engine={engine} />
+        </ErrorBoundary>
+      </main>
+
       <ErrorBanner />
     </div>
   )

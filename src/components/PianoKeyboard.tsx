@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { AudioEngine } from '../audio/AudioEngine'
+import { getMousePerformanceAdapter, type MousePerfState } from '../performance/MousePerformanceAdapter'
 
 const START_NOTE = 36 // C2
 const END_NOTE = 96 // C7 (5 octaves)
@@ -24,13 +25,16 @@ const noteLabel = (midi: number) =>
   midi % 12 === 0 ? `C${midi / 12 - 1}` : NOTE_NAMES[midi % 12]
 
 /**
- * Minimal mouse/touch-playable keyboard for engine validation.
- * Active-note highlighting is driven DIRECTLY on the DOM from engine events
- * (no React re-render on note events). Renders once; render count is exposed
- * for the smoke tests to verify render isolation.
+ * Playable piano keyboard surface.
+ * Active-note highlighting & Mouse Performance indicator are driven DIRECTLY
+ * on the DOM from engine events / performance adapter (zero React re-renders).
  */
 export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const indicatorRef = useRef<HTMLDivElement | null>(null)
+  const pitchTextRef = useRef<HTMLSpanElement | null>(null)
+  const modTextRef = useRef<HTMLSpanElement | null>(null)
+
   const keyEls = useRef(new Map<number, HTMLElement>())
   const held = useRef(new Map<number, number>())
   const engineRef = useRef(engine)
@@ -44,18 +48,46 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
     w.__apiano.keyboardRenders = renderBox.current
   }, [])
 
-  // Engine events -> direct DOM class toggles. Audio drives the UI, never the reverse.
+  // Input events -> direct DOM class toggles on key lifecycle (zero release-tail latency).
   useEffect(() => {
     const apply = (notes: ReadonlySet<number>) => {
       for (const [note, el] of keyEls.current) {
         el.classList.toggle('ap-key--active', notes.has(note))
       }
     }
-    apply(engine.getActiveNotes())
+    apply(engine.getInputActiveNotes())
     return engine.subscribe((e) => {
-      if (e.type === 'active-notes') apply(e.notes)
+      if (e.type === 'input-notes') apply(e.notes)
     })
   }, [engine])
+
+  // Mouse performance adapter -> direct DOM updates for expression badge
+  useEffect(() => {
+    const adapter = getMousePerformanceAdapter()
+    const updateIndicator = (state: MousePerfState) => {
+      const el = indicatorRef.current
+      if (!el) return
+      if (state.enabled && state.active) {
+        el.classList.add('mouse-perf-indicator--active')
+        if (state.settling) {
+          if (pitchTextRef.current) pitchTextRef.current.textContent = 'Mouse Perf: Settling...'
+          if (modTextRef.current) modTextRef.current.textContent = ''
+        } else {
+          if (pitchTextRef.current) {
+            const p = state.pitchBend >= 0 ? `+${state.pitchBend.toFixed(2)}` : state.pitchBend.toFixed(2)
+            pitchTextRef.current.textContent = `Pitch: ${p}`
+          }
+          if (modTextRef.current) {
+            modTextRef.current.textContent = `Mod: ${state.modulation.toFixed(2)}`
+          }
+        }
+      } else {
+        el.classList.remove('mouse-perf-indicator--active')
+      }
+    }
+    updateIndicator(adapter.getState())
+    return adapter.subscribe(updateIndicator)
+  }, [])
 
   // Safety: release everything on tab hide / pointer release anywhere.
   useEffect(() => {
@@ -69,6 +101,7 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
     const releaseAll = () => {
       for (const midi of held.current.values()) engineRef.current.noteOff({ note: midi })
       held.current.clear()
+      getMousePerformanceAdapter().reset()
     }
     window.addEventListener('pointerup', onUp)
     window.addEventListener('pointercancel', onUp)
@@ -98,13 +131,19 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
     held.current.set(pointerId, midi)
   }
 
+  const onPointerEnter = (e: ReactPointerEvent<HTMLDivElement>) => {
+    getMousePerformanceAdapter().handlePointerEnter(e.clientX, e.clientY)
+  }
+
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const el = keyFromTarget(e.target)
     if (el) startNote(e.pointerId, el, e.clientY)
   }
 
-  // Glissando: while a pointer is held, sliding across keys retriggers notes.
+  // Mouse performance pitch/mod expression + glissando note triggering
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    getMousePerformanceAdapter().handlePointerMove(e.clientX, e.clientY)
+
     const cur = held.current.get(e.pointerId)
     if (cur === undefined) return
     const el = keyFromTarget(e.target)
@@ -121,6 +160,7 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
   }
 
   const onPointerLeave = () => {
+    getMousePerformanceAdapter().handlePointerLeave()
     for (const midi of held.current.values()) engineRef.current.noteOff({ note: midi })
     held.current.clear()
   }
@@ -134,11 +174,22 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
     <div
       className="kb"
       ref={rootRef}
+      onPointerEnter={onPointerEnter}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       onContextMenu={(e) => e.preventDefault()}
     >
+      <div className="mouse-perf-indicator" ref={indicatorRef} data-mouse-perf-indicator>
+        <span className="mouse-perf-indicator__badge">Mouse Performance</span>
+        <span className="mouse-perf-indicator__val" ref={pitchTextRef} data-mouse-perf-pitch>
+          Pitch: +0.00
+        </span>
+        <span className="mouse-perf-indicator__val" ref={modTextRef} data-mouse-perf-mod>
+          Mod: 0.00
+        </span>
+      </div>
+
       <div className="kb-whites">
         {WHITES.map((midi) => (
           <div

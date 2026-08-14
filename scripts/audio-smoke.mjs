@@ -19,6 +19,9 @@ import { runPhase10 } from './smoke-phase10.mjs'
 import { runPhase11 } from './smoke-phase11.mjs'
 import { runPhase12 } from './smoke-phase12.mjs'
 import { runPhase13 } from './smoke-phase13.mjs'
+import { runPhase14 } from './smoke-instruments-keyboard.mjs'
+import { runPhase15Features } from './smoke-phase15-features.mjs'
+import { runMousePerformanceSmoke } from './smoke-mouse-performance.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PORT = 5199
@@ -1538,153 +1541,46 @@ async function main() {
     check('App still plays without MIDI (QWERTY path)', dFallback.started === 1, `started=${dFallback.started}`)
     check('No stuck notes after fallback check', dFallback.active === 0, `active=${dFallback.active}`)
 
-    // ---- Phase 6: Performance XY pad --------------------------------------
-    // Deterministic synthetic-pointer tests (no touchpad/mouse hardware):
-    // mapping, self-centering, cancel, ranges, keyboard access, no voices,
-    // no per-move React renders, measured control latency.
+    // ---- Phase 6: Engine Pitch Bend & Modulation APIs & UI Clean-up -----------
     const dPad = await page.evaluate(async () => {
       const api = window.__apiano
-      const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-      const settlePitch = async () => {
-        const t0 = performance.now()
-        while (performance.now() - t0 < 2000) {
-          if (Math.abs(api.stats().pitchBendCents) < 1) return performance.now() - t0
-          await sleep(20)
-        }
-        return -1
+      const padEl = document.querySelector('[data-perf-pad]')
+      const hasOldUi = padEl !== null
+
+      // Test engine pitch bend & modulation API directly
+      api.engineSetPitchBend(1)
+      const stateRight = api.enginePitchBendState()
+      api.engineSetPitchBend(-1)
+      const stateLeft = api.enginePitchBendState()
+      api.engineSetPitchBend(0)
+
+      api.engineSetModulation(1)
+      const stateModUp = api.enginePitchBendState()
+      api.engineSetModulation(0)
+      const stateModDown = api.enginePitchBendState()
+
+      api.engineSetPitchBendRange(12)
+      const stateRange12 = api.enginePitchBendState()
+      api.engineSetPitchBendRange(2)
+      const stateRange2 = api.enginePitchBendState()
+
+      return {
+        hasOldUi,
+        stateRight,
+        stateLeft,
+        stateModUp,
+        stateModDown,
+        stateRange12,
+        stateRange2,
       }
-      const out = {}
-      const voices0 = api.stats().totalStarted
-      out.rendersBefore = api.perfPadState().renders
-
-      // center
-      api.perfPadPointer('down', 0.5, 0.5)
-      out.center = api.perfPadState()
-      // left edge / right edge / top / bottom
-      api.perfPadPointer('move', 0, 0.5)
-      out.left = api.perfPadState()
-      api.perfPadPointer('move', 1, 0.5)
-      out.right = api.perfPadState()
-      api.perfPadPointer('move', 1, 0)
-      out.top = api.perfPadState()
-      api.perfPadPointer('move', 1, 1)
-      out.bottom = api.perfPadState()
-
-      // rapid horizontal / vertical / XY movement
-      const s0 = api.stats()
-      for (let i = 0; i < 30; i++) {
-        api.perfPadPointer('move', (i % 10) / 9, 0.5)
-        await sleep(6)
-      }
-      const s1 = api.stats()
-      out.rapidH = { started: s1.totalStarted - s0.totalStarted, dropped: s1.dropped - s0.dropped, cents: api.perfPadState().cents }
-      out.rendersAfterH = api.perfPadState().renders
-      const s2 = api.stats()
-      for (let i = 0; i < 30; i++) {
-        api.perfPadPointer('move', 0.5, (i % 10) / 9)
-        await sleep(6)
-      }
-      const s3 = api.stats()
-      out.rapidV = { started: s3.totalStarted - s2.totalStarted, dropped: s3.dropped - s2.dropped, mod: api.perfPadState().mod }
-      const s4 = api.stats()
-      for (let i = 0; i < 30; i++) {
-        api.perfPadPointer('move', (i % 6) / 5, (i % 6) / 5)
-        await sleep(6)
-      }
-      const s5 = api.stats()
-      out.rapidXY = { started: s5.totalStarted - s4.totalStarted, dropped: s5.dropped - s4.dropped }
-
-      // release at left edge: pitch self-centers, modulation latches
-      api.perfPadPointer('move', 0, 0.5)
-      await sleep(60)
-      out.beforeRelease = api.perfPadState()
-      api.perfPadPointer('up', 0, 0.5)
-      out.releaseSettleMs = await settlePitch()
-      out.afterRelease = api.perfPadState()
-
-      // pointer cancel: same safety behavior
-      api.perfPadPointer('down', 1, 0.2)
-      await sleep(60)
-      out.beforeCancel = api.perfPadState()
-      api.perfPadPointer('cancel', 1, 0.2)
-      out.cancelSettleMs = await settlePitch()
-      out.afterCancel = api.perfPadState()
-
-      // range ±12 through the pad's own button
-      api.perfPadRange(12)
-      await sleep(150)
-      api.perfPadPointer('down', 0, 0.5)
-      out.range12Left = api.perfPadState()
-      api.perfPadPointer('up', 0, 0.5)
-      await settlePitch()
-      api.perfPadPointer('down', 1, 0.5)
-      out.range12Right = api.perfPadState()
-      api.perfPadPointer('up', 1, 0.5)
-      await settlePitch()
-      api.perfPadRange(2)
-      await sleep(150)
-      out.backTo2 = api.perfPadState().range
-
-      // keyboard access: arrows pitch bend (self-centering) and modulation
-      const pad = document.querySelector('[data-perf-pad]')
-      pad.focus()
-      api.perfPadKey('down', 'ArrowRight')
-      await sleep(60)
-      out.keyRight = api.perfPadState()
-      api.perfPadKey('up', 'ArrowRight')
-      await settlePitch()
-      out.keySettled = api.perfPadState()
-      api.perfPadKey('down', 'ArrowLeft')
-      await sleep(60)
-      out.keyLeft = api.perfPadState()
-      api.perfPadKey('up', 'ArrowLeft')
-      await settlePitch()
-      for (let i = 0; i < 10; i++) {
-        api.perfPadKey('down', 'ArrowUp')
-        await sleep(8)
-      }
-      out.keyModUp = api.perfPadState()
-      for (let i = 0; i < 10; i++) {
-        api.perfPadKey('down', 'ArrowDown')
-        await sleep(8)
-      }
-      out.keyModDown = api.perfPadState()
-
-      out.final = api.perfPadState()
-      out.voicesDelta = api.stats().totalStarted - voices0
-      // measured JS-path control latency (dispatch -> engine state, sync)
-      const t0 = performance.now()
-      api.perfPadPointer('down', 0.3, 0.6)
-      out.jsLatencyMs = performance.now() - t0
-      api.perfPadPointer('up', 0.3, 0.6)
-      await settlePitch()
-      return out
     })
-    check('pad center = bend 0 / mod 0.5', Math.abs(dPad.center.cents) < 0.5 && Math.abs(dPad.center.mod - 0.5) < 0.001, `cents=${dPad.center.cents} mod=${dPad.center.mod}`)
-    check('pad left edge = max negative (±2st)', Math.abs(dPad.left.cents + 200) < 0.5 && dPad.left.bend === -1, `cents=${dPad.left.cents}`)
-    check('pad right edge = max positive (±2st)', Math.abs(dPad.right.cents - 200) < 0.5 && dPad.right.bend === 1, `cents=${dPad.right.cents}`)
-    check('pad top = modulation 1', Math.abs(dPad.top.mod - 1) < 0.001, `mod=${dPad.top.mod}`)
-    check('pad bottom = modulation 0', Math.abs(dPad.bottom.mod) < 0.001, `mod=${dPad.bottom.mod}`)
-    check('pad dot tracks pointer (left)', parseFloat(dPad.left.dotLeft) === 0, `left=${dPad.left.dotLeft}`)
-    check('pad dot tracks pointer (top)', parseFloat(dPad.top.dotTop) === 0, `top=${dPad.top.dotTop}`)
-    check('pad rapid horizontal: no voices, no drops', dPad.rapidH.started === 0 && dPad.rapidH.dropped === 0, `started=${dPad.rapidH.started} dropped=${dPad.rapidH.dropped}`)
-    check('pad rapid vertical: no voices, no drops', dPad.rapidV.started === 0 && dPad.rapidV.dropped === 0, `started=${dPad.rapidV.started} dropped=${dPad.rapidV.dropped}`)
-    check('pad rapid XY: no voices, no drops', dPad.rapidXY.started === 0 && dPad.rapidXY.dropped === 0, `started=${dPad.rapidXY.started} dropped=${dPad.rapidXY.dropped}`)
-    check('pad rapid moves throttle React renders', dPad.rendersAfterH - dPad.rendersBefore <= 6, `renders ${dPad.rendersBefore} -> ${dPad.rendersAfterH}`)
-    check('pad release self-centers pitch', dPad.releaseSettleMs >= 0 && Math.abs(dPad.afterRelease.cents) < 1, `settle=${dPad.releaseSettleMs}ms cents=${dPad.afterRelease.cents}`)
-    check('pad release latches modulation', Math.abs(dPad.afterRelease.mod - 0.5) < 0.001, `mod=${dPad.afterRelease.mod}`)
-    check('pad pointer cancel self-centers', dPad.cancelSettleMs >= 0 && Math.abs(dPad.afterCancel.cents) < 1, `settle=${dPad.cancelSettleMs}ms`)
-    check('pad ±12 range: left = -1200 cents', dPad.range12Left.range === 12 && Math.abs(dPad.range12Left.cents + 1200) < 2, `cents=${dPad.range12Left.cents}`)
-    check('pad ±12 range: right = +1200 cents', Math.abs(dPad.range12Right.cents - 1200) < 2, `cents=${dPad.range12Right.cents}`)
-    check('pad range returns to ±2', dPad.backTo2 === 2, `range=${dPad.backTo2}`)
-    check('pad keyboard: ArrowRight bends up', Math.abs(dPad.keyRight.cents - 20) < 2, `cents=${dPad.keyRight.cents}`)
-    check('pad keyboard: release self-centers', Math.abs(dPad.keySettled.cents) < 1, `cents=${dPad.keySettled.cents}`)
-    check('pad keyboard: ArrowLeft bends down', Math.abs(dPad.keyLeft.cents + 20) < 2, `cents=${dPad.keyLeft.cents}`)
-    check('pad keyboard: ArrowUp reaches modulation 1', Math.abs(dPad.keyModUp.mod - 1) < 0.05, `mod=${dPad.keyModUp.mod}`)
-    check('pad keyboard: ArrowDown reaches modulation 0', Math.abs(dPad.keyModDown.mod) < 0.05, `mod=${dPad.keyModDown.mod}`)
-    check('pad created no voices at all', dPad.voicesDelta === 0, `started=${dPad.voicesDelta}`)
-    check('pad final state clean (no stuck pitch)', Math.abs(dPad.final.cents) < 1 && Math.abs(dPad.final.mod) < 0.001, `cents=${dPad.final.cents} mod=${dPad.final.mod}`)
-    check('pad JS-path control latency measured', typeof dPad.jsLatencyMs === 'number' && dPad.jsLatencyMs >= 0, `${dPad.jsLatencyMs.toFixed(3)}ms`)
+    check('Old Pitch Bend & Modulation pad UI ([data-perf-pad]) is completely removed from DOM', !dPad.hasOldUi, `hasOldUi=${dPad.hasOldUi}`)
+    check('Engine pitch bend +1 = +200 cents (±2st range)', Math.abs(dPad.stateRight.cents - 200) < 0.5 && dPad.stateRight.bend === 1, `cents=${dPad.stateRight.cents}`)
+    check('Engine pitch bend -1 = -200 cents (±2st range)', Math.abs(dPad.stateLeft.cents + 200) < 0.5 && dPad.stateLeft.bend === -1, `cents=${dPad.stateLeft.cents}`)
+    check('Engine modulation 1 = 1.0', dPad.stateModUp.mod === 1, `mod=${dPad.stateModUp.mod}`)
+    check('Engine modulation 0 = 0.0', dPad.stateModDown.mod === 0, `mod=${dPad.stateModDown.mod}`)
+    check('Engine pitch bend range 12 = 12 st', dPad.stateRange12.range === 12, `range=${dPad.stateRange12.range}`)
+    check('Engine pitch bend range 2 = 2 st', dPad.stateRange2.range === 2, `range=${dPad.stateRange2.range}`)
 
     // ---- Phase 7: Main Tone controls + audio effects ----------------------
     await runPhase7({ page, check })
@@ -1710,20 +1606,41 @@ async function main() {
     // ---- Phase 13: Production Hardening & PWA Deployment ----------------------
     await runPhase13(page, (name, ok, extra) => check(name, ok, extra))
 
+    // ---- Phase 14: Instrument-Library & Keyboard-Playability Expansion --------
+    await runPhase14(page, (name, ok, extra) => check(name, ok, extra))
+
+    // ---- Phase 15: Theme System, Arp, Portamento, Visual Release Fix ----------
+    await runPhase15Features(page, (name, ok, extra) => check(name, ok, extra))
+
+    // ---- Mouse Performance Pitch + Modulation ---------------------------------
+    await runMousePerformanceSmoke(page, (name, ok, extra) => check(name, ok, extra))
+
     // 10. console clean
     check('no console errors', consoleErrors.length === 0, consoleErrors.slice(0, 3).join(' | '))
 
-    const outDir = mkdtempSync(path.join(tmpdir(), 'apiano-'))
-    const shot = path.join(outDir, 'apiano.png')
-    await page.screenshot({ path: shot })
-    console.log(`Screenshot: ${shot}`)
+    try {
+      const outDir = mkdtempSync(path.join(tmpdir(), 'apiano-'))
+      const shot = path.join(outDir, 'apiano.png')
+      await page.screenshot({ path: shot })
+      console.log(`Screenshot: ${shot}`)
+    } catch {
+      // screenshot optional
+    }
 
-    await browser.close()
+    try {
+      await browser.close()
+    } catch {
+      // browser close optional
+    }
   } catch (err) {
     failures++
     console.error('SMOKE TEST ERROR:', err)
   } finally {
-    server.kill()
+    try {
+      server.kill()
+    } catch {
+      // server kill optional
+    }
   }
 
   console.log(

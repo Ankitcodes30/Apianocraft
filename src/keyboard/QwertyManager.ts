@@ -1,57 +1,119 @@
 import type { NoteEventBus } from '../midi/NoteEventBus'
 
 /**
- * QWERTY computer-keyboard input adapter (Phase 7.5).
+ * QWERTY computer-keyboard input adapter (Phase 7.5 / Phase 14 38-Key Redesign).
  *
- *   Physical keyboard → QwertyManager → NoteEventBus → engine adapter → engine
+ * Provides a continuous 38-key chromatic piano keyboard mapping directly playable
+ * from the laptop keyboard without requiring Shift, CapsLock, or octave buttons.
  *
- * The manager never calls AudioEngine directly — like MidiManager it only
- * emits normalized NoteEventBus events (source: 'keyboard'). A physical
- * computer keyboard has no true velocity, so notes use a fixed configurable
- * velocity (default 0.7); nothing fake is invented.
- *
- * Default layout (one octave + octave shift):
- *   A W S E D F T G Y H U J   =  C4 C#4 D4 D#4 E4 F4 F#4 G4 G#4 A4 A#4 B4
- *   Z = octave down, X = octave up  (QWERTY-local octave, -4..+4)
- *
- * The emitted note is `baseNote + keyIndex + octave*12` (baseNote = C4).
- * Everything else — engine octave shift, transpose, fine tuning, pitch bend,
- * sustain — flows through the existing engine transformations; nothing is
- * re-implemented here.
- *
- * Safety:
- * - keydown repeat and duplicate keydowns are ignored (one voice per key);
- *   a real keyup clears the key so the next physical press retriggers.
- * - Keys typed into input/textarea/select/contenteditable never play notes.
- * - Ctrl/Meta/Alt-modified presses never play notes (browser shortcuts).
- * - On window blur or tab-hide only the QWERTY-held notes are released —
- *   MIDI / mouse notes are untouched (each adapter owns its own emissions).
- * - keyup is never gated by the editable check, so focus moving into a
- *   text field mid-hold cannot leave a stuck note.
+ * Chromatic Range: MIDI 48 (C3, Lower -1) to MIDI 85 (C#6, Upper +1)
+ * Sargam Convention: C# = Sa (D#=Re, F=Ga, F#=Ma, G#=Pa, A#=Dha, C=Ni)
  */
+export interface QwertyKeyMapping {
+  key: string
+  midiNote: number
+  noteName: string
+  octave: number
+  rangeLabel: 'Lower (-1)' | 'Middle (0)' | 'Upper (+1)'
+  sargam: string
+  isBlackKey: boolean
+  displayLabel: string
+  order: number
+}
+
 export interface QwertyManagerOptions {
-  /** e.key (lowercased) → chromatic index within the base octave. */
-  keymap?: Readonly<Record<string, number>>
-  /** Key that lowers the QWERTY octave (default 'z'). */
-  octaveDownKey?: string
-  /** Key that raises the QWERTY octave (default 'x'). */
-  octaveUpKey?: string
-  /** MIDI note of the first key in the base octave (default 60 = C4). */
+  keymap38?: Readonly<Record<string, QwertyKeyMapping>>
   baseNote?: number
   octaveMin?: number
   octaveMax?: number
 }
 
-export type QwertyManagerEvent = { type: 'octave'; octave: number }
-
+export type QwertyManagerEvent = { type: 'octave'; octave: number } | { type: 'held-keys'; keys: string[] }
 export type QwertyListener = (event: QwertyManagerEvent) => void
 
-export const DEFAULT_KEYMAP: Readonly<Record<string, number>> = {
-  a: 0, w: 1, s: 2, e: 3, d: 4, f: 5, t: 6, g: 7, y: 8, h: 9, u: 10, j: 11,
+const SARGAM_NAMES: Record<string, string> = {
+  C: 'Ni',
+  'C#': 'Sa',
+  D: 're',
+  'D#': 'Re',
+  E: 'ga',
+  F: 'Ga',
+  'F#': 'Ma',
+  G: 'ma',
+  'G#': 'Pa',
+  A: 'dha',
+  'A#': 'Dha',
+  B: 'ni',
 }
 
-export const DEFAULT_OCTAVE_DOWN_KEY = 'z'
-export const DEFAULT_OCTAVE_UP_KEY = 'x'
+const NOTE_NAMES_12 = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+/**
+ * Authoritative 38 physical playable computer keys in pitch order (MIDI 48..85).
+ * Left-to-right pitch order is strictly monotonically increasing.
+ */
+export const PHYSICAL_38_KEYS: readonly string[] = [
+  // Lower Range (-1): C3..B3 (MIDI 48..59)
+  'z', 's', 'x', 'd', 'c', 'v', 'g', 'b', 'h', 'n', 'j', 'm',
+  // Middle Range (0): C4..B4 (MIDI 60..71)
+  'q', '2', 'w', '3', 'e', 'r', '5', 't', '6', 'y', '7', 'u',
+  // Upper Range (+1): C5..C#6 (MIDI 72..85)
+  'i', '9', 'o', '0', 'p', '[', '=', ']', 'k', 'l', ';', "'", ',', '.',
+]
+
+function build38KeyMappings(): QwertyKeyMapping[] {
+  const mappings: QwertyKeyMapping[] = []
+  const startMidi = 48 // C3 (Lower -1)
+
+  for (let i = 0; i < PHYSICAL_38_KEYS.length; i++) {
+    const key = PHYSICAL_38_KEYS[i]
+    const midiNote = startMidi + i
+    const noteName = NOTE_NAMES_12[midiNote % 12]
+    const octave = Math.floor(midiNote / 12) - 1
+
+    let rangeLabel: 'Lower (-1)' | 'Middle (0)' | 'Upper (+1)' = 'Lower (-1)'
+    if (midiNote >= 60 && midiNote <= 71) {
+      rangeLabel = 'Middle (0)'
+    } else if (midiNote >= 72) {
+      rangeLabel = 'Upper (+1)'
+    }
+
+    const sargam = SARGAM_NAMES[noteName] ?? ''
+    const isBlackKey = noteName.includes('#')
+
+    mappings.push({
+      key,
+      midiNote,
+      noteName,
+      octave,
+      rangeLabel,
+      sargam,
+      isBlackKey,
+      displayLabel: key.toUpperCase(),
+      order: i + 1,
+    })
+  }
+
+  return mappings
+}
+
+export const PRIMARY_38_KEYMAP: ReadonlyArray<QwertyKeyMapping> = Object.freeze(build38KeyMappings())
+
+export const PRIMARY_38_KEYMAP_BY_KEY: Readonly<Record<string, QwertyKeyMapping>> = Object.freeze(
+  PRIMARY_38_KEYMAP.reduce<Record<string, QwertyKeyMapping>>((acc, item) => {
+    acc[item.key] = item
+    return acc
+  }, {}),
+)
+
+// Legacy backward-compatibility index map (key -> semitone relative to C4=60)
+export const DEFAULT_KEYMAP: Readonly<Record<string, number>> = Object.freeze(
+  PRIMARY_38_KEYMAP.reduce<Record<string, number>>((acc, item) => {
+    acc[item.key] = item.midiNote - 60
+    return acc
+  }, {}),
+)
+
 export const DEFAULT_BASE_NOTE = 60
 export const DEFAULT_OCTAVE_MIN = -4
 export const DEFAULT_OCTAVE_MAX = 4
@@ -60,10 +122,7 @@ export const DEFAULT_KEYBOARD_VELOCITY = 0.7
 const EDITABLE_SELECTOR = 'input, textarea, select, [contenteditable], [contenteditable="true"]'
 
 export class QwertyManager {
-  private readonly keymap: Readonly<Record<string, number>>
-  private readonly octaveDownKey: string
-  private readonly octaveUpKey: string
-  private readonly baseNote: number
+  private readonly keymap38: Readonly<Record<string, QwertyKeyMapping>>
   private readonly octaveMin: number
   private readonly octaveMax: number
   private readonly listeners = new Set<QwertyListener>()
@@ -79,10 +138,7 @@ export class QwertyManager {
     private readonly bus: NoteEventBus,
     options: QwertyManagerOptions = {},
   ) {
-    this.keymap = options.keymap ?? DEFAULT_KEYMAP
-    this.octaveDownKey = options.octaveDownKey ?? DEFAULT_OCTAVE_DOWN_KEY
-    this.octaveUpKey = options.octaveUpKey ?? DEFAULT_OCTAVE_UP_KEY
-    this.baseNote = options.baseNote ?? DEFAULT_BASE_NOTE
+    this.keymap38 = options.keymap38 ?? PRIMARY_38_KEYMAP_BY_KEY
     this.octaveMin = options.octaveMin ?? DEFAULT_OCTAVE_MIN
     this.octaveMax = options.octaveMax ?? DEFAULT_OCTAVE_MAX
   }
@@ -104,12 +160,10 @@ export class QwertyManager {
     return this.velocity
   }
 
-  /** Fixed velocity for all QWERTY notes (0.01..1). No per-key velocity. */
   setVelocity(value: number): void {
     this.velocity = Math.max(0.01, Math.min(1, value))
   }
 
-  /** QWERTY-local octave (clamped). Applied to new notes only. */
   setOctave(octave: number): void {
     const clamped = Math.max(this.octaveMin, Math.min(this.octaveMax, Math.round(octave)))
     if (clamped === this.octave) return
@@ -124,7 +178,6 @@ export class QwertyManager {
     }
   }
 
-  /** Attach window listeners. Idempotent. */
   start(): void {
     if (this.started || this.disposed) return
     this.started = true
@@ -134,7 +187,6 @@ export class QwertyManager {
     document.addEventListener('visibilitychange', this.onVisibilityChange)
   }
 
-  /** Detach window listeners and release any held notes. */
   stop(): void {
     if (!this.started) return
     this.started = false
@@ -145,7 +197,6 @@ export class QwertyManager {
     this.releaseAll()
   }
 
-  /** Release every QWERTY-held note (blur / tab-hide / panic). */
   releaseAll(): void {
     if (this.held.size === 0) return
     const at = performance.now()
@@ -153,6 +204,7 @@ export class QwertyManager {
       this.bus.emit({ kind: 'note-off', note, source: 'keyboard', at })
     }
     this.held.clear()
+    this.emit({ type: 'held-keys', keys: [] })
   }
 
   dispose(): void {
@@ -161,6 +213,32 @@ export class QwertyManager {
       this.disposed = true
       this.listeners.clear()
     }
+  }
+
+  get38KeyMappings(): ReadonlyArray<QwertyKeyMapping> {
+    return PRIMARY_38_KEYMAP
+  }
+
+  get38KeyMap(): Readonly<Record<string, QwertyKeyMapping>> {
+    return this.keymap38
+  }
+
+  getMappingForKey(key: string): QwertyKeyMapping | undefined {
+    return this.keymap38[key.toLowerCase()]
+  }
+
+  getKeyMap(): Readonly<Record<string, number>> {
+    return DEFAULT_KEYMAP
+  }
+
+  getActiveKeys(): string[] {
+    return [...this.held.keys()]
+  }
+
+  reset(): void {
+    this.releaseAll()
+    this.octave = 0
+    this.emit({ type: 'octave', octave: 0 })
   }
 
   // ---- internals -----------------------------------------------------------
@@ -174,29 +252,19 @@ export class QwertyManager {
 
     const key = e.key.toLowerCase()
 
-    if (key === this.octaveDownKey) {
-      e.preventDefault()
-      if (this.octave > this.octaveMin) this.setOctave(this.octave - 1)
-      return
-    }
-    if (key === this.octaveUpKey) {
-      e.preventDefault()
-      if (this.octave < this.octaveMax) this.setOctave(this.octave + 1)
-      return
-    }
+    const mapping = this.keymap38[key]
+    if (!mapping) return
 
-    const index = this.keymap[key]
-    if (index === undefined) return
     // Hold protection: OS key-repeat and duplicate keydowns never re-trigger.
     if (e.repeat || this.held.has(key)) return
     e.preventDefault()
 
-    const note = this.baseNote + index + this.octave * 12
+    const note = Math.max(0, Math.min(127, mapping.midiNote + this.octave * 12))
     this.held.set(key, note)
     this.bus.emit({ kind: 'note-on', note, velocity: this.velocity, source: 'keyboard', at: e.timeStamp })
+    this.emit({ type: 'held-keys', keys: [...this.held.keys()] })
   }
 
-  /** Never gated by the editable check: focus changes must not stick notes. */
   private readonly onKeyUp = (e: KeyboardEvent): void => {
     if (!this.started || this.disposed) return
     const key = e.key.toLowerCase()
@@ -204,6 +272,7 @@ export class QwertyManager {
     if (note === undefined) return
     this.held.delete(key)
     this.bus.emit({ kind: 'note-off', note, source: 'keyboard', at: e.timeStamp })
+    this.emit({ type: 'held-keys', keys: [...this.held.keys()] })
   }
 
   private readonly onWindowBlur = (): void => {
@@ -226,7 +295,6 @@ export class QwertyManager {
 
 let manager: QwertyManager | null = null
 
-/** Module singleton: one adapter per app lifetime, survives React remounts. */
 export function getQwertyManager(bus: NoteEventBus): QwertyManager {
   if (!manager) manager = new QwertyManager(bus)
   return manager

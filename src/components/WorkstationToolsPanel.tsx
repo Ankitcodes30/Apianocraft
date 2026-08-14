@@ -2,18 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { getEngine } from '../audio/AudioEngine'
 import type { MetronomeSnapshot, TimeSignature } from '../audio/tools/Metronome'
 import { detectChord, type ChordResult } from '../audio/tools/ChordDetector'
-import { ROOT_KEYS, SCALE_DEFINITIONS, getScaleHighlightState, type ScaleType } from '../audio/tools/ScaleProvider'
+import { Card, CardHeader, CardContent } from './ui/card'
+import { Select } from './ui/select'
+import { Button } from './ui/button'
+import { Badge } from './ui/badge'
 
-interface WorkstationToolsPanelProps {
-  onScaleChange?: (rootKey: string, scaleType: ScaleType) => void
-}
-
-export const WorkstationToolsPanel: React.FC<WorkstationToolsPanelProps> = ({ onScaleChange }) => {
+export const WorkstationToolsPanel: React.FC = () => {
   const engine = getEngine()
   const [metronomeSnap, setMetronomeSnap] = useState<MetronomeSnapshot>(() => engine.getMetronomeSnapshot())
   const [chord, setChord] = useState<ChordResult | null>(null)
-  const [selectedRoot, setSelectedRoot] = useState<string>('C')
-  const [selectedScale, setSelectedScale] = useState<ScaleType>('none')
 
   // Metronome subscription & live beat ticker
   useEffect(() => {
@@ -55,77 +52,55 @@ export const WorkstationToolsPanel: React.FC<WorkstationToolsPanelProps> = ({ on
     engine.tapTempoMetronome()
   }
 
-  const handleRootChange = (r: string) => {
-    setSelectedRoot(r)
-    onScaleChange?.(r, selectedScale)
-    updateKeyboardScaleHighlights(r, selectedScale)
-  }
-
-  const handleScaleChange = (st: ScaleType) => {
-    setSelectedScale(st)
-    onScaleChange?.(selectedRoot, st)
-    updateKeyboardScaleHighlights(selectedRoot, st)
-  }
-
-  const updateKeyboardScaleHighlights = (rootKey: string, scaleType: ScaleType) => {
-    const state = getScaleHighlightState(rootKey, scaleType)
-    const keys = document.querySelectorAll<HTMLElement>('[data-note]')
-    keys.forEach((el) => {
-      const note = parseInt(el.getAttribute('data-note') || '-1', 10)
-      if (note < 0) return
-      const pc = note % 12
-      el.removeAttribute('data-scale-highlight')
-      if (state.scaleType !== 'none' && state.scalePitchClasses.has(pc)) {
-        if (pc === state.rootPitchClass) {
-          el.setAttribute('data-scale-highlight', 'root')
-        } else {
-          el.setAttribute('data-scale-highlight', 'degree')
-        }
-      }
-    })
-  }
-
   return (
-    <section className="tools-panel" aria-label="Workstation Tools Panel">
-      <div className="tools-panel__head">
-        <span className="tools-panel__title">WORKSTATION TOOLS & HARMONY</span>
-      </div>
+    <Card className="tools-panel border-border" aria-label="Workstation Tools Panel">
+      <CardHeader className="tools-panel__head p-3 pb-2">
+        <span className="tools-panel__title font-bold text-xs tracking-wider text-foreground">
+          WORKSTATION TOOLS & HARMONY
+        </span>
+      </CardHeader>
 
-      <div className="tools-panel__body">
+      <CardContent className="p-3 pt-0 flex flex-col gap-3">
         {/* Metronome Controls */}
-        <div className="tools-section metronome-section">
-          <div className="metronome-section__header">
-            <span className="section-label">METRONOME</span>
-            <div className="metronome-tempo-display">
-              <span className="bpm-val" data-bpm-val>{metronomeSnap.bpm}</span>
-              <span className="bpm-unit">BPM</span>
+        <div className="tools-section metronome-section p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
+          <div className="metronome-section__header flex items-center justify-between">
+            <span className="section-label font-bold text-[11px] text-muted-foreground uppercase tracking-wider">
+              METRONOME
+            </span>
+            <div className="metronome-tempo-display font-mono text-xs text-foreground flex items-center gap-1">
+              <span className="bpm-val font-bold text-primary" data-bpm-val>{metronomeSnap.bpm}</span>
+              <span className="bpm-unit text-muted-foreground text-[10px]">BPM</span>
             </div>
           </div>
 
-          <div className="metronome-section__controls">
-            <button
+          <div className="metronome-section__controls flex flex-wrap gap-2 items-center">
+            <Button
               type="button"
+              variant={metronomeSnap.running ? 'on' : 'outline'}
+              size="sm"
               className={`btn-metronome ${metronomeSnap.running ? 'active' : ''}`}
               onClick={handleMetronomeToggle}
               data-btn-metronome
             >
               {metronomeSnap.running ? 'Stop Metronome' : 'Start Metronome'}
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
-              className="btn-tap-tempo"
+              variant="secondary"
+              size="sm"
+              className="btn-tap-tempo text-xs"
               onClick={handleTapTempo}
               data-btn-tap-tempo
             >
               Tap Tempo
-            </button>
+            </Button>
 
-            <div className="tool-field">
+            <div className="tool-field flex flex-col gap-1 text-[11px] text-muted-foreground">
               <label htmlFor="time-sig-select">Time Sig</label>
-              <select
+              <Select
                 id="time-sig-select"
-                className="select"
+                className="select w-20 text-xs"
                 value={metronomeSnap.timeSignature}
                 onChange={(e) => handleTimeSigChange(e.target.value as TimeSignature)}
                 data-time-signature
@@ -134,10 +109,10 @@ export const WorkstationToolsPanel: React.FC<WorkstationToolsPanelProps> = ({ on
                 <option value="3/4">3/4</option>
                 <option value="4/4">4/4</option>
                 <option value="6/8">6/8</option>
-              </select>
+              </Select>
             </div>
 
-            <div className="tool-field slider-field">
+            <div className="tool-field slider-field flex flex-col gap-1 text-[11px] text-muted-foreground">
               <label htmlFor="bpm-slider">BPM</label>
               <input
                 id="bpm-slider"
@@ -146,11 +121,12 @@ export const WorkstationToolsPanel: React.FC<WorkstationToolsPanelProps> = ({ on
                 max="280"
                 value={metronomeSnap.bpm}
                 onChange={(e) => handleBpmChange(Number(e.target.value))}
+                className="accent-primary cursor-pointer w-28"
                 data-bpm-slider
               />
             </div>
 
-            <div className="tool-field slider-field">
+            <div className="tool-field slider-field flex flex-col gap-1 text-[11px] text-muted-foreground">
               <label htmlFor="metronome-vol">Vol</label>
               <input
                 id="metronome-vol"
@@ -160,60 +136,27 @@ export const WorkstationToolsPanel: React.FC<WorkstationToolsPanelProps> = ({ on
                 step="0.05"
                 value={metronomeSnap.volume}
                 onChange={(e) => engine.setMetronomeVolume(Number(e.target.value))}
+                className="accent-primary cursor-pointer w-24"
               />
             </div>
           </div>
         </div>
 
-        {/* Chord & Scale Guide */}
-        <div className="tools-section harmony-section">
-          <div className="harmony-section__header">
-            <span className="section-label">CHORD & HARMONY ASSIST</span>
+        {/* Real-time Chord Detector */}
+        <div className="tools-section harmony-section p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
+          <div className="harmony-section__header flex items-center justify-between">
+            <span className="section-label font-bold text-[11px] text-muted-foreground uppercase tracking-wider">
+              REAL-TIME CHORD DETECTOR
+            </span>
           </div>
 
           <div className="chord-display-container">
-            <div className="chord-badge" data-chord-name>
+            <Badge variant="accent" className="chord-badge text-xs font-mono font-bold px-3 py-1 text-primary-foreground" data-chord-name>
               {chord ? chord.name : '— No Active Chord —'}
-            </div>
-          </div>
-
-          <div className="scale-guide-controls">
-            <div className="tool-field">
-              <label htmlFor="root-key-select">Root Key</label>
-              <select
-                id="root-key-select"
-                className="select"
-                value={selectedRoot}
-                onChange={(e) => handleRootChange(e.target.value)}
-                data-root-key
-              >
-                {ROOT_KEYS.map((rk) => (
-                  <option key={rk} value={rk}>
-                    {rk}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="tool-field">
-              <label htmlFor="scale-type-select">Scale Guide</label>
-              <select
-                id="scale-type-select"
-                className="select"
-                value={selectedScale}
-                onChange={(e) => handleScaleChange(e.target.value as ScaleType)}
-                data-scale-type
-              >
-                {SCALE_DEFINITIONS.map((sd) => (
-                  <option key={sd.id} value={sd.id}>
-                    {sd.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            </Badge>
           </div>
         </div>
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   )
 }

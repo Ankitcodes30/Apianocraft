@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { AudioEngine } from '../audio/AudioEngine'
 import type { MidiManager, MidiStats, MidiSupport } from '../midi/MidiManager'
+import { Card, CardHeader, CardContent } from './ui/card'
+import { Select } from './ui/select'
+import { Badge } from './ui/badge'
 
 interface PanelState {
   support: MidiSupport
@@ -25,9 +28,8 @@ interface PerfView {
 }
 
 /**
- * Minimal MIDI panel (Phase 5, not the final UI). Subscribes only to
- * low-frequency MidiManager events: support/device changes and throttled
- * activity (~10/s). Note events never touch React — they flow bus -> engine.
+ * MIDI panel. Subscribes only to low-frequency MidiManager events:
+ * support/device changes and throttled activity. Note events never touch React.
  */
 export function MidiPanel({ midi, engine }: { midi: MidiManager; engine: AudioEngine }) {
   const [panel, setPanel] = useState<PanelState>(() => midi.getState())
@@ -72,61 +74,73 @@ export function MidiPanel({ midi, engine }: { midi: MidiManager; engine: AudioEn
   const ageMs = activity ? Math.round(performance.now() - activity.at) : -1
 
   return (
-    <section className="midi-panel" aria-label="MIDI panel">
-      <span className="chip chip--accent">MIDI</span>
-      <span className={`chip chip--${available ? 'ok' : panel.support === 'unavailable' ? 'bad' : 'warn'}`}>
-        {available ? 'available' : panel.support === 'unavailable' ? 'unavailable' : '…'}
-      </span>
+    <Card className="midi-panel border-border" aria-label="MIDI panel">
+      <CardHeader className="p-3 pb-2 flex flex-row items-center justify-between space-y-0">
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-xs tracking-wider text-foreground">MIDI INPUT & HARDWARE</span>
+          <Badge variant="accent" className="chip chip--accent">MIDI</Badge>
+          <Badge
+            variant={available ? 'ok' : panel.support === 'unavailable' ? 'bad' : 'warn'}
+            className={`chip chip--${available ? 'ok' : panel.support === 'unavailable' ? 'bad' : 'warn'}`}
+          >
+            {available ? 'available' : panel.support === 'unavailable' ? 'unavailable' : '…'}
+          </Badge>
+        </div>
+      </CardHeader>
 
-      {available && (
-        <>
-          <select
-            className="select"
-            aria-label="MIDI input device"
-            value={panel.selected ?? ''}
-            disabled={connected.length === 0}
-            onChange={(e) => midi.selectInput(e.target.value || null)}
-          >
-            {connected.length === 0 && <option value="">no devices</option>}
-            {connected.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name || 'Unnamed input'}
-              </option>
-            ))}
-          </select>
-          <span className="chip" data-midi-connection>
-            {selected ? `connected: ${selected.name}` : 'no device selected'}
-          </span>
-          <span className={`midi-led${activity && ageMs < 1500 ? ' midi-led--on' : ''}`} aria-label="MIDI activity" />
-          <span className="chip midi-activity" data-midi-activity>
-            {activity ? `${activity.name}${activity.note !== undefined ? ` ${activity.note}` : ''}` : 'idle'}
-            <span className="midi-activity__msg">{stats.messages} msgs</span>
-          </span>
-          <span className="chip" data-midi-sustain>
-            sustain {perf.sustain ? 'ON' : 'off'}
-          </span>
-          <span className="chip" data-midi-bend>
-            bend {perf.bendCents > 0 ? '+' : ''}
-            {perf.bendCents.toFixed(0)}c
-            <span className="midi-meter">
-              <span className="midi-meter__fill" style={{ left: `${((perf.bend + 1) / 2) * 100}%` }} />
+      <CardContent className="p-3 pt-0">
+        {available && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <Select
+              className="select w-48 text-xs"
+              aria-label="MIDI input device"
+              value={panel.selected ?? ''}
+              disabled={connected.length === 0}
+              onChange={(e) => midi.selectInput(e.target.value || null)}
+            >
+              {connected.length === 0 && <option value="">no devices</option>}
+              {connected.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name || 'Unnamed input'}
+                </option>
+              ))}
+            </Select>
+            <span className="chip text-xs" data-midi-connection>
+              {selected ? `connected: ${selected.name}` : 'no device selected'}
             </span>
-          </span>
-          <span className="chip" data-midi-mod>
-            mod {(perf.modulation * 100).toFixed(0)}%
-          </span>
-          <select
-            className="select"
-            aria-label="Pitch bend range"
-            value={String(perf.range)}
-            onChange={(e) => engine.setPitchBendRange(Number(e.target.value))}
-          >
-            <option value="2">bend ±2 st</option>
-            <option value="12">bend ±12 st</option>
-          </select>
-        </>
-      )}
-      {panel.support === 'unavailable' && <span className="chip chip--warn">MIDI not supported — QWERTY/mouse still work</span>}
-    </section>
+            <span className={`midi-led ${activity && ageMs < 1500 ? 'midi-led--on' : ''}`} aria-label="MIDI activity" />
+            <span className="chip midi-activity text-xs" data-midi-activity>
+              {activity ? `${activity.name}${activity.note !== undefined ? ` ${activity.note}` : ''}` : 'idle'}
+              <span className="midi-activity__msg opacity-60 ml-1">({stats.messages} msgs)</span>
+            </span>
+            <span className="chip text-xs" data-midi-sustain>
+              sustain {perf.sustain ? 'ON' : 'off'}
+            </span>
+            <span className="chip text-xs" data-midi-bend>
+              bend {perf.bendCents > 0 ? '+' : ''}
+              {perf.bendCents.toFixed(0)}c
+              <span className="midi-meter inline-block w-8 h-1 bg-secondary rounded overflow-hidden align-middle ml-1">
+                <span className="midi-meter__fill block h-full bg-primary" style={{ left: `${((perf.bend + 1) / 2) * 100}%` }} />
+              </span>
+            </span>
+            <span className="chip text-xs" data-midi-mod>
+              mod {(perf.modulation * 100).toFixed(0)}%
+            </span>
+            <Select
+              className="select w-32 text-xs"
+              aria-label="Pitch bend range"
+              value={String(perf.range)}
+              onChange={(e) => engine.setPitchBendRange(Number(e.target.value))}
+            >
+              <option value="2">bend ±2 st</option>
+              <option value="12">bend ±12 st</option>
+            </Select>
+          </div>
+        )}
+        {panel.support === 'unavailable' && (
+          <span className="chip chip--warn text-xs">MIDI not supported — QWERTY/mouse still work</span>
+        )}
+      </CardContent>
+    </Card>
   )
 }

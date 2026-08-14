@@ -13,6 +13,10 @@ export interface VoiceStartParams {
   gainDb?: number
   /** Current global pitch bend in cents (-2400..2400), applied at start. */
   pitchBendCents?: number
+  /** Optional starting playback rate for portamento glide. */
+  portamentoFromRate?: number
+  /** Optional portamento glide time in milliseconds. */
+  portamentoTimeMs?: number
   out: AudioNode
   env: EnvelopeConfig
   when: number
@@ -49,30 +53,48 @@ export class Voice {
 
   /** Effective playback rate: base rate shifted by the current pitch bend. */
   get playbackRate(): number {
-    return this.baseRate * Math.pow(2, this.bendCents / 1200)
+    const rate = this.baseRate * Math.pow(2, this.bendCents / 1200)
+    return Number.isFinite(rate) && rate > 0 ? rate : 1
   }
 
   start(p: VoiceStartParams): void {
+    const vel = Number.isFinite(p.velocity) ? p.velocity : 0.8
     this.midiNote = p.note
-    this.velocity = p.velocity
+    this.velocity = vel
     this.held = false
-    this.baseRate = p.playbackRate
-    this.bendCents = p.pitchBendCents ?? 0
+    this.baseRate = Number.isFinite(p.playbackRate) && p.playbackRate > 0 ? p.playbackRate : 1
+    this.bendCents = Number.isFinite(p.pitchBendCents) ? (p.pitchBendCents ?? 0) : 0
     this.startedAt = performance.now()
 
     const ctx = this.ctx
     const gain = ctx.createGain()
     const source = ctx.createBufferSource()
     source.buffer = p.buffer
-    source.playbackRate.value = this.playbackRate
+
+    const targetRate = this.playbackRate
+    if (p.portamentoTimeMs && p.portamentoTimeMs > 0 && p.portamentoFromRate && p.portamentoFromRate > 0) {
+      const bendFactor = Math.pow(2, this.bendCents / 1200)
+      const startRate = p.portamentoFromRate * (Number.isFinite(bendFactor) ? bendFactor : 1)
+      source.playbackRate.setValueAtTime(startRate, p.when)
+      const timeConstant = (p.portamentoTimeMs / 1000) / 3
+      source.playbackRate.setTargetAtTime(targetRate, p.when, Math.max(0.005, timeConstant))
+    } else {
+      source.playbackRate.value = targetRate
+    }
 
     // Velocity curve + headroom for polyphony; the master limiter catches sums.
-    let peak = Math.max(0.02, 0.25 + 0.7 * Math.pow(p.velocity, 1.5))
-    if (p.gainDb) peak *= Math.pow(10, p.gainDb / 20)
-    const attackEnd = p.when + Math.max(0.002, p.env.attack)
+    let peak = Math.max(0.02, 0.25 + 0.7 * Math.pow(vel, 1.5))
+    if (p.gainDb && Number.isFinite(p.gainDb)) peak *= Math.pow(10, p.gainDb / 20)
+    if (!Number.isFinite(peak) || peak <= 0) peak = 0.5
+
+    const attack = Number.isFinite(p.env.attack) ? p.env.attack : 0.005
+    const decay = Number.isFinite(p.env.decay) ? p.env.decay : 0.1
+    const sustainLevel = Number.isFinite(p.env.sustainLevel) ? p.env.sustainLevel : 0.8
+
+    const attackEnd = p.when + Math.max(0.002, attack)
     gain.gain.setValueAtTime(0.0001, p.when)
     gain.gain.linearRampToValueAtTime(peak, attackEnd)
-    gain.gain.setTargetAtTime(Math.max(0.0001, peak * p.env.sustainLevel), attackEnd, Math.max(0.01, p.env.decay) / 3)
+    gain.gain.setTargetAtTime(Math.max(0.0001, peak * sustainLevel), attackEnd, Math.max(0.01, decay) / 3)
 
     source.connect(gain)
     gain.connect(p.out)
@@ -91,11 +113,14 @@ export class Voice {
    */
   setPitchBendCents(cents: number, when: number): void {
     if (this.state === 'idle') return
-    this.bendCents = cents
+    const bend = Number.isFinite(cents) ? cents : 0
+    this.bendCents = bend
     const s = this.source
     if (!s) return
-    const target = this.baseRate * Math.pow(2, cents / 1200)
-    s.playbackRate.setTargetAtTime(target, Math.max(when, this.ctx.currentTime), 0.012)
+    const target = this.baseRate * Math.pow(2, bend / 1200)
+    const targetRate = Number.isFinite(target) && target > 0 ? target : 1
+    const startTime = Number.isFinite(when) ? Math.max(when, this.ctx.currentTime) : this.ctx.currentTime
+    s.playbackRate.setTargetAtTime(targetRate, startTime, 0.012)
   }
 
   release(when: number, releaseSeconds: number): void {
@@ -108,12 +133,15 @@ export class Voice {
       this.stopNow()
       return
     }
-    const t = Math.max(when, this.ctx.currentTime + 0.002)
-    const v = Math.max(g.gain.value, 0.0002)
+    const safeWhen = Number.isFinite(when) ? when : this.ctx.currentTime
+    const t = Math.max(safeWhen, this.ctx.currentTime + 0.002)
+    const rawGain = Number.isFinite(g.gain.value) ? g.gain.value : 0.5
+    const v = Math.max(rawGain, 0.0002)
+    const relSec = Number.isFinite(releaseSeconds) ? releaseSeconds : 0.3
     g.gain.cancelScheduledValues(t)
     g.gain.setValueAtTime(v, t)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.008, releaseSeconds))
-    s.stop(t + Math.max(0.008, releaseSeconds) + 0.05)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.008, relSec))
+    s.stop(t + Math.max(0.008, relSec) + 0.05)
   }
 
   /** Immediate stop used by voice stealing; detaches handler so an async

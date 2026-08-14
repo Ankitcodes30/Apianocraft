@@ -161,17 +161,18 @@ export class SampleInstrument implements Instrument {
 
   private async fetchManifest(): Promise<InstrumentDef> {
     let lastErr: unknown
-    for (let attempt = 1; attempt <= FETCH_RETRIES; attempt++) {
+    const url = typeof window !== 'undefined' && window.location?.href ? new URL(this.opts.defUrl, window.location.href).href : this.opts.defUrl
+    for (let attempt = 1; attempt <= 5; attempt++) {
       try {
-        const res = await fetch(this.opts.defUrl, { cache: 'no-cache' })
-        if (!res.ok) throw new Error(`HTTP ${res.status} loading ${this.opts.defUrl}`)
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status} loading ${url}`)
         const def = (await res.json()) as InstrumentDef
         validateDef(def)
         this.manifestFetches++
         return def
       } catch (err) {
         lastErr = err
-        if (attempt < FETCH_RETRIES) await sleep(300 * attempt)
+        if (attempt < 5) await sleep(200 * attempt)
       }
     }
     throw new Error(`Could not load instrument manifest: ${lastErr instanceof Error ? lastErr.message : String(lastErr)}`)

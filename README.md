@@ -46,8 +46,9 @@ Input (mouse/touch, QWERTY, MIDI)
   no React re-render on note events.
 - Dual Tone Layering: run two independent sound generators (with separate tone chains and tuning) simultaneously.
 - Keyboard Split Mode: assign independent instrument, volume, octave, and transpose to lower vs upper keyboard zones.
-- Workstation Tools: Sample-accurate Audio-Clock Metronome (30–280 BPM), Real-Time Pitch Class Chord Detector (triads, 7ths, slash inversions), and Scale Harmony Visualizer.
+- Workstation Tools: Sample-accurate Audio-Clock Metronome (30–280 BPM) and Real-Time Pitch Class Chord Detector (triads, 7ths, slash inversions).
 - Performance Recorder: Capture performance timelines, transport playback, and binary Standard MIDI File (`.mid`) export.
+- Mouse Performance Expression Control: Use laptop/mouse cursor movement directly over the piano surface as a real-time expression controller (ΔX = pitch bend, ΔY = modulation) without parameter jumps or note triggers.
 - PWA & Error Isolation: Service Worker offline asset caching, network status banner, and React Error Boundaries around UI control panels.
 
 ## Computer Keyboard (QWERTY, Phase 7.5)

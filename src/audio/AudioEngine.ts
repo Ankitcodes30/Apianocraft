@@ -9,12 +9,22 @@ import { SynthOrganInstrument } from './instruments/SynthOrganInstrument'
 import { SynthStringsInstrument } from './instruments/SynthStringsInstrument'
 import { SynthBrassInstrument } from './instruments/SynthBrassInstrument'
 import { SynthBassInstrument } from './instruments/SynthBassInstrument'
+import { TrumpetInstrument } from './instruments/TrumpetInstrument'
+import { BrassSectionInstrument } from './instruments/BrassSectionInstrument'
+import { SaxophoneInstrument } from './instruments/SaxophoneInstrument'
+import { OboeInstrument } from './instruments/OboeInstrument'
+import { TuttiInstrument } from './instruments/TuttiInstrument'
+import { PluckInstrument } from './instruments/PluckInstrument'
+import { DulcimerInstrument } from './instruments/DulcimerInstrument'
+import { BrightGrandInstrument } from './instruments/BrightGrandInstrument'
+import { WarmGrandInstrument } from './instruments/WarmGrandInstrument'
+import { FmEPianoInstrument } from './instruments/FmEPianoInstrument'
 import { InstrumentBank } from './instruments/InstrumentBank'
 import { SampleInstrument } from './samples/SampleInstrument'
 import type { SampleLoadState } from './samples/types'
 import { VoiceManager, type EnvelopeConfig } from './VoiceManager'
 import { clampNote } from './instruments/Instrument'
-import type { DiagnosticsSnapshot, EngineEvent, EngineListener, InputSource, LimiterKind, MainToneSnapshot, MasterEQState, NoteOnRequest, SampleZoneInfo, SplitZoneSnapshot, WorkstationPreset } from './types'
+import type { ArpeggiatorSnapshot, DiagnosticsSnapshot, EngineEvent, EngineListener, InputSource, LimiterKind, MainToneSnapshot, MasterEQState, NoteOnRequest, SampleZoneInfo, SplitZoneSnapshot, WorkstationPreset } from './types'
 import { PerformanceRecorder } from './recorder/PerformanceRecorder'
 import { encodeMidiFile } from './recorder/MidiEncoder'
 import { AudioBufferTap } from './recorder/WavEncoder'
@@ -125,36 +135,109 @@ export const FACTORY_PRESETS: WorkstationPreset[] = [
     master: { volume: 1, lowGainDb: 3, midGainDb: -1, highGainDb: 0 },
   },
   {
-    id: 'vintage-ep-chill',
-    name: 'Vintage EP Chill',
+    id: 'trumpet-solo',
+    name: 'Trumpet Solo',
     category: 'factory',
     main: {
-      instrument: 'electric-piano',
+      instrument: 'trumpet',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
-      tone: { volume: 1, pan: 0, cutoffNorm: 0.95, cutoffHz: 16000, reverbAmount: 0.25, reverbPreset: 'room', chorusAmount: 0.4, delayAmount: 0.3, delayTime: 0.35, delayFeedback: 0.25 },
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.25, reverbPreset: 'hall', chorusAmount: 0, delayAmount: 0.1, delayTime: 0.35, delayFeedback: 0.2 },
     },
-    dual: {
-      enabled: false,
-      instrument: 'string-ensemble',
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 1, midGainDb: 1, highGainDb: 0 },
+  },
+  {
+    id: 'brass-section-lead',
+    name: 'Brass Section',
+    category: 'factory',
+    main: {
+      instrument: 'brass-section',
       octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
-      tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.3, reverbPreset: 'stage', chorusAmount: 0.1, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
     },
-    split: {
-      enabled: false,
-      splitPoint: 60,
-      instrument: 'synth-bass',
-      octaveShift: -1,
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 2, midGainDb: 1, highGainDb: 1 },
+  },
+  {
+    id: 'sax-lead',
+    name: 'Saxophone Lead',
+    category: 'factory',
+    main: {
+      instrument: 'saxophone',
+      octaveShift: 0,
       transpose: 0,
       tuningCents: 0,
-      volume: 1,
-      pan: 0,
-      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.3, reverbPreset: 'hall', chorusAmount: 0.15, delayAmount: 0.15, delayTime: 0.3, delayFeedback: 0.25 },
     },
-    master: { volume: 1, lowGainDb: 1, midGainDb: 1, highGainDb: -1 },
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 1, midGainDb: 1, highGainDb: 0 },
+  },
+  {
+    id: 'oboe-solo',
+    name: 'Oboe Solo',
+    category: 'factory',
+    main: {
+      instrument: 'oboe',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.35, reverbPreset: 'hall', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 0, midGainDb: 2, highGainDb: 0 },
+  },
+  {
+    id: 'orchestral-tutti',
+    name: 'Orchestral Tutti',
+    category: 'factory',
+    main: {
+      instrument: 'tutti',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.4, reverbPreset: 'hall', chorusAmount: 0.1, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 },
+    },
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 3, midGainDb: 1, highGainDb: 2 },
+  },
+  {
+    id: 'dulcimer-zither',
+    name: 'Hammered Dulcimer',
+    category: 'factory',
+    main: {
+      instrument: 'dulcimer',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.3, reverbPreset: 'hall', chorusAmount: 0.2, delayAmount: 0.2, delayTime: 0.25, delayFeedback: 0.3 },
+    },
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 0, midGainDb: 1, highGainDb: 2 },
+  },
+  {
+    id: 'acoustic-pluck',
+    name: 'Acoustic Pluck',
+    category: 'factory',
+    main: {
+      instrument: 'pluck',
+      octaveShift: 0,
+      transpose: 0,
+      tuningCents: 0,
+      tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0.2, reverbPreset: 'room', chorusAmount: 0.1, delayAmount: 0.15, delayTime: 0.3, delayFeedback: 0.2 },
+    },
+    dual: { enabled: false, instrument: 'synth-pad', octaveShift: 0, transpose: 0, tuningCents: 0, tone: { volume: 0.8, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    split: { enabled: false, splitPoint: 60, instrument: 'synth-bass', octaveShift: -1, transpose: 0, tuningCents: 0, volume: 1, pan: 0, tone: { volume: 1, pan: 0, cutoffNorm: 1, cutoffHz: 20000, reverbAmount: 0, reverbPreset: 'room', chorusAmount: 0, delayAmount: 0, delayTime: 0.35, delayFeedback: 0.3 } },
+    master: { volume: 1, lowGainDb: 0, midGainDb: 1, highGainDb: 1 },
   },
   {
     id: 'lush-strings-piano',
@@ -208,6 +291,7 @@ export class AudioEngine {
   private listeners = new Set<EngineListener>()
 
   private activeNotes = new Set<number>()
+  private inputActiveNotes = new Set<number>()
   private meter: AnalyserNode | null = null
   private noteCounts = new Map<number, number>()
   private pendingLoads = 0
@@ -215,6 +299,11 @@ export class AudioEngine {
   private pendingOffs = new Map<number, { sustain: boolean; seq: number }>()
   /** Monotonic input ordering so pending releases never leak into later respawns. */
   private eventSeq = 0
+
+  private isPortamentoEnabled = false
+  private portamentoTime = 0
+  private lastMidiNote: number | null = null
+  private arpeggiatorRef: unknown = null
 
   private transpose = 0
   private octaveShift = 0
@@ -466,6 +555,16 @@ export class AudioEngine {
     this.bank.register(new SynthStringsInstrument())
     this.bank.register(new SynthBrassInstrument())
     this.bank.register(new SynthBassInstrument())
+    this.bank.register(new TrumpetInstrument())
+    this.bank.register(new BrassSectionInstrument())
+    this.bank.register(new SaxophoneInstrument())
+    this.bank.register(new OboeInstrument())
+    this.bank.register(new TuttiInstrument())
+    this.bank.register(new PluckInstrument())
+    this.bank.register(new DulcimerInstrument())
+    this.bank.register(new BrightGrandInstrument())
+    this.bank.register(new WarmGrandInstrument())
+    this.bank.register(new FmEPianoInstrument())
     this.registerSampleInstrument('grand-piano')
 
     ctx.addEventListener('statechange', () => {
@@ -499,69 +598,7 @@ export class AudioEngine {
     if (ctx.state === 'running') this.emit({ type: 'state', state: ctx.state })
   }
 
-  /**
-   * Input -> engine path. No React involved. Transpose + octave are applied
-   * here so every input source (mouse, QWERTY, MIDI) is automatically tuned.
-   */
-  noteOn(req: NoteOnRequest): void {
-    const ctx = this.ctx
-    if (!ctx || !this.voiceManager) return
-    if (ctx.state !== 'running') {
-      void this.unlock()
-      return
-    }
-    const velocity = clamp(req.velocity, 0, 1)
-    this.recorder.recordEvent({ type: 'noteOn', note: req.note, velocity, source: req.source })
-    const seq = ++this.eventSeq
 
-    if (this.splitEnabled && req.note < this.splitPoint) {
-      const effectiveLower = this.applyLowerTuning(req.note)
-      this.voiceManager.retrigger(effectiveLower, this.envConfig.release * 0.25)
-      void this.spawnVoice(effectiveLower, velocity, req.source, seq, 'lower')
-    } else {
-      const effectiveMain = this.applyTuning(req.note)
-      this.voiceManager.retrigger(effectiveMain, this.envConfig.release * 0.25)
-      void this.spawnVoice(effectiveMain, velocity, req.source, seq, 'main')
-
-      if (this.dualEnabled) {
-        const effectiveDual = this.applyDualTuning(req.note)
-        this.voiceManager.retrigger(effectiveDual, this.envConfig.release * 0.25)
-        void this.spawnVoice(effectiveDual, velocity, req.source, seq, 'dual')
-      }
-    }
-  }
-
-  noteOff(req: { note: number }): void {
-    const ctx = this.ctx
-    if (!ctx || !this.voiceManager || ctx.state !== 'running') return
-    this.recorder.recordEvent({ type: 'noteOff', note: req.note })
-
-    if (this.splitEnabled && req.note < this.splitPoint) {
-      const effectiveLower = this.applyLowerTuning(req.note)
-      const releasedLower = this.voiceManager.noteOff(effectiveLower, this.sustainPedal)
-      if (releasedLower === 0 && (this.spawnsInFlight.get(effectiveLower) ?? 0) > 0) {
-        this.pendingOffs.set(effectiveLower, { sustain: this.sustainPedal, seq: ++this.eventSeq })
-      }
-    } else {
-      const effectiveMain = this.applyTuning(req.note)
-      const releasedMain = this.voiceManager.noteOff(effectiveMain, this.sustainPedal)
-      if (releasedMain === 0 && (this.spawnsInFlight.get(effectiveMain) ?? 0) > 0) {
-        this.pendingOffs.set(effectiveMain, { sustain: this.sustainPedal, seq: ++this.eventSeq })
-      }
-
-      if (this.dualEnabled) {
-        const effectiveDual = this.applyDualTuning(req.note)
-        const releasedDual = this.voiceManager.noteOff(effectiveDual, this.sustainPedal)
-        if (releasedDual === 0 && (this.spawnsInFlight.get(effectiveDual) ?? 0) > 0) {
-          this.pendingOffs.set(effectiveDual, { sustain: this.sustainPedal, seq: ++this.eventSeq })
-        }
-      }
-    }
-  }
-
-  releaseAll(): void {
-    this.voiceManager?.releaseAll()
-  }
 
   sustainOn(): void {
     this.sustainPedal = true
@@ -1448,6 +1485,112 @@ export class AudioEngine {
     return this.activeNotes
   }
 
+  getInputActiveNotes(): ReadonlySet<number> {
+    return this.inputActiveNotes
+  }
+
+  get portamentoEnabled(): boolean {
+    return this.isPortamentoEnabled
+  }
+
+  setPortamentoEnabled(enabled: boolean): void {
+    this.isPortamentoEnabled = enabled
+  }
+
+  get portamentoTimeMs(): number {
+    return this.portamentoTime
+  }
+
+  setPortamentoTime(timeMs: number): void {
+    this.portamentoTime = Math.max(0, Math.min(2000, timeMs))
+  }
+
+  setArpeggiatorRef(ref: unknown): void {
+    this.arpeggiatorRef = ref
+  }
+
+  /**
+   * Input -> engine path. No React involved. Transpose + octave are applied
+   * here so every input source (mouse, QWERTY, MIDI) is automatically tuned.
+   */
+  noteOn(req: NoteOnRequest): void {
+    const ctx = this.ctx
+    if (!ctx || !this.voiceManager) return
+    if (ctx.state !== 'running') {
+      void this.unlock()
+      return
+    }
+    this.inputActiveNotes.add(req.note)
+    this.emit({ type: 'input-notes', notes: this.inputActiveNotes })
+
+    let portamentoFromRate: number | undefined
+    if (
+      this.isPortamentoEnabled &&
+      this.portamentoTime > 0 &&
+      this.lastMidiNote !== null &&
+      this.lastMidiNote !== req.note
+    ) {
+      portamentoFromRate = Math.pow(2, (this.lastMidiNote - req.note) / 12)
+    }
+    this.lastMidiNote = req.note
+
+    const velocity = clamp(req.velocity, 0, 1)
+    this.recorder.recordEvent({ type: 'noteOn', note: req.note, velocity, source: req.source })
+    const seq = ++this.eventSeq
+
+    if (this.splitEnabled && req.note < this.splitPoint) {
+      const effectiveLower = this.applyLowerTuning(req.note)
+      this.voiceManager.retrigger(effectiveLower, this.envConfig.release * 0.25)
+      void this.spawnVoice(effectiveLower, velocity, req.source, seq, 'lower', portamentoFromRate)
+    } else {
+      const effectiveMain = this.applyTuning(req.note)
+      this.voiceManager.retrigger(effectiveMain, this.envConfig.release * 0.25)
+      void this.spawnVoice(effectiveMain, velocity, req.source, seq, 'main', portamentoFromRate)
+
+      if (this.dualEnabled) {
+        const effectiveDual = this.applyDualTuning(req.note)
+        this.voiceManager.retrigger(effectiveDual, this.envConfig.release * 0.25)
+        void this.spawnVoice(effectiveDual, velocity, req.source, seq, 'dual', portamentoFromRate)
+      }
+    }
+  }
+
+  noteOff(req: { note: number }): void {
+    const ctx = this.ctx
+    this.inputActiveNotes.delete(req.note)
+    this.emit({ type: 'input-notes', notes: this.inputActiveNotes })
+    if (!ctx || !this.voiceManager || ctx.state !== 'running') return
+    this.recorder.recordEvent({ type: 'noteOff', note: req.note })
+
+    if (this.splitEnabled && req.note < this.splitPoint) {
+      const effectiveLower = this.applyLowerTuning(req.note)
+      const releasedLower = this.voiceManager.noteOff(effectiveLower, this.sustainPedal)
+      if (releasedLower === 0 && (this.spawnsInFlight.get(effectiveLower) ?? 0) > 0) {
+        this.pendingOffs.set(effectiveLower, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+      }
+    } else {
+      const effectiveMain = this.applyTuning(req.note)
+      const releasedMain = this.voiceManager.noteOff(effectiveMain, this.sustainPedal)
+      if (releasedMain === 0 && (this.spawnsInFlight.get(effectiveMain) ?? 0) > 0) {
+        this.pendingOffs.set(effectiveMain, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+      }
+
+      if (this.dualEnabled) {
+        const effectiveDual = this.applyDualTuning(req.note)
+        const releasedDual = this.voiceManager.noteOff(effectiveDual, this.sustainPedal)
+        if (releasedDual === 0 && (this.spawnsInFlight.get(effectiveDual) ?? 0) > 0) {
+          this.pendingOffs.set(effectiveDual, { sustain: this.sustainPedal, seq: ++this.eventSeq })
+        }
+      }
+    }
+  }
+
+  releaseAll(): void {
+    this.inputActiveNotes.clear()
+    this.emit({ type: 'input-notes', notes: this.inputActiveNotes })
+    this.voiceManager?.releaseAll()
+  }
+
   /** True while samples are still loading or voices are sounding. */
   isBusy(): boolean {
     return this.pendingLoads > 0 || (this.voiceManager?.activeCount ?? 0) > 0
@@ -1518,6 +1661,7 @@ export class AudioEngine {
       polyphonyCap: stats?.maxVoices ?? 0,
       limiter: this.limiterKind,
       instrument: this.activeInstrument,
+      instrumentId: this.instrument,
       transpose: this.transpose,
       octaveShift: this.octaveShift,
       tuningCents: this.tuningOffset,
@@ -1556,6 +1700,16 @@ export class AudioEngine {
       dualTuningCents: this.dualTuningOffset,
       masterEQ: this.masterEQState(),
       splitZone: this.splitZoneState(),
+      portamento: { enabled: this.isPortamentoEnabled, timeMs: this.portamentoTime },
+      arpeggiator: (this.arpeggiatorRef as { getDiagnostics?: () => ArpeggiatorSnapshot })?.getDiagnostics?.() ?? {
+        enabled: false,
+        rate: '1/8',
+        direction: 'up',
+        octaveRange: 1,
+        gate: 0.8,
+        heldCount: 0,
+        generatedCount: 0,
+      },
     }
   }
 
@@ -1586,6 +1740,7 @@ export class AudioEngine {
     source: InputSource,
     spawnSeq: number,
     layer: 'main' | 'dual' | 'lower' = 'main',
+    portamentoFromRate?: number,
   ): Promise<void> {
     const ctx = this.ctx
     const vm = this.voiceManager
@@ -1624,6 +1779,8 @@ export class AudioEngine {
           startOffset: sampled.startOffset,
           gainDb: sampled.gainDb,
           pitchBendCents: this.pitchBendCents,
+          portamentoFromRate: portamentoFromRate ? sampled.playbackRate * tuningFactor * portamentoFromRate : undefined,
+          portamentoTimeMs: this.isPortamentoEnabled ? this.portamentoTime : undefined,
           out: destNode,
         })
       ) {

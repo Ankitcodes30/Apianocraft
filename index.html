@@ -1,7 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-transitions">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      Blocking theme script — runs synchronously before first paint to prevent FOUC.
+      Reads persisted theme from localStorage and applies the correct class/attribute
+      on <html> before any CSS or React code loads.
+    -->
+    <script>
+      ;(function () {
+        var KEY = 'apianocraft-theme'
+        var stored = null
+        try { stored = localStorage.getItem(KEY) } catch (e) {}
+        var pref = (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : 'system'
+        var isDark = pref === 'dark' || (pref === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        var effective = isDark ? 'dark' : 'light'
+        var el = document.documentElement
+        if (isDark) el.classList.add('dark')
+        else el.classList.remove('dark')
+        el.setAttribute('data-theme', effective)
+        // Remove no-transitions after first paint to enable smooth theme switching
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            el.classList.remove('no-transitions')
+          })
+        })
+      })()
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0e1116" />

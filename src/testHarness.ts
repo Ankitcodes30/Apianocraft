@@ -8,6 +8,7 @@ import { getMidiManager } from './midi/MidiManager'
 import { getNoteEventBus } from './midi/NoteEventBus'
 import { getQwertyManager } from './keyboard/QwertyManager'
 import { detectChord } from './audio/tools/ChordDetector'
+import { getMousePerformanceAdapter } from './performance/MousePerformanceAdapter'
 
 export interface MidiDeviceView {
   id: string
@@ -68,23 +69,11 @@ export interface TestApi {
   midiDisconnect(id: string): void
   /** Configure the pitch-bend range in semitones (2 or 12). */
   setPitchBendRange(semitones: number): void
-  // ---- Phase 6: performance XY pad --------------------------------------
-  /** Drive the pad with synthetic pointer events (nx, ny in 0..1; ny 0 = top). */
-  perfPadPointer(type: 'down' | 'move' | 'up' | 'cancel', nx: number, ny: number, pointerId?: number): void
-  /** Keyboard access on the pad (arrow keys). */
-  perfPadKey(type: 'down' | 'up', key: string): void
-  /** Pad + engine state snapshot for assertions. */
-  perfPadState(): {
-    cents: number
-    bend: number
-    mod: number
-    range: number
-    dotLeft: string
-    dotTop: string
-    renders: number
-  }
-  /** Click the pad's pitch-bend range toggle. */
-  perfPadRange(semitones: 2 | 12): void
+  // ---- Engine Pitch Bend & Modulation ------------------------------------
+  engineSetPitchBend(value: number): void
+  engineSetModulation(value: number): void
+  engineSetPitchBendRange(semitones: number): void
+  enginePitchBendState(): { cents: number; bend: number; mod: number; range: number }
   // ---- Phase 7: Main Tone controls + effects -----------------------------
   /** Drive a Main Tone slider through the real UI path (input event). */
   mainToneSet(
@@ -128,6 +117,10 @@ export interface TestApi {
   qwertyVelocity(value: number): void
   /** Release all QWERTY-held notes (panic path). */
   qwertyReleaseAll(): void
+  /** Authoritative 38-key mappings array. */
+  qwerty38Mappings(): ReadonlyArray<unknown>
+  /** Authoritative 38-key map by key. */
+  qwerty38KeyMap(): Readonly<Record<string, unknown>>
   /** Simulate window blur (safety release path). */
   qwertyBlur(): void
   /** Override document visibility and dispatch visibilitychange. */
@@ -168,6 +161,13 @@ export interface TestApi {
   presetDelete(id: string): boolean
   // ---- Phase 10: Additional Instrument Bank ------------------------------
   getAvailableInstruments(): { id: string; name: string; kind: 'synth' | 'samples' }[]
+  // ---- Mouse Performance Pitch + Modulation ------------------------------
+  mousePerfIsEnabled(): boolean
+  mousePerfSetEnabled(enabled: boolean): void
+  mousePerfEnter(x: number, y: number): void
+  mousePerfMove(x: number, y: number): void
+  mousePerfLeave(): void
+  mousePerfGetState(): import('./performance/MousePerformanceAdapter').MousePerfState
   // ---- Phase 11: Recording & Transport -----------------------------------
   recordingStart(): void
   recordingStop(): void
@@ -339,47 +339,18 @@ export function installTestHarness(engine: AudioEngine): TestApi {
       mock?.disconnect(id)
     },
     setPitchBendRange: (semitones) => engine.setPitchBendRange(semitones),
-    // ---- Phase 6: performance XY pad -----------------------------------
-    perfPadPointer: (type, nx, ny, pointerId = 1) => {
-      const pad = document.querySelector('[data-perf-pad]')
-      if (!pad) return
-      const r = pad.getBoundingClientRect()
-      const nativeType = type === 'down' ? 'pointerdown' : type === 'move' ? 'pointermove' : type === 'up' ? 'pointerup' : 'pointercancel'
-      pad.dispatchEvent(
-        new PointerEvent(nativeType, {
-          pointerId,
-          isPrimary: true,
-          bubbles: true,
-          cancelable: true,
-          clientX: r.left + nx * r.width,
-          clientY: r.top + ny * r.height,
-          buttons: type === 'up' || type === 'cancel' ? 0 : 1,
-        }),
-      )
-    },
-    perfPadKey: (type, key) => {
-      const pad = document.querySelector('[data-perf-pad]')
-      if (!pad) return
-      pad.dispatchEvent(new KeyboardEvent(type === 'down' ? 'keydown' : 'keyup', { key, bubbles: true, cancelable: true }))
-    },
-    perfPadState: () => {
-      const dot = document.querySelector('[data-perf-dot]')
+    // ---- Engine Pitch Bend & Modulation ----------------------------------
+    engineSetPitchBend: (value) => engine.setPitchBend(value),
+    engineSetModulation: (value) => engine.setModulation(value),
+    engineSetPitchBendRange: (semitones) => engine.setPitchBendRange(semitones),
+    enginePitchBendState: () => {
       const d = engine.getDiagnostics()
-      const w = window as unknown as { __apiano?: { perfPadRenders?: { count: number } } }
       return {
         cents: d.pitchBendCents,
         bend: d.pitchBend,
         mod: d.modulation,
         range: d.pitchBendRange,
-        dotLeft: dot instanceof HTMLElement ? dot.style.left : '',
-        dotTop: dot instanceof HTMLElement ? dot.style.top : '',
-        renders: w.__apiano?.perfPadRenders?.count ?? -1,
       }
-    },
-    perfPadRange: (semitones) => {
-      const pad = document.querySelector('[data-perf-pad]')
-      const button = pad?.querySelector(`[data-bend-range="${semitones}"]`)
-      if (button instanceof HTMLElement) button.click()
     },
     // ---- Phase 7: Main Tone controls + effects -------------------------
     mainToneSet: (kind, value) => {
@@ -475,6 +446,8 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     qwertySetOctave: (octave) => getQwertyManager(getNoteEventBus()).setOctave(octave),
     qwertyVelocity: (value) => getQwertyManager(getNoteEventBus()).setVelocity(value),
     qwertyReleaseAll: () => getQwertyManager(getNoteEventBus()).releaseAll(),
+    qwerty38Mappings: () => getQwertyManager(getNoteEventBus()).get38KeyMappings(),
+    qwerty38KeyMap: () => getQwertyManager(getNoteEventBus()).get38KeyMap(),
     qwertyBlur: () => window.dispatchEvent(new Event('blur')),
     qwertyVisibility: (hidden) => {
       Object.defineProperty(document, 'hidden', { value: hidden, configurable: true })
@@ -557,6 +530,13 @@ export function installTestHarness(engine: AudioEngine): TestApi {
     presetDelete: (id) => engine.deleteUserPreset(id),
     // ---- Phase 10: Additional Instrument Bank ------------------------------
     getAvailableInstruments: () => engine.getInstruments(),
+    // ---- Mouse Performance Pitch + Modulation ------------------------------
+    mousePerfIsEnabled: () => getMousePerformanceAdapter().isEnabled(),
+    mousePerfSetEnabled: (enabled) => getMousePerformanceAdapter().setEnabled(enabled),
+    mousePerfEnter: (x, y) => getMousePerformanceAdapter().handlePointerEnter(x, y),
+    mousePerfMove: (x, y) => getMousePerformanceAdapter().handlePointerMove(x, y),
+    mousePerfLeave: () => getMousePerformanceAdapter().handlePointerLeave(),
+    mousePerfGetState: () => getMousePerformanceAdapter().getState(),
     // ---- Phase 11: Recording & Transport -----------------------------------
     recordingStart: () => engine.startRecording(),
     recordingStop: () => engine.stopRecording(),

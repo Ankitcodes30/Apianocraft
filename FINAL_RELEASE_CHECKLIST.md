@@ -30,7 +30,7 @@
 - [x] **Dual Tone Layering**: Enable layer, assign separate instruments/tuning, verify doubled polyphony. **[PASS]** (Automated Smoke)
 - [x] **Split Keyboard Mode**: Enable split at middle C (note 60); verify lower zone instrument vs upper zone instrument. **[PASS]** (Automated Smoke)
 - [x] **Factory & User Presets**: Load presets, create user preset in LocalStorage, delete preset. **[PASS]** (Automated Smoke)
-- [x] **Workstation Tools**: Sample-accurate Metronome click, Tap Tempo, Chord Detector, Scale degree highlights. **[PASS]** (Automated Smoke)
+- [x] **Workstation Tools**: Sample-accurate Metronome click, Tap Tempo, Chord Detector. **[PASS]** (Automated Smoke)
 - [x] **Performance Recording**: Record timeline, transport playback, export binary Standard MIDI File (`.mid`). **[PASS]** (Automated Smoke)
 - [ ] **PWA Installation Prompt**: Test desktop Chrome/Edge "Install Apianocraft" PWA prompt in address bar. **[PENDING-MANUAL]** (Requires real browser window)
 

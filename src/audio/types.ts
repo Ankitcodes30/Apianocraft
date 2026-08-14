@@ -15,6 +15,7 @@ export type EngineEvent =
   | { type: 'state'; state: AudioContextState }
   | { type: 'tuning' }
   | { type: 'active-notes'; notes: ReadonlySet<number> }
+  | { type: 'input-notes'; notes: ReadonlySet<number> }
   | { type: 'error'; error: AudioEngineError }
   | { type: 'load'; instrumentId: string; state: SampleLoadState }
 
@@ -92,6 +93,7 @@ export interface DiagnosticsSnapshot {
   polyphonyCap: number
   limiter: LimiterKind
   instrument: string
+  instrumentId: string
   transpose: number
   octaveShift: number
   tuningCents: number
@@ -123,6 +125,23 @@ export interface DiagnosticsSnapshot {
   dualTuningCents?: number
   masterEQ?: MasterEQState
   splitZone?: SplitZoneSnapshot
+  portamento?: PortamentoSnapshot
+  arpeggiator?: ArpeggiatorSnapshot
+}
+
+export interface PortamentoSnapshot {
+  enabled: boolean
+  timeMs: number
+}
+
+export interface ArpeggiatorSnapshot {
+  enabled: boolean
+  rate: string
+  direction: string
+  octaveRange: number
+  gate: number
+  heldCount: number
+  generatedCount: number
 }
 
 export interface MasterEQState {
