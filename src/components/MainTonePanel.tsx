@@ -86,14 +86,14 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
   }, [engine])
 
   return (
-    <Card className="mt border-border" aria-label="Main tone controls">
-      <CardHeader className="mt__head flex flex-row items-center justify-between space-y-0 p-3">
+    <Card className="mt border-[#3A3A3A] bg-[#242424]" aria-label="Main tone controls">
+      <CardHeader className="mt__head flex flex-row items-center justify-between space-y-0 p-2.5 pb-2">
         <div className="mt__title flex items-center gap-2">
-          <span className="font-bold text-xs tracking-wider text-foreground">MAIN TONE (LAYER A)</span>
-          <Badge variant="accent" className="mt-badge">Primary</Badge>
+          <span className="font-semibold text-xs text-[#F2F2F2]">MAIN TONE (LAYER A)</span>
+          <Badge variant="accent" className="mt-badge bg-[#29323C] text-[#F2F2F2] border-[#4A5D70]">Primary</Badge>
         </div>
         <Select
-          className="chip select w-44 text-xs font-semibold"
+          className="chip select w-40 text-xs font-medium bg-[#292929] border-[#3A3A3A] text-[#F2F2F2]"
           aria-label="Main Tone Instrument"
           data-instrument-select
           value={out.instrument}
@@ -107,23 +107,28 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
         </Select>
       </CardHeader>
 
-      <CardContent className="p-3 pt-0">
-        <div className="mt-grid flex gap-3 flex-wrap">
-          {/* Sub-Card 1: Sound Source & Pitch Controls */}
-          <div className="mt-card flex-1 min-w-[300px] p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
-            <div className="mt-card__title flex items-center justify-between text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              <span>Primary Sound Controls</span>
-              <Badge variant="outline" className="mt-badge mt-badge--subtle text-[10px]">
+      <CardContent className="p-2.5 pt-0">
+        <div className="mt-grid flex gap-2.5 flex-wrap">
+          {/* Primary Channel Strip */}
+          <div className="mt-card flex-1 min-w-[290px] p-2 bg-[#292929] rounded-[4px] border border-[#3A3A3A] flex flex-col gap-2">
+            <div className="mt-card__title flex items-center justify-between text-[10px] font-semibold text-[#B5B5B5] uppercase">
+              <span>PRIMARY CHANNEL STRIP</span>
+              <Badge variant="outline" className="mt-badge font-mono text-[9px] text-[#B5B5B5] border-[#3A3A3A]">
                 {cutoffLabel(out.cutoffHz)}
               </Badge>
             </div>
 
-            <div className="mt__row flex flex-wrap gap-2.5 items-center">
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Volume</span>
+            <div className="mt__row flex flex-wrap gap-2 items-center">
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-[9px]">Volume</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-vol-out>
+                    {Math.round(out.volume * 100)}%
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Main tone volume"
                   data-vol
                   min={0}
@@ -132,16 +137,18 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={1}
                   onChange={(e) => engine.setMainToneVolume(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-vol-out>
-                  {Math.round(out.volume * 100)}%
-                </span>
               </label>
 
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Pan</span>
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-[9px]">Pan</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-pan-out>
+                    {panLabel(out.pan)}
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Main tone pan"
                   data-pan
                   min={-1}
@@ -150,16 +157,18 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={0}
                   onChange={(e) => engine.setMainTonePan(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-pan-out>
-                  {panLabel(out.pan)}
-                </span>
               </label>
 
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Cutoff</span>
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-[9px]">Cutoff</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-cutoff-out>
+                    {cutoffLabel(out.cutoffHz)}
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Main tone cutoff"
                   data-cutoff
                   min={0}
@@ -168,57 +177,54 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={1}
                   onChange={(e) => engine.setMainToneCutoff(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-cutoff-out>
-                  {cutoffLabel(out.cutoffHz)}
-                </span>
               </label>
 
-              <div className="mt__ctl mt__stepper flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Octave</span>
+              <div className="mt__ctl mt__stepper flex flex-col gap-1 text-[10px] text-[#B5B5B5]">
+                <span className="font-medium text-[9px]">Octave</span>
                 <div className="flex items-center gap-1">
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-oct-down onClick={() => engine.setOctaveShift(engine.octave - 1)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[11px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-oct-down onClick={() => engine.setOctaveShift(engine.octave - 1)}>
                     −
                   </Button>
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-oct-up onClick={() => engine.setOctaveShift(engine.octave + 1)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[11px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-oct-up onClick={() => engine.setOctaveShift(engine.octave + 1)}>
                     +
                   </Button>
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-oct-reset onClick={() => engine.setOctaveShift(0)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[11px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-oct-reset onClick={() => engine.setOctaveShift(0)}>
                     0
                   </Button>
-                  <Badge variant="secondary" className="chip font-mono" data-oct-value>
+                  <Badge variant="secondary" className="chip font-mono text-xs text-[#F2F2F2] bg-[#202020] border-[#3A3A3A]" data-oct-value>
                     {out.octave > 0 ? '+' : ''}
                     {out.octave}
                   </Badge>
                 </div>
               </div>
 
-              <div className="mt__ctl mt__stepper flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Transpose</span>
+              <div className="mt__ctl mt__stepper flex flex-col gap-1 text-[10px] text-[#B5B5B5]">
+                <span className="font-medium text-[9px]">Transpose</span>
                 <div className="flex items-center gap-1">
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-tr-down onClick={() => engine.setTranspose(engine.transposeSemitones - 1)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[11px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-tr-down onClick={() => engine.setTranspose(engine.transposeSemitones - 1)}>
                     −
                   </Button>
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-tr-up onClick={() => engine.setTranspose(engine.transposeSemitones + 1)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[11px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-tr-up onClick={() => engine.setTranspose(engine.transposeSemitones + 1)}>
                     +
                   </Button>
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-tr-reset onClick={() => engine.setTranspose(0)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[11px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-tr-reset onClick={() => engine.setTranspose(0)}>
                     0
                   </Button>
-                  <Badge variant="secondary" className="chip font-mono" data-tr-value>
+                  <Badge variant="secondary" className="chip font-mono text-xs text-[#F2F2F2] bg-[#202020] border-[#3A3A3A]" data-tr-value>
                     {out.transpose > 0 ? '+' : ''}
                     {out.transpose}
                   </Badge>
                 </div>
               </div>
 
-              <div className="mt__ctl mt__stepper flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Tune</span>
+              <div className="mt__ctl mt__stepper flex flex-col gap-1 text-[10px] text-[#B5B5B5]">
+                <span className="font-medium text-[9px]">Fine Tune</span>
                 <div className="flex items-center gap-1">
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="btn h-6 px-1.5 text-xs"
+                    className="btn h-5 px-1 text-[10px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]"
                     data-tune-down
                     onClick={() => engine.setTuningCents(engine.tuningCents - 10)}
                   >
@@ -228,16 +234,16 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="btn h-6 px-1.5 text-xs"
+                    className="btn h-5 px-1 text-[10px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]"
                     data-tune-up
                     onClick={() => engine.setTuningCents(engine.tuningCents + 10)}
                   >
                     +10
                   </Button>
-                  <Button type="button" variant="outline" size="sm" className="btn h-6 px-2 text-xs" data-tune-reset onClick={() => engine.setTuningCents(0)}>
+                  <Button type="button" variant="outline" size="sm" className="btn h-5 px-1.5 text-[10px] bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]" data-tune-reset onClick={() => engine.setTuningCents(0)}>
                     0
                   </Button>
-                  <Badge variant="secondary" className="chip font-mono" data-tune-value>
+                  <Badge variant="secondary" className="chip font-mono text-xs text-[#F2F2F2] bg-[#202020] border-[#3A3A3A]" data-tune-value>
                     {out.tuning > 0 ? '+' : ''}
                     {out.tuning}¢
                   </Badge>
@@ -246,20 +252,25 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
             </div>
           </div>
 
-          {/* Sub-Card 2: Master Effects Send Chain */}
-          <div className="mt-card mt-card--fx flex-1 min-w-[300px] p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
-            <div className="mt-card__title flex items-center justify-between text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              <span>Effects Bus</span>
-              <Badge variant="outline" className="mt-badge mt-badge--subtle text-[10px]">
-                {out.reverbAmount > 0 || out.chorusAmount > 0 || out.delayAmount > 0 ? 'FX Active' : 'Dry'}
+          {/* Effects Send Bus */}
+          <div className="mt-card mt-card--fx flex-1 min-w-[290px] p-2 bg-[#292929] rounded-[4px] border border-[#3A3A3A] flex flex-col gap-2">
+            <div className="mt-card__title flex items-center justify-between text-[10px] font-semibold text-[#B5B5B5] uppercase">
+              <span>EFFECTS SEND BUS</span>
+              <Badge variant="outline" className="mt-badge font-mono text-[9px] text-[#B5B5B5] border-[#3A3A3A]">
+                {out.reverbAmount > 0 || out.chorusAmount > 0 || out.delayAmount > 0 ? 'FX ACTIVE' : 'DRY'}
               </Badge>
             </div>
 
-            <div className="mt__row mt__row--effects flex flex-wrap gap-2.5 items-center">
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Reverb</span>
+            <div className="mt__row mt__row--effects flex flex-wrap gap-2 items-center">
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-[9px]">Reverb</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-reverb-out>
+                    {Math.round(out.reverbAmount * 100)}%
+                  </span>
+                </div>
                 <Select
-                  className="chip select mt__preset h-6 text-[11px] py-0 px-1 mb-1"
+                  className="chip select mt__preset h-5 text-[10px] py-0 px-1 mb-0.5 w-28 bg-[#202020] border-[#3A3A3A] text-[#F2F2F2]"
                   aria-label="Reverb preset"
                   data-reverb-preset
                   value={out.reverbPreset}
@@ -273,7 +284,7 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                 </Select>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Reverb amount"
                   data-reverb
                   min={0}
@@ -282,16 +293,18 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={0}
                   onChange={(e) => engine.setMainToneReverbAmount(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-reverb-out>
-                  {Math.round(out.reverbAmount * 100)}%
-                </span>
               </label>
 
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Chorus</span>
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-[9px]">Chorus</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-chorus-out>
+                    {Math.round(out.chorusAmount * 100)}%
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Chorus amount"
                   data-chorus
                   min={0}
@@ -300,16 +313,18 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={0}
                   onChange={(e) => engine.setMainToneChorusAmount(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-chorus-out>
-                  {Math.round(out.chorusAmount * 100)}%
-                </span>
               </label>
 
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Delay</span>
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-[9px]">Delay Amt</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-delay-out>
+                    {Math.round(out.delayAmount * 100)}%
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Delay amount"
                   data-delay-amt
                   min={0}
@@ -318,12 +333,15 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={0}
                   onChange={(e) => engine.setMainToneDelayAmount(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-delay-out>
-                  {Math.round(out.delayAmount * 100)}%
-                </span>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="font-medium text-[9px]">Time</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-delay-time-out>
+                    {Math.round(out.delayTime * 1000)} ms
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Delay time"
                   data-delay-time
                   min={0}
@@ -332,12 +350,15 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={0.35}
                   onChange={(e) => engine.setMainToneDelayTime(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-delay-time-out>
-                  {Math.round(out.delayTime * 1000)} ms
-                </span>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="font-medium text-[9px]">Feedback</span>
+                  <span className="mt__out font-mono text-xs text-[#F2F2F2] font-semibold tabular-nums" data-delay-fb-out>
+                    {Math.round(out.delayFeedback * 100)}%
+                  </span>
+                </div>
                 <input
                   type="range"
-                  className="mt__slider w-28 accent-primary cursor-pointer"
+                  className="mt__slider w-28 accent-[#5B7FA3] cursor-pointer"
                   aria-label="Delay feedback"
                   data-delay-fb
                   min={0}
@@ -346,9 +367,6 @@ export function MainTonePanel({ engine }: { engine: AudioEngine }) {
                   defaultValue={0.3}
                   onChange={(e) => engine.setMainToneDelayFeedback(parseFloat(e.currentTarget.value))}
                 />
-                <span className="mt__out font-mono text-[11px] text-foreground tabular-nums" data-delay-fb-out>
-                  {Math.round(out.delayFeedback * 100)}%
-                </span>
               </label>
             </div>
           </div>

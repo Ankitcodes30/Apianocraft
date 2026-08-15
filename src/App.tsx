@@ -16,7 +16,7 @@ import { ThemeSelector } from './components/ThemeSelector'
 import { MousePerformanceToggle } from './components/MousePerformanceToggle'
 import { BrandLogo } from './components/BrandLogo'
 import { Button } from './components/ui/button'
-import { Badge } from './components/ui/badge'
+import { Select } from './components/ui/select'
 
 interface TuningUiState {
   state: AudioContextState | 'closed'
@@ -93,25 +93,44 @@ export default function App() {
   }, [engine])
 
   return (
-    <div className="app font-sans">
+    <div className="app font-sans bg-[#181818] text-[#F2F2F2] antialiased">
       <OfflineBanner />
 
-      {/* Top Performance Dock */}
-      <header className="app__bar flex items-center gap-3 px-3 py-1.5 bg-card border border-border rounded-lg shadow-sm">
-        {/* Professional Studio Brand Logo Mark & Wordmark */}
+      {/* ── Neutral Professional Header ── */}
+      <header className="app__bar flex items-center justify-between gap-3 px-3 py-1 bg-[#202020] border border-[#3A3A3A] rounded-[4px]">
+        {/* LEFT: Brand Lockup */}
         <BrandLogo />
 
-        {/* Synchronized Compact Active Instrument Display */}
-        <Badge
-          variant="secondary"
-          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-foreground/90 border border-border/80 shadow-xs"
-          title="Active Main Tone Instrument (controlled via Main Tone panel)"
-        >
-          <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Main Tone:</span>
-          <span>{engine.getInstruments().find((i) => i.id === instrumentId)?.name ?? instrumentId}</span>
-        </Badge>
+        {/* CENTER: Active Instrument Tone Display */}
+        <div className="hidden sm:flex items-center gap-2 px-2.5 py-0.5 bg-[#292929] rounded-[4px] border border-[#3A3A3A]">
+          <span className="text-[9px] text-[#808080] font-bold uppercase tracking-wider font-mono">
+            ACTIVE TONE
+          </span>
+          <Select
+            className="chip select text-xs font-semibold w-40 h-6 border-0 bg-transparent py-0 px-1 text-[#F2F2F2]"
+            aria-label="Active Instrument Tone"
+            data-instrument-select
+            value={instrumentId}
+            onChange={(e) => void engine.setInstrument(e.target.value)}
+          >
+            {engine.getInstruments().map((i) => (
+              <option key={i.id} value={i.id}>
+                {i.name}
+              </option>
+            ))}
+          </Select>
+        </div>
 
-        <div className="flex items-center gap-2 ml-auto">
+        {/* RIGHT: Quick Telemetry & Status */}
+        <div className="flex items-center gap-2">
+          <SampleStatus engine={engine} instrumentId={instrumentId} />
+          <EngineStatus engine={engine} />
+        </div>
+      </header>
+
+      {/* ── Professional Workstation Toolbar ── */}
+      <nav className="flex items-center justify-between gap-2 px-3 py-1 bg-[#202020] border border-[#3A3A3A] rounded-[4px] shrink-0 flex-wrap">
+        <div className="flex items-center gap-2">
           <Button
             type="button"
             variant={tuning.sustain ? 'on' : 'outline'}
@@ -119,10 +138,11 @@ export default function App() {
             onClick={() => engine.toggleSustain()}
             disabled={!ready}
             title="Toggle Sustain Pedal (Spacebar)"
-            className={tuning.sustain ? 'btn--on' : ''}
+            className={tuning.sustain ? 'bg-[#5B7FA3] border-[#5B7FA3] text-white font-semibold' : 'bg-[#292929] border-[#3A3A3A] text-[#D5D5D5] font-medium'}
           >
             Sustain {tuning.sustain ? 'ON' : 'OFF'}
           </Button>
+
           <Button
             type="button"
             variant="panic"
@@ -130,29 +150,34 @@ export default function App() {
             onClick={() => engine.releaseAll()}
             disabled={!ready}
             title="Panic / All Notes Off (Escape)"
-            className="btn--panic"
+            className="btn--panic text-xs font-semibold"
           >
             Panic
           </Button>
+
           <MousePerformanceToggle />
-          <ThemeSelector />
-          <SampleStatus engine={engine} instrumentId={instrumentId} />
-          <EngineStatus engine={engine} />
         </div>
-      </header>
+
+        <div className="flex items-center gap-2">
+          <ThemeSelector />
+        </div>
+      </nav>
 
       {tuning.state === 'suspended' && (
-        <div className="warn">Audio is paused — click anywhere to enable sound.</div>
+        <div className="warn flex items-center gap-2 text-xs py-1.5 px-3 bg-[#2A241F] border border-[#C89040]/60 text-[#F2F2F2] rounded-[4px]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C89040]" />
+          <span>Audio engine is paused — click anywhere to initialize Web Audio context.</span>
+        </div>
       )}
-      {bootError && <div className="warn">Startup problem: {bootError}</div>}
+      {bootError && <div className="warn py-1.5 px-3 text-xs bg-[#2A1F1F] border border-[#A84A4A]/60 text-[#F2F2F2] rounded-[4px]">Startup problem: {bootError}</div>}
 
-      {/* Workstation Tabbed Inspector */}
+      {/* ── Workstation Tabbed Inspector ── */}
       <ErrorBoundary name="Workstation Inspector">
         <WorkstationInspector engine={engine} />
       </ErrorBoundary>
 
-      {/* Piano Keyboard Centerpiece Viewport */}
-      <main className="app-piano-container flex-1 flex flex-col min-h-[200px]" aria-label="Piano keyboard surface">
+      {/* ── Piano Keyboard Centerpiece Viewport ── */}
+      <main className="app-piano-container flex-1 flex flex-col min-h-[180px]" aria-label="Piano keyboard surface">
         <ErrorBoundary name="Piano Keyboard">
           <PianoKeyboard engine={engine} />
         </ErrorBoundary>

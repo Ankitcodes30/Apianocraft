@@ -17,24 +17,24 @@ export function PortamentoPanel({ engine }: { engine: AudioEngine }) {
 
   return (
     <Card
-      className={`mt border-border transition-all ${enabled ? 'mt--dual-active' : ''}`}
+      className={`mt border-[#3A3A3A] bg-[#242424] transition-all ${enabled ? 'border-[#5B7FA3]' : ''}`}
       aria-label="Portamento glide controls"
     >
-      <CardHeader className="mt__head flex flex-row items-center justify-between space-y-0 p-3">
+      <CardHeader className="mt__head flex flex-row items-center justify-between space-y-0 p-2.5 pb-2">
         <div className="mt__title flex items-center gap-2">
-          <span className="font-bold text-xs tracking-wider text-foreground">PORTAMENTO / GLIDE</span>
+          <span className="font-semibold text-xs text-[#F2F2F2]">PORTAMENTO / GLIDE</span>
           <Badge
             variant={enabled ? 'accent' : 'outline'}
-            className={`mt-badge ${enabled ? '' : 'mt-badge--subtle'}`}
+            className={`mt-badge font-mono text-[9px] ${enabled ? 'bg-[#29323C] text-[#F2F2F2] border-[#4A5D70]' : 'text-[#B5B5B5] border-[#3A3A3A]'}`}
           >
-            {enabled ? 'Active' : 'Off'}
+            {enabled ? 'ACTIVE' : 'OFF'}
           </Badge>
         </div>
         <Button
           type="button"
           variant={enabled ? 'on' : 'outline'}
           size="sm"
-          className={`btn ${enabled ? 'btn--on' : ''}`}
+          className={`btn ${enabled ? 'bg-[#5B7FA3] border-[#5B7FA3] text-white font-semibold' : 'bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]'}`}
           data-portamento-toggle
           onClick={togglePortamento}
         >
@@ -42,21 +42,21 @@ export function PortamentoPanel({ engine }: { engine: AudioEngine }) {
         </Button>
       </CardHeader>
 
-      <CardContent className="p-3 pt-0">
-        <div className="mt-grid flex gap-3 flex-wrap">
-          <div className="mt-card flex-1 min-w-[300px] p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
-            <div className="mt-card__title flex items-center justify-between text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-              <span>Glide Speed</span>
-              <Badge variant="outline" className="mt-badge mt-badge--subtle text-[10px]">
+      <CardContent className="p-2.5 pt-0">
+        <div className="mt-grid flex gap-2.5 flex-wrap">
+          <div className="mt-card flex-1 min-w-[290px] p-2 bg-[#292929] rounded-[4px] border border-[#3A3A3A] flex flex-col gap-2">
+            <div className="mt-card__title flex items-center justify-between text-[10px] font-semibold text-[#B5B5B5] uppercase">
+              <span>GLIDE TIME & TRANSITION SPEED</span>
+              <Badge variant="outline" className="mt-badge font-mono text-[9px] text-[#B5B5B5] border-[#3A3A3A]">
                 {timeMs} ms
               </Badge>
             </div>
 
-            <div className="mt__row flex flex-wrap gap-2.5 items-center">
-              <label className="mt__ctl flex flex-col gap-1 text-[11px] text-muted-foreground">
-                <span>Glide Time</span>
+            <div className="mt__row flex flex-wrap gap-2 items-center">
+              <label className="mt__ctl flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+                <span className="font-medium text-[9px]">Glide Speed</span>
                 <Select
-                  className="chip select w-40 text-xs"
+                  className="chip select w-36 text-xs font-medium bg-[#202020] border-[#3A3A3A] text-[#F2F2F2]"
                   aria-label="Portamento Glide Time"
                   data-portamento-time
                   value={timeMs}

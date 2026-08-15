@@ -34,7 +34,7 @@ const TabsList = React.forwardRef<
     ref={ref}
     role="tablist"
     className={cn(
-      'inline-flex h-9 items-center justify-center rounded-lg bg-secondary/50 p-1 text-muted-foreground gap-1',
+      'inline-flex h-8 items-center justify-center rounded-md bg-secondary/40 p-0.5 text-muted-foreground gap-1',
       className
     )}
     {...props}
@@ -65,10 +65,10 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         aria-selected={isSelected}
         onClick={handleClick}
         className={cn(
-          'inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 cursor-pointer',
+          'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-2.5 py-1 text-xs font-semibold ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer',
           isSelected
-            ? 'bg-card text-foreground shadow-sm border border-border/80'
-            : 'hover:bg-accent/50 hover:text-accent-foreground text-muted-foreground',
+            ? 'bg-card text-foreground shadow-xs border border-border'
+            : 'hover:bg-accent/40 hover:text-accent-foreground text-muted-foreground',
           className
         )}
         {...props}
@@ -94,7 +94,7 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
       <div
         ref={ref}
         role="tabpanel"
-        className={cn('mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2', className)}
+        className={cn('mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring', className)}
         {...props}
       >
         {children}

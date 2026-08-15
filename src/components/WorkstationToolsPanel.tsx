@@ -53,23 +53,23 @@ export const WorkstationToolsPanel: React.FC = () => {
   }
 
   return (
-    <Card className="tools-panel border-border" aria-label="Workstation Tools Panel">
-      <CardHeader className="tools-panel__head p-3 pb-2">
-        <span className="tools-panel__title font-bold text-xs tracking-wider text-foreground">
+    <Card className="tools-panel border-[#3A3A3A] bg-[#242424]" aria-label="Workstation Tools Panel">
+      <CardHeader className="tools-panel__head p-2.5 pb-2">
+        <span className="tools-panel__title font-semibold text-xs text-[#F2F2F2]">
           WORKSTATION TOOLS & HARMONY
         </span>
       </CardHeader>
 
-      <CardContent className="p-3 pt-0 flex flex-col gap-3">
+      <CardContent className="p-2.5 pt-0 flex flex-col gap-2.5">
         {/* Metronome Controls */}
-        <div className="tools-section metronome-section p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
+        <div className="tools-section metronome-section p-2 bg-[#292929] rounded-[4px] border border-[#3A3A3A] flex flex-col gap-2">
           <div className="metronome-section__header flex items-center justify-between">
-            <span className="section-label font-bold text-[11px] text-muted-foreground uppercase tracking-wider">
-              METRONOME
+            <span className="section-label font-medium text-[10px] text-[#B5B5B5] uppercase">
+              METRONOME CLOCK
             </span>
-            <div className="metronome-tempo-display font-mono text-xs text-foreground flex items-center gap-1">
-              <span className="bpm-val font-bold text-primary" data-bpm-val>{metronomeSnap.bpm}</span>
-              <span className="bpm-unit text-muted-foreground text-[10px]">BPM</span>
+            <div className="metronome-tempo-display font-mono text-xs text-[#F2F2F2] flex items-center gap-1">
+              <span className="bpm-val font-semibold text-[#5B7FA3] text-sm" data-bpm-val>{metronomeSnap.bpm}</span>
+              <span className="bpm-unit text-[#808080] text-[9px]">BPM</span>
             </div>
           </div>
 
@@ -78,10 +78,11 @@ export const WorkstationToolsPanel: React.FC = () => {
               type="button"
               variant={metronomeSnap.running ? 'on' : 'outline'}
               size="sm"
-              className={`btn-metronome ${metronomeSnap.running ? 'active' : ''}`}
+              className={`btn-metronome ${metronomeSnap.running ? 'bg-[#5B7FA3] border-[#5B7FA3] text-white font-semibold' : 'bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]'}`}
               onClick={handleMetronomeToggle}
               data-btn-metronome
             >
+              <span className={`w-1.5 h-1.5 rounded-full mr-1.5 inline-block ${metronomeSnap.running ? 'bg-[#6FA77A]' : 'bg-[#808080]'}`} />
               {metronomeSnap.running ? 'Stop Metronome' : 'Start Metronome'}
             </Button>
 
@@ -89,18 +90,18 @@ export const WorkstationToolsPanel: React.FC = () => {
               type="button"
               variant="secondary"
               size="sm"
-              className="btn-tap-tempo text-xs"
+              className="btn-tap-tempo text-xs bg-[#2B2B2B] border-[#3A3A3A] text-[#D5D5D5]"
               onClick={handleTapTempo}
               data-btn-tap-tempo
             >
               Tap Tempo
             </Button>
 
-            <div className="tool-field flex flex-col gap-1 text-[11px] text-muted-foreground">
-              <label htmlFor="time-sig-select">Time Sig</label>
+            <div className="tool-field flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+              <label htmlFor="time-sig-select" className="font-medium text-[9px]">Time Sig</label>
               <Select
                 id="time-sig-select"
-                className="select w-20 text-xs"
+                className="select w-20 text-xs bg-[#202020] border-[#3A3A3A] text-[#F2F2F2]"
                 value={metronomeSnap.timeSignature}
                 onChange={(e) => handleTimeSigChange(e.target.value as TimeSignature)}
                 data-time-signature
@@ -112,8 +113,8 @@ export const WorkstationToolsPanel: React.FC = () => {
               </Select>
             </div>
 
-            <div className="tool-field slider-field flex flex-col gap-1 text-[11px] text-muted-foreground">
-              <label htmlFor="bpm-slider">BPM</label>
+            <div className="tool-field slider-field flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+              <label htmlFor="bpm-slider" className="font-medium text-[9px]">BPM</label>
               <input
                 id="bpm-slider"
                 type="range"
@@ -121,13 +122,13 @@ export const WorkstationToolsPanel: React.FC = () => {
                 max="280"
                 value={metronomeSnap.bpm}
                 onChange={(e) => handleBpmChange(Number(e.target.value))}
-                className="accent-primary cursor-pointer w-28"
+                className="accent-[#5B7FA3] cursor-pointer w-24"
                 data-bpm-slider
               />
             </div>
 
-            <div className="tool-field slider-field flex flex-col gap-1 text-[11px] text-muted-foreground">
-              <label htmlFor="metronome-vol">Vol</label>
+            <div className="tool-field slider-field flex flex-col gap-0.5 text-[10px] text-[#B5B5B5]">
+              <label htmlFor="metronome-vol" className="font-medium text-[9px]">Vol</label>
               <input
                 id="metronome-vol"
                 type="range"
@@ -136,22 +137,22 @@ export const WorkstationToolsPanel: React.FC = () => {
                 step="0.05"
                 value={metronomeSnap.volume}
                 onChange={(e) => engine.setMetronomeVolume(Number(e.target.value))}
-                className="accent-primary cursor-pointer w-24"
+                className="accent-[#5B7FA3] cursor-pointer w-20"
               />
             </div>
           </div>
         </div>
 
         {/* Real-time Chord Detector */}
-        <div className="tools-section harmony-section p-2.5 bg-secondary/20 rounded border border-border flex flex-col gap-2">
+        <div className="tools-section harmony-section p-2 bg-[#292929] rounded-[4px] border border-[#3A3A3A] flex flex-col gap-1.5">
           <div className="harmony-section__header flex items-center justify-between">
-            <span className="section-label font-bold text-[11px] text-muted-foreground uppercase tracking-wider">
-              REAL-TIME CHORD DETECTOR
+            <span className="section-label font-medium text-[10px] text-[#B5B5B5] uppercase">
+              REAL-TIME CHORD HARMONY DETECTOR
             </span>
           </div>
 
-          <div className="chord-display-container">
-            <Badge variant="accent" className="chord-badge text-xs font-mono font-bold px-3 py-1 text-primary-foreground" data-chord-name>
+          <div className="chord-display-container flex items-center justify-center p-2 bg-[#202020] rounded-[4px] border border-[#3A3A3A]">
+            <Badge variant="accent" className="chord-badge text-xs font-mono font-semibold px-3 py-1 bg-[#29323C] text-[#F2F2F2] border-[#4A5D70]" data-chord-name>
               {chord ? chord.name : '— No Active Chord —'}
             </Badge>
           </div>

@@ -17,37 +17,41 @@ export function EngineStatus({ engine }: { engine: AudioEngine }) {
 
   if (!diag) return null
 
-  const pill =
-    diag.contextState === 'running' ? 'ok' : diag.contextState === 'suspended' ? 'warn' : 'bad'
+  const isRunning = diag.contextState === 'running'
+  const isSuspended = diag.contextState === 'suspended'
+  const dotColor = isRunning ? '#6FA77A' : isSuspended ? '#C89040' : '#A84A4A'
 
   return (
-    <div className="inline-flex items-center gap-1.5" data-engine-status>
+    <div className="inline-flex items-center gap-1.5 font-mono text-[10px]" data-engine-status>
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
-        className={`chip chip--${pill} cursor-pointer hover:opacity-90 transition-opacity`}
-        title="Click to toggle detailed engine telemetry"
+        className="chip cursor-pointer hover:bg-[#303030] transition-colors font-medium border-[#3A3A3A] bg-[#242424] text-[#F2F2F2]"
+        title="Click to toggle detailed audio engine diagnostics monitor"
       >
-        <span>audio: {diag.contextState}</span>
-        <span className="opacity-60 text-[10px]">
+        <span className="w-1.5 h-1.5 rounded-full mr-1.5 inline-block" style={{ backgroundColor: dotColor }} />
+        <span>AUDIO: {diag.contextState.toUpperCase()}</span>
+        <span className="opacity-60 ml-1 text-[9px] text-[#B5B5B5]">
           ({diag.activeVoices}/{diag.polyphonyCap} v {expanded ? '▲' : '▼'})
         </span>
       </button>
 
-      {/* Render all diagnostic chips for smoke test verification & developer telemetry */}
-      <div className={`${expanded ? 'inline-flex flex-wrap items-center gap-1.5' : 'hidden'} md:inline-flex md:flex-wrap md:items-center md:gap-1.5`}>
-        <span className="chip">limiter: {diag.limiter}</span>
-        <span className="chip">latency: {diag.baseLatencyMs.toFixed(1)} ms</span>
-        <span className="chip">
+      {/* Render all diagnostic chips for smoke test verification & telemetry */}
+      <div className={`${expanded ? 'inline-flex flex-wrap items-center gap-1' : 'hidden'} md:inline-flex md:flex-wrap md:items-center md:gap-1`}>
+        <span className="chip" title="Audio Limiter Mode">limiter: {diag.limiter}</span>
+        <span className="chip text-[#F2F2F2]" title="Base Hardware Latency">
+          {diag.baseLatencyMs.toFixed(1)} ms
+        </span>
+        <span className="chip" title="Active Voices / Polyphony Cap">
           voices: {diag.activeVoices}/{diag.polyphonyCap}
         </span>
-        <span className="chip">sustained: {diag.sustainedVoices}</span>
-        <span className="chip">started: {diag.totalStarted}</span>
-        <span className="chip">steals: {diag.steals}</span>
-        <span className="chip">dropped: {diag.dropped}</span>
-        <span className="chip">retrigger: {diag.retriggers}</span>
-        <span className="chip">loads: {diag.pendingLoads}</span>
-        <span className="chip">fps: {fps}</span>
+        <span className="chip" title="Sustained Voices">sustained: {diag.sustainedVoices}</span>
+        <span className="chip" title="Total Voice Triggers">started: {diag.totalStarted}</span>
+        <span className="chip" title="Voice Steals">steals: {diag.steals}</span>
+        <span className="chip" title="Dropped Voices">dropped: {diag.dropped}</span>
+        <span className="chip" title="Retriggers">retrigger: {diag.retriggers}</span>
+        <span className="chip" title="Pending Sample Loads">loads: {diag.pendingLoads}</span>
+        <span className="chip text-[#F2F2F2]" title="Frames Per Second">fps: {fps}</span>
       </div>
     </div>
   )

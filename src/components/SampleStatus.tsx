@@ -22,28 +22,37 @@ export function SampleStatus({ engine, instrumentId }: { engine: AudioEngine; in
 
   const p = state.progress
   const percent = p.totalFiles > 0 ? Math.round((p.loadedFiles / p.totalFiles) * 100) : 0
-  const pill = state.status === 'ready' ? 'ok' : state.status === 'error' ? 'bad' : 'warn'
+  const dotColor = state.status === 'ready' ? '#6FA77A' : state.status === 'error' ? '#A84A4A' : '#C89040'
   const mb = (n: number) => `${(n / (1024 * 1024)).toFixed(1)} MB`
 
   return (
-    <div className="sample-status" aria-live="polite">
+    <div className="sample-status inline-flex items-center gap-1.5 font-mono text-[10px]" aria-live="polite">
       {state.status === 'loading' && (
         <>
-          <span className={`chip chip--${pill}`}>loading samples</span>
-          <span className="chip">
+          <span className="chip text-[#F2F2F2]">
+            <span className="w-1.5 h-1.5 rounded-full mr-1 inline-block" style={{ backgroundColor: dotColor }} />
+            LOADING SAMPLES
+          </span>
+          <span className="chip text-[#B5B5B5]">
             {p.loadedFiles}/{p.totalFiles} files ({percent}%) — {mb(p.loadedBytes)}/{mb(p.totalBytes)}
           </span>
-          <progress className="sample-status__bar" max={p.totalFiles} value={p.loadedFiles} />
+          <progress className="sample-status__bar h-1.5 w-16 accent-[#5B7FA3] rounded" max={p.totalFiles} value={p.loadedFiles} />
         </>
       )}
       {state.status === 'ready' && (
-        <span className={`chip chip--${pill}`}>samples ready — {p.totalFiles} files, {mb(p.totalBytes)}</span>
+        <span className="chip text-[#F2F2F2]">
+          <span className="w-1.5 h-1.5 rounded-full mr-1 inline-block" style={{ backgroundColor: dotColor }} />
+          SAMPLES READY ({p.totalFiles} files, {mb(p.totalBytes)})
+        </span>
       )}
       {state.status === 'error' && (
         <>
-          <span className={`chip chip--${pill}`}>sample load failed</span>
-          <span className="chip">{state.error}</span>
-          <button type="button" className="btn" onClick={() => engine.reloadInstrument(instrumentId)}>
+          <span className="chip text-[#A84A4A]">
+            <span className="w-1.5 h-1.5 rounded-full mr-1 inline-block" style={{ backgroundColor: dotColor }} />
+            SAMPLE LOAD FAILED
+          </span>
+          <span className="chip text-[#A84A4A]">{state.error}</span>
+          <button type="button" className="btn btn--sm text-[10px]" onClick={() => engine.reloadInstrument(instrumentId)}>
             Retry
           </button>
         </>

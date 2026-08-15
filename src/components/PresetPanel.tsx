@@ -50,19 +50,19 @@ export const PresetPanel: React.FC = () => {
 
   return (
     <Card className="panel preset-panel border-border" data-testid="preset-panel">
-      <CardHeader className="panel-header p-3 pb-2">
+      <CardHeader className="panel-header p-2.5 pb-2">
         <h3 className="panel-title font-bold text-xs tracking-wider text-foreground">
           WORKSTATION PRESETS
         </h3>
       </CardHeader>
 
-      <CardContent className="p-3 pt-0 flex flex-col gap-3">
-        <div className="control-group flex flex-col gap-1 text-[11px] text-muted-foreground">
-          <label className="control-label font-semibold">Active Preset</label>
+      <CardContent className="p-2.5 pt-0 flex flex-col gap-2.5">
+        <div className="control-group flex flex-col gap-0.5 text-[10px] text-muted-foreground">
+          <label className="control-label font-semibold uppercase tracking-wider text-[9px]">Active Preset</label>
           <Select
             value={selectedId}
             onChange={handleSelectPreset}
-            className="control-select text-xs"
+            className="control-select text-xs font-semibold"
             data-testid="preset-select"
           >
             <optgroup label="Factory Presets">
@@ -88,7 +88,7 @@ export const PresetPanel: React.FC = () => {
           </Select>
         </div>
 
-        <div className="preset-actions flex flex-col gap-2">
+        <div className="preset-actions flex flex-col gap-1.5">
           {!showSaveInput ? (
             <Button
               variant="outline"
@@ -106,13 +106,13 @@ export const PresetPanel: React.FC = () => {
                 placeholder="Preset Name..."
                 value={presetName}
                 onChange={(e) => setPresetName(e.target.value)}
-                className="control-input flex-1 h-8 rounded-md border border-border bg-card px-2.5 text-xs text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="control-input flex-1 h-7 rounded-md border border-border bg-card px-2 text-xs text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-sans"
                 data-testid="preset-name-input"
               />
               <Button
                 variant="default"
                 size="sm"
-                className="btn-small btn-primary text-xs"
+                className="btn-small text-xs font-bold"
                 onClick={handleSavePreset}
                 data-testid="confirm-save-preset"
               >
@@ -133,7 +133,7 @@ export const PresetPanel: React.FC = () => {
             <Button
               variant="destructive"
               size="sm"
-              className="btn-action btn-danger text-xs"
+              className="btn-action btn-danger text-xs font-bold"
               onClick={handleDeletePreset}
               data-testid="delete-preset-btn"
             >

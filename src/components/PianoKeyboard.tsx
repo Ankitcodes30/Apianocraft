@@ -181,7 +181,7 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
       onContextMenu={(e) => e.preventDefault()}
     >
       <div className="mouse-perf-indicator" ref={indicatorRef} data-mouse-perf-indicator>
-        <span className="mouse-perf-indicator__badge">Mouse Performance</span>
+        <span className="mouse-perf-indicator__badge font-mono">Mouse Performance</span>
         <span className="mouse-perf-indicator__val" ref={pitchTextRef} data-mouse-perf-pitch>
           Pitch: +0.00
         </span>
@@ -197,6 +197,7 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
             className={`ap-key ap-key--white${midi % 12 === 0 ? ' ap-key--c' : ''}`}
             data-midi={midi}
             ref={setKeyRef(midi)}
+            title={`Note: ${noteLabel(midi)} (MIDI ${midi})`}
           >
             <span className="ap-key__label">{noteLabel(midi)}</span>
           </div>
@@ -213,6 +214,7 @@ export function PianoKeyboard({ engine }: { engine: AudioEngine }) {
               left: `${((leftWhite + 0.62) / WHITES.length) * 100}%`,
               width: `${(0.42 / WHITES.length) * 100}%`,
             }}
+            title={`Note: ${NOTE_NAMES[midi % 12]} (MIDI ${midi})`}
           >
             <span className="ap-key__label">{NOTE_NAMES[midi % 12]}</span>
           </div>

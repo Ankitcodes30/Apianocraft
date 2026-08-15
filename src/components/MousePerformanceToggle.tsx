@@ -19,13 +19,13 @@ export const MousePerformanceToggle: React.FC = () => {
       type="button"
       variant={enabled ? 'on' : 'outline'}
       size="sm"
-      className="btn-mouse-perf text-xs gap-1 font-medium"
+      className={`btn-mouse-perf text-xs gap-1.5 font-medium ${enabled ? 'bg-[#5B7FA3] border-[#5B7FA3] text-white' : 'bg-[#292929] border-[#3A3A3A] text-[#D5D5D5]'}`}
       onClick={toggle}
       title="Toggle Mouse Performance Pitch + Modulation Control"
       data-btn-mouse-perf
     >
-      <span className="opacity-70">Mouse Express:</span>
-      <span className="font-bold">{enabled ? 'ON' : 'OFF'}</span>
+      <span className="opacity-80">Mouse Express:</span>
+      <span className="font-semibold">{enabled ? 'ON' : 'OFF'}</span>
     </Button>
   )
 }

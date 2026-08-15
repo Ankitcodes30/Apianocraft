@@ -81,35 +81,35 @@ export const RecorderPanel: React.FC = () => {
 
   return (
     <Card className="recorder-panel border-border" aria-label="Performance Recorder Controls">
-      <CardHeader className="recorder-panel__head flex flex-row items-center justify-between space-y-0 p-3">
+      <CardHeader className="recorder-panel__head flex flex-row items-center justify-between space-y-0 p-2.5 pb-2">
         <span className="recorder-panel__title font-bold text-xs tracking-wider text-foreground">
-          RECORDER / TRANSPORT
+          RECORDER / TRANSPORT DECK
         </span>
-        <Badge variant="outline" className="recorder-panel__timecode font-mono text-xs px-2 py-0.5" data-timecode>
+        <Badge variant="outline" className="recorder-panel__timecode font-mono text-xs px-2 py-0.5 font-bold text-emerald-400 bg-secondary/30" data-timecode>
           {formatTimecode(snap.recordedTimeMs)}
         </Badge>
       </CardHeader>
 
-      <CardContent className="p-3 pt-0 flex flex-col gap-3">
+      <CardContent className="p-2.5 pt-0 flex flex-col gap-2.5">
         <div className="recorder-panel__controls flex gap-2 flex-wrap items-center">
           <Button
             type="button"
             variant={snap.state === 'recording' ? 'panic' : 'outline'}
             size="sm"
-            className={`btn-transport btn-record ${snap.state === 'recording' ? 'active' : ''}`}
+            className={`btn-transport btn-record font-bold ${snap.state === 'recording' ? 'active animate-pulse' : ''}`}
             onClick={handleRecordToggle}
             aria-label={snap.state === 'recording' ? 'Stop Recording' : 'Record'}
             data-btn-record
           >
-            <span className="rec-dot inline-block w-2 h-2 rounded-full bg-red-500 mr-1 animate-pulse" />
-            {snap.state === 'recording' ? 'Rec...' : 'Record'}
+            <span className="rec-dot inline-block w-2 h-2 rounded-full bg-red-400 mr-1.5" />
+            {snap.state === 'recording' ? 'REC...' : 'Record'}
           </Button>
 
           <Button
             type="button"
             variant={snap.state === 'playing' ? 'on' : 'outline'}
             size="sm"
-            className={`btn-transport btn-play ${snap.state === 'playing' ? 'active' : ''}`}
+            className={`btn-transport btn-play font-semibold ${snap.state === 'playing' ? 'active' : ''}`}
             onClick={handlePlayToggle}
             disabled={snap.eventCount === 0 || snap.state === 'recording'}
             aria-label={snap.state === 'playing' ? 'Pause Playback' : 'Play'}
@@ -150,7 +150,7 @@ export const RecorderPanel: React.FC = () => {
             type="button"
             variant="secondary"
             size="sm"
-            className="btn-export btn-export-midi text-xs"
+            className="btn-export btn-export-midi text-xs font-semibold"
             onClick={handleExportMidi}
             disabled={snap.eventCount === 0}
             data-export-midi
@@ -162,7 +162,7 @@ export const RecorderPanel: React.FC = () => {
             type="button"
             variant="secondary"
             size="sm"
-            className="btn-export btn-export-wav text-xs"
+            className="btn-export btn-export-wav text-xs font-semibold"
             onClick={handleExportWav}
             disabled={snap.eventCount === 0}
             data-export-wav
