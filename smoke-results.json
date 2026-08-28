@@ -1,0 +1,1856 @@
+{
+  "results": [
+    {
+      "name": "context running",
+      "ok": true,
+      "extra": "state=running"
+    },
+    {
+      "name": "sample rate valid",
+      "ok": true,
+      "extra": "44100 Hz"
+    },
+    {
+      "name": "limiter is worklet",
+      "ok": true,
+      "extra": "worklet"
+    },
+    {
+      "name": "polyphony cap >= 32",
+      "ok": true,
+      "extra": "cap=64"
+    },
+    {
+      "name": "single note sounding",
+      "ok": true,
+      "extra": "{\"active\":1,\"notes\":[60]}"
+    },
+    {
+      "name": "single note drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "chord 16 all started",
+      "ok": true,
+      "extra": "started=17"
+    },
+    {
+      "name": "chord 16 drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "rapid 400 processed",
+      "ok": true,
+      "extra": "started=417"
+    },
+    {
+      "name": "rapid 400 drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "rapid 400 no drops",
+      "ok": true,
+      "extra": "dropped=0"
+    },
+    {
+      "name": "rapid-gap 150 retriggers",
+      "ok": true,
+      "extra": "retriggers=816"
+    },
+    {
+      "name": "rapid-gap drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "rapid-gap no drops",
+      "ok": true,
+      "extra": "dropped=0"
+    },
+    {
+      "name": "voice pool does not grow",
+      "ok": true,
+      "extra": "pool 64 -> 64 (cap 64)"
+    },
+    {
+      "name": "stress 90 stays within initial cap",
+      "ok": true,
+      "extra": "active=0 cap=64"
+    },
+    {
+      "name": "stealing engaged over cap",
+      "ok": true,
+      "extra": "steals=672"
+    },
+    {
+      "name": "stress drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "adaptive cap reduced under pressure",
+      "ok": true,
+      "extra": "min=32"
+    },
+    {
+      "name": "adaptive cap recovers when idle",
+      "ok": true,
+      "extra": "last=64"
+    },
+    {
+      "name": "same-note retrigger x3",
+      "ok": true,
+      "extra": "delta=3"
+    },
+    {
+      "name": "retrigger drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "sustain holds after key-up",
+      "ok": true,
+      "extra": "active=8"
+    },
+    {
+      "name": "sustain drains on pedal lift",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "keyboard not re-rendered during notes",
+      "ok": true,
+      "extra": "renders 5 -> 5"
+    },
+    {
+      "name": "heap growth bounded",
+      "ok": true,
+      "extra": "-0.7 MB"
+    },
+    {
+      "name": "grand-piano cold load ready",
+      "ok": true,
+      "extra": "3847 ms"
+    },
+    {
+      "name": "grand-piano all 60 files loaded",
+      "ok": true,
+      "extra": "60/60"
+    },
+    {
+      "name": "grand-piano cold load under 240 s",
+      "ok": true,
+      "extra": "3847 ms"
+    },
+    {
+      "name": "grand-piano manifest reports bytes",
+      "ok": true,
+      "extra": "82.9 MB"
+    },
+    {
+      "name": "grand-piano first note lazy",
+      "ok": true,
+      "extra": "started in 235 ms"
+    },
+    {
+      "name": "grand-piano first note buffer ready fast",
+      "ok": true,
+      "extra": "196 ms"
+    },
+    {
+      "name": "grand-piano background load still in progress",
+      "ok": true,
+      "extra": "status=loading"
+    },
+    {
+      "name": "grand-piano warm load ready",
+      "ok": true,
+      "extra": "2843 ms"
+    },
+    {
+      "name": "grand-piano warm load under 60 s",
+      "ok": true,
+      "extra": "2843 ms"
+    },
+    {
+      "name": "grand-piano warm faster than cold",
+      "ok": true,
+      "extra": "warm 2843 vs cold 3847 ms"
+    },
+    {
+      "name": "grand-piano warm note < 100 ms to buffer",
+      "ok": true,
+      "extra": "0 ms"
+    },
+    {
+      "name": "grand-piano warm note drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "grand-piano sample cache hits",
+      "ok": true,
+      "extra": "hits 1 -> 2"
+    },
+    {
+      "name": "grand-piano decode cache within budget",
+      "ok": true,
+      "extra": "124.4 MB"
+    },
+    {
+      "name": "grand-piano chord 16 all started",
+      "ok": true,
+      "extra": "started=19"
+    },
+    {
+      "name": "grand-piano chord 16 drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "grand-piano rapid 300 processed",
+      "ok": true,
+      "extra": "started=319"
+    },
+    {
+      "name": "grand-piano rapid drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "grand-piano rapid no drops",
+      "ok": true,
+      "extra": "dropped=0"
+    },
+    {
+      "name": "grand-piano pending-off storm drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "grand-piano pending-off storm no drops",
+      "ok": true,
+      "extra": "dropped=0"
+    },
+    {
+      "name": "grand-piano full-range zone coverage",
+      "ok": true,
+      "extra": "delta=88, active=0"
+    },
+    {
+      "name": "grand-piano sustain holds",
+      "ok": true,
+      "extra": "active=8"
+    },
+    {
+      "name": "grand-piano sustain drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "sustain holds 8 under pedal",
+      "ok": true,
+      "extra": "active=8"
+    },
+    {
+      "name": "sustain re-strike retriggers without growth",
+      "ok": true,
+      "extra": "active=8"
+    },
+    {
+      "name": "sustain re-strike holds after key-up",
+      "ok": true,
+      "extra": "active=8"
+    },
+    {
+      "name": "sustain 8 drains on pedal lift",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "same-note hammer under sustain bounded",
+      "ok": true,
+      "extra": "peak=1"
+    },
+    {
+      "name": "same-note hammer under sustain drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "rapid pedal cycles bounded",
+      "ok": true,
+      "extra": "peak=12"
+    },
+    {
+      "name": "rapid pedal cycles drain to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "no stuck voices after sustain stress",
+      "ok": true,
+      "extra": "voices=0"
+    },
+    {
+      "name": "CC64 toggle maps to engine pedal",
+      "ok": true,
+      "extra": "on=true off=false"
+    },
+    {
+      "name": "octave +1 plays up an octave",
+      "ok": true,
+      "extra": "midiNote=72"
+    },
+    {
+      "name": "octave +1 plays the real C5 sample (rate ~1)",
+      "ok": true,
+      "extra": "rate=1"
+    },
+    {
+      "name": "octave -1 plays down an octave",
+      "ok": true,
+      "extra": "midiNote=48"
+    },
+    {
+      "name": "transpose +5 plays F5",
+      "ok": true,
+      "extra": "midiNote=65"
+    },
+    {
+      "name": "transpose -12 plays down an octave",
+      "ok": true,
+      "extra": "midiNote=48"
+    },
+    {
+      "name": "octave+transpose combine correctly",
+      "ok": true,
+      "extra": "midiNote=70"
+    },
+    {
+      "name": "reset restores untransposed note",
+      "ok": true,
+      "extra": "midiNote=60"
+    },
+    {
+      "name": "tuning diagnostics reset to 0",
+      "ok": true,
+      "extra": "{\"transpose\":0,\"octaveShift\":0,\"tuningCents\":0}"
+    },
+    {
+      "name": "octave changes reload no samples (warm)",
+      "ok": true,
+      "extra": "misses 214 -> 214"
+    },
+    {
+      "name": "tuning diagnostics report cents",
+      "ok": true,
+      "extra": "50 -> 50, -100 -> -100, 100 -> 100"
+    },
+    {
+      "name": "tuning +50 raises playback rate",
+      "ok": true,
+      "extra": "rate=1.0293 expected=1.0293"
+    },
+    {
+      "name": "tuning -100 lowers playback rate",
+      "ok": true,
+      "extra": "rate=0.9439 expected=0.9439"
+    },
+    {
+      "name": "tuning +100 after -100 (direct switch)",
+      "ok": true,
+      "extra": "rate=1.0595 expected=1.0595"
+    },
+    {
+      "name": "tuning -50 lowers playback rate",
+      "ok": true,
+      "extra": "rate=0.9715 expected=0.9715"
+    },
+    {
+      "name": "tuning 0 restores base rate",
+      "ok": true,
+      "extra": "rate=1.0000"
+    },
+    {
+      "name": "tuning does not change zone selection",
+      "ok": true,
+      "extra": "zone=C4v16"
+    },
+    {
+      "name": "soft velocity selects soft layer",
+      "ok": true,
+      "extra": "soft=C4v1 mid=C4v1"
+    },
+    {
+      "name": "loud velocity selects loud layer",
+      "ok": true,
+      "extra": "loud=C4v16 full=C4v16"
+    },
+    {
+      "name": "velocity layer boundary at 63/64",
+      "ok": true,
+      "extra": "63=C4v1 64=C4v16"
+    },
+    {
+      "name": "velocity layers on low notes too",
+      "ok": true,
+      "extra": "soft=A2v1 loud=A2v16"
+    },
+    {
+      "name": "all velocities play through",
+      "ok": true,
+      "extra": "[{\"vel\":0.2,\"started\":true,\"voiceVel\":0.2},{\"vel\":0.4,\"started\":true,\"voiceVel\":0.4},{\"vel\":0.7,\"started\":true,\"voiceVel\":0.7},{\"vel\":1,\"started\":true,\"voiceVel\":1}]"
+    },
+    {
+      "name": "hammer C4 x5 plays 5",
+      "ok": true,
+      "extra": "started=5"
+    },
+    {
+      "name": "hammer C4 x5 drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "hammer x20 no drops (mid)",
+      "ok": true,
+      "extra": "started=20 dropped=0"
+    },
+    {
+      "name": "hammer x20 no drops (high)",
+      "ok": true,
+      "extra": "started=20"
+    },
+    {
+      "name": "hammer x20 no drops (low)",
+      "ok": true,
+      "extra": "started=20"
+    },
+    {
+      "name": "hammer stress drains",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "no stuck voices after hammer",
+      "ok": true,
+      "extra": "voices=0"
+    },
+    {
+      "name": "voice pool stays within cap",
+      "ok": true,
+      "extra": "pool=64 cap=64"
+    },
+    {
+      "name": "chord sizes all start",
+      "ok": true,
+      "extra": "{\"3\":3,\"5\":5,\"8\":8,\"10\":10,\"12\":12}"
+    },
+    {
+      "name": "chord sizes all drain",
+      "ok": true,
+      "extra": "{\"3\":true,\"5\":true,\"8\":true,\"10\":true,\"12\":true}"
+    },
+    {
+      "name": "fast chord changes no drops",
+      "ok": true,
+      "extra": "dropped=0"
+    },
+    {
+      "name": "fast chord changes drain",
+      "ok": true,
+      "extra": "started=120"
+    },
+    {
+      "name": "chord stress peak within cap",
+      "ok": true,
+      "extra": "peak=64 cap=64"
+    },
+    {
+      "name": "phase4A stress heap bounded",
+      "ok": true,
+      "extra": "4.4 MB"
+    },
+    {
+      "name": "release profile decays cleanly (C4)",
+      "ok": true,
+      "extra": "head=0.3213 tail=0.0000 jumps=0"
+    },
+    {
+      "name": "release profile decays cleanly (high)",
+      "ok": true,
+      "extra": "head=0.1121 tail=0.0000 jumps=0"
+    },
+    {
+      "name": "release profile decays cleanly (low)",
+      "ok": true,
+      "extra": "head=0.2196 tail=0.0000 jumps=0"
+    },
+    {
+      "name": "MIDI manager survives without mock",
+      "ok": true,
+      "extra": "support=unavailable"
+    },
+    {
+      "name": "MIDI graceful with no devices",
+      "ok": true,
+      "extra": "devices=0"
+    },
+    {
+      "name": "MIDI panel renders",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "MIDI device discovery",
+      "ok": true,
+      "extra": "devices=2"
+    },
+    {
+      "name": "MIDI auto-selects first device",
+      "ok": true,
+      "extra": "selected=kb1"
+    },
+    {
+      "name": "MIDI hot-plug connect adds device",
+      "ok": true,
+      "extra": "devices=3"
+    },
+    {
+      "name": "MIDI hot-plug disconnect removes device",
+      "ok": true,
+      "extra": "devices=2"
+    },
+    {
+      "name": "MIDI selection falls over on disconnect",
+      "ok": true,
+      "extra": "selected=kb2 connected=1"
+    },
+    {
+      "name": "MIDI explicit device selection",
+      "ok": true,
+      "extra": "selected=kb1"
+    },
+    {
+      "name": "MIDI note-on routes bus -> engine",
+      "ok": true,
+      "extra": "active=1 started=1"
+    },
+    {
+      "name": "MIDI note-off releases voice",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "velocity-0 note-on treated as note-off",
+      "ok": true,
+      "extra": "started=0 active=0"
+    },
+    {
+      "name": "velocity-0 note-off still drains later notes",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "MIDI velocity 1 maps to 1/127",
+      "ok": true,
+      "extra": "voiceVel=0.0079 expected=0.0079"
+    },
+    {
+      "name": "MIDI velocity 32 maps to 32/127",
+      "ok": true,
+      "extra": "voiceVel=0.2520 expected=0.2520"
+    },
+    {
+      "name": "MIDI velocity 64 maps to 64/127",
+      "ok": true,
+      "extra": "voiceVel=0.5039 expected=0.5039"
+    },
+    {
+      "name": "MIDI velocity 96 maps to 96/127",
+      "ok": true,
+      "extra": "voiceVel=0.7559 expected=0.7559"
+    },
+    {
+      "name": "MIDI velocity 127 maps to 1",
+      "ok": true,
+      "extra": "voiceVel=1.0000"
+    },
+    {
+      "name": "MIDI grand-piano loads for layer test",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "MIDI soft velocity selects soft layer",
+      "ok": true,
+      "extra": "zone=C4v1 voiceVel=0.2520"
+    },
+    {
+      "name": "MIDI loud velocity selects loud layer",
+      "ok": true,
+      "extra": "zone=C4v16 voiceVel=1.0000"
+    },
+    {
+      "name": "MIDI notes started on grand-piano",
+      "ok": true,
+      "extra": "started=2"
+    },
+    {
+      "name": "MIDI CC64 >= 64 turns sustain on",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "MIDI note holds after key-up under sustain",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "MIDI sustain-held counted as sustained",
+      "ok": true,
+      "extra": "sustained=1"
+    },
+    {
+      "name": "MIDI repeated notes under sustain no stuck",
+      "ok": true,
+      "extra": "active=4"
+    },
+    {
+      "name": "MIDI sustain lift drains everything",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "MIDI rapid pedal cycles drain",
+      "ok": true,
+      "extra": "{\"active\":0,\"dropped\":0,\"sustain\":false}"
+    },
+    {
+      "name": "MIDI CC64 < 64 turns sustain off",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "MIDI pitch bend center = 0 cents",
+      "ok": true,
+      "extra": "cents=0"
+    },
+    {
+      "name": "MIDI pitch bend max down = -range cents",
+      "ok": true,
+      "extra": "cents=-200"
+    },
+    {
+      "name": "MIDI pitch bend max down changes voice rate",
+      "ok": true,
+      "extra": "rate=0.8909 expected=0.8909"
+    },
+    {
+      "name": "MIDI pitch bend max up = +range cents",
+      "ok": true,
+      "extra": "cents=199.9755859375"
+    },
+    {
+      "name": "MIDI pitch bend max up changes voice rate",
+      "ok": true,
+      "extra": "rate=1.1224 expected=1.1225"
+    },
+    {
+      "name": "MIDI rapid bend keeps one voice (no rebuilds)",
+      "ok": true,
+      "extra": "active=1 started=0 dropped=0"
+    },
+    {
+      "name": "MIDI rapid bend ends at expected rate",
+      "ok": true,
+      "extra": "rate=1.1224"
+    },
+    {
+      "name": "MIDI bend range 12 maps to ±1200 cents",
+      "ok": true,
+      "extra": "cents=1199.853515625"
+    },
+    {
+      "name": "MIDI bend ±12 semitones doubles rate",
+      "ok": true,
+      "extra": "rate=1.9998 expected=2.0000"
+    },
+    {
+      "name": "MIDI bend while sustaining keeps voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "MIDI bend moves sustained voice",
+      "ok": true,
+      "extra": "rate=0.8909"
+    },
+    {
+      "name": "MIDI bend under sustain drains on lift",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "MIDI CC1 127 -> modulation 1",
+      "ok": true,
+      "extra": "mod=1"
+    },
+    {
+      "name": "MIDI CC1 0 -> modulation 0",
+      "ok": true,
+      "extra": "mod=0"
+    },
+    {
+      "name": "MIDI CC1 64 -> 64/127",
+      "ok": true,
+      "extra": "mod=0.5039"
+    },
+    {
+      "name": "MIDI burst 40 notes no drops",
+      "ok": true,
+      "extra": "started=40 dropped=0"
+    },
+    {
+      "name": "MIDI burst drains to 0",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "MIDI activity throttled (no per-note React churn)",
+      "ok": true,
+      "extra": "mutations=5"
+    },
+    {
+      "name": "MIDI scheduling timing measured",
+      "ok": true,
+      "extra": "count=55 last=0.30ms avg=3.27ms"
+    },
+    {
+      "name": "MIDI CC123 all-notes-off releases everything",
+      "ok": true,
+      "extra": "{\"activeBefore\":3,\"activeAfter\":0}"
+    },
+    {
+      "name": "MIDI unsupported reports unavailable",
+      "ok": true,
+      "extra": "support=unavailable"
+    },
+    {
+      "name": "MIDI panel shows unavailable state",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "App still plays without MIDI (QWERTY path)",
+      "ok": true,
+      "extra": "started=1"
+    },
+    {
+      "name": "No stuck notes after fallback check",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Old Pitch Bend & Modulation pad UI ([data-perf-pad]) is completely removed from DOM",
+      "ok": true,
+      "extra": "hasOldUi=false"
+    },
+    {
+      "name": "Engine pitch bend +1 = +200 cents (±2st range)",
+      "ok": true,
+      "extra": "cents=200"
+    },
+    {
+      "name": "Engine pitch bend -1 = -200 cents (±2st range)",
+      "ok": true,
+      "extra": "cents=-200"
+    },
+    {
+      "name": "Engine modulation 1 = 1.0",
+      "ok": true,
+      "extra": "mod=1"
+    },
+    {
+      "name": "Engine modulation 0 = 0.0",
+      "ok": true,
+      "extra": "mod=0"
+    },
+    {
+      "name": "Engine pitch bend range 12 = 12 st",
+      "ok": true,
+      "extra": "range=12"
+    },
+    {
+      "name": "Engine pitch bend range 2 = 2 st",
+      "ok": true,
+      "extra": "range=2"
+    },
+    {
+      "name": "main tone defaults (vol 1, pan 0, cutoff 20k, effects off)",
+      "ok": true,
+      "extra": "vol=1 pan=0 cutoff=20000Hz reverb=0/room"
+    },
+    {
+      "name": "effects chain initialized quickly",
+      "ok": true,
+      "extra": "55.10000002384186ms"
+    },
+    {
+      "name": "all 4 reverb IRs pre-generated at init",
+      "ok": true,
+      "extra": "generated=4"
+    },
+    {
+      "name": "effects bypassed at start (reverb+delay sends unwired)",
+      "ok": true,
+      "extra": "{\"reverb\":false,\"delay\":false}"
+    },
+    {
+      "name": "volume 0% reaches engine",
+      "ok": true,
+      "extra": "target=0 audio=0.000"
+    },
+    {
+      "name": "volume 25% reaches engine",
+      "ok": true,
+      "extra": "target=0.25 audio=0.250"
+    },
+    {
+      "name": "volume 50% reaches engine",
+      "ok": true,
+      "extra": "target=0.5 audio=0.500"
+    },
+    {
+      "name": "volume 75% reaches engine",
+      "ok": true,
+      "extra": "target=0.75 audio=0.750"
+    },
+    {
+      "name": "volume 100% reaches engine",
+      "ok": true,
+      "extra": "target=1 audio=1.000"
+    },
+    {
+      "name": "volume 0 silences the piano",
+      "ok": true,
+      "extra": "peak=0"
+    },
+    {
+      "name": "volume 1 sounds normally",
+      "ok": true,
+      "extra": "peak=0.2438243180513382"
+    },
+    {
+      "name": "volume 25% measured ~quarter output level",
+      "ok": true,
+      "extra": "peak25=0.0610 peak1=0.2438"
+    },
+    {
+      "name": "rapid volume movement creates no voices",
+      "ok": true,
+      "extra": "started=0"
+    },
+    {
+      "name": "pan L100 applies",
+      "ok": true,
+      "extra": "target=-1 audio=-1.000"
+    },
+    {
+      "name": "pan center applies",
+      "ok": true,
+      "extra": "target=0 audio=0.000"
+    },
+    {
+      "name": "pan R100 applies",
+      "ok": true,
+      "extra": "target=1 audio=1.000"
+    },
+    {
+      "name": "cutoff min = 100 Hz",
+      "ok": true,
+      "extra": "audio=100"
+    },
+    {
+      "name": "cutoff mid = musical log midpoint (~1.4 kHz)",
+      "ok": true,
+      "extra": "target=1414Hz audio=1414.213562373095"
+    },
+    {
+      "name": "cutoff max = 20 kHz",
+      "ok": true,
+      "extra": "audio=20000"
+    },
+    {
+      "name": "rapid cutoff movement creates no voices",
+      "ok": true,
+      "extra": "started=0"
+    },
+    {
+      "name": "reverb 0% reaches engine",
+      "ok": true,
+      "extra": "target=0 audio=0.000"
+    },
+    {
+      "name": "reverb 25% reaches engine",
+      "ok": true,
+      "extra": "target=0.25 audio=0.250"
+    },
+    {
+      "name": "reverb 50% reaches engine",
+      "ok": true,
+      "extra": "target=0.5 audio=0.500"
+    },
+    {
+      "name": "reverb 100% reaches engine",
+      "ok": true,
+      "extra": "target=1 audio=1.000"
+    },
+    {
+      "name": "reverb 0% bypasses (send unwired)",
+      "ok": true,
+      "extra": "{\"reverb\":false,\"delay\":false}"
+    },
+    {
+      "name": "reverb 50% wires the send",
+      "ok": true,
+      "extra": "{\"reverb\":true,\"delay\":false}"
+    },
+    {
+      "name": "preset switching never regenerates IRs (cache reused)",
+      "ok": true,
+      "extra": "generated=4 switches=4"
+    },
+    {
+      "name": "preset switches swap in matching IR lengths",
+      "ok": true,
+      "extra": "1.6 / 2.4 / 4 / 0.9"
+    },
+    {
+      "name": "chorus 0% reaches engine",
+      "ok": true,
+      "extra": "target=0 audio=0.000"
+    },
+    {
+      "name": "chorus 25% reaches engine",
+      "ok": true,
+      "extra": "target=0.25 audio=0.250"
+    },
+    {
+      "name": "chorus 50% reaches engine",
+      "ok": true,
+      "extra": "target=0.5 audio=0.500"
+    },
+    {
+      "name": "chorus 100% reaches engine",
+      "ok": true,
+      "extra": "target=1 audio=1.000"
+    },
+    {
+      "name": "delay off bypasses (send unwired)",
+      "ok": true,
+      "extra": "{\"reverb\":true,\"delay\":false}"
+    },
+    {
+      "name": "delay 50% wires the send",
+      "ok": true,
+      "extra": "{\"reverb\":true,\"delay\":true}"
+    },
+    {
+      "name": "delay time 120ms applies",
+      "ok": true,
+      "extra": "target=0.12 audio=0.124"
+    },
+    {
+      "name": "delay time 350ms applies",
+      "ok": true,
+      "extra": "target=0.35 audio=0.347"
+    },
+    {
+      "name": "delay time 900ms applies",
+      "ok": true,
+      "extra": "target=0.9 audio=0.895"
+    },
+    {
+      "name": "feedback max 85% applies",
+      "ok": true,
+      "extra": 0.85
+    },
+    {
+      "name": "feedback hard-clamped (2 -> 0.85)",
+      "ok": true,
+      "extra": 0.85
+    },
+    {
+      "name": "feedback floor clamped (-1 -> 0)",
+      "ok": true,
+      "extra": 0
+    },
+    {
+      "name": "UI octave +2 applies and displays",
+      "ok": true,
+      "extra": "2 chip=\"↑ +2 Oct\""
+    },
+    {
+      "name": "UI transpose -3 applies and displays",
+      "ok": true,
+      "extra": "-3 chip=\"↓ -3 st\""
+    },
+    {
+      "name": "UI tune +10 applies and displays",
+      "ok": true,
+      "extra": "10 chip=\"↑ +10 ¢\""
+    },
+    {
+      "name": "chord with all effects starts voices",
+      "ok": true,
+      "extra": "started=6"
+    },
+    {
+      "name": "post-limiter output never clips under max effects (chord heard)",
+      "ok": true,
+      "extra": "peak=0.5838"
+    },
+    {
+      "name": "no stuck voices after release",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "disabling effects drains tails quickly",
+      "ok": true,
+      "extra": "peak=0"
+    },
+    {
+      "name": "rapid interleaved changes create no voices",
+      "ok": true,
+      "extra": "started=0"
+    },
+    {
+      "name": "no NaN/infinite AudioParam values after stress",
+      "ok": true,
+      "extra": "all finite"
+    },
+    {
+      "name": "slider movement does not spam React renders",
+      "ok": true,
+      "extra": "renders 3 -> 62"
+    },
+    {
+      "name": "limiter render clock advances (worklet renders audio)",
+      "ok": true,
+      "extra": "samples=192512"
+    },
+    {
+      "name": "parameter tests created no voices at all",
+      "ok": true,
+      "extra": "delta=9 (3 audibility + 6 chord)"
+    },
+    {
+      "name": "final state clean (defaults restored, no voices)",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "38-Key Redesign: Exactly 38 primary mappings exist",
+      "ok": true,
+      "extra": "count=38"
+    },
+    {
+      "name": "38-Key Redesign: Every mapping key is unique",
+      "ok": true,
+      "extra": "unique=38"
+    },
+    {
+      "name": "38-Key Redesign: MIDI notes are continuous chromatic 48..85",
+      "ok": true,
+      "extra": "start=48 end=85"
+    },
+    {
+      "name": "38-Key Redesign: Pitch strictly increases monotonically",
+      "ok": true,
+      "extra": "monotonic=true"
+    },
+    {
+      "name": "38-Key Redesign: Black (16) and White (22) keys both represented",
+      "ok": true,
+      "extra": "black=16 white=22"
+    },
+    {
+      "name": "38-Key Redesign: C# correctly identifies as Sa (Sargam)",
+      "ok": true,
+      "extra": "sa=4/4"
+    },
+    {
+      "name": "38-Key Redesign: Range boundaries correct (-1: 12 notes, 0: 12 notes, +1: 14 notes)",
+      "ok": true,
+      "extra": "lower=12 mid=12 upper=14"
+    },
+    {
+      "name": "Lower Range key \"z\" plays C3 (48)",
+      "ok": true,
+      "extra": "note=48"
+    },
+    {
+      "name": "Middle Range key \"q\" plays C4 (60)",
+      "ok": true,
+      "extra": "note=60"
+    },
+    {
+      "name": "Upper Range key \"i\" plays C5 (72)",
+      "ok": true,
+      "extra": "note=72"
+    },
+    {
+      "name": "Upper Range top key \".\" plays C#6 (85)",
+      "ok": true,
+      "extra": "note=85"
+    },
+    {
+      "name": "Repeated keydown ignored (no duplicate voice)",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Simultaneous keys across ranges sound and drain cleanly",
+      "ok": true,
+      "extra": "held=3 notes=[48,60,72] drained=0"
+    },
+    {
+      "name": "Sustain holds notes across complete keyboard and releases on lift",
+      "ok": true,
+      "extra": "active=3"
+    },
+    {
+      "name": "Window blur releases all active keys",
+      "ok": true,
+      "extra": "before=2 after=0"
+    },
+    {
+      "name": "Visibility change releases all active keys",
+      "ok": true,
+      "extra": "before=2 after=0"
+    },
+    {
+      "name": "Input editable gating ignores piano keys",
+      "ok": true,
+      "extra": "started=0"
+    },
+    {
+      "name": "UI control focus (range sliders, buttons, dropdowns) allows QWERTY piano keys to play",
+      "ok": true,
+      "extra": "started=1"
+    },
+    {
+      "name": "Final Phase 7.5 / Phase 14 QWERTY state clean",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Dual tone disabled by default",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Single voice when Dual is OFF",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual tone enabled via API",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual voices (2) spawned for 1 key when Dual is ON",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual volume updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual pan updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual cutoff updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual reverb amount updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual chorus amount updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual delay amount updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual delay time updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual delay feedback updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual octave shift updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual transpose updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Dual tuning cents updated",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Both voices sustained when pedal is down",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Sustained voices released when pedal lifted",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Reverted to 1 voice per note when Dual is disabled",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Output peak stays within safe bounds (≤ 1.0)",
+      "ok": true,
+      "extra": ""
+    },
+    {
+      "name": "Master EQ default state",
+      "ok": true,
+      "extra": "vol=1 low=0 mid=0 high=0"
+    },
+    {
+      "name": "Master EQ & Volume update",
+      "ok": true,
+      "extra": "vol=0.5 low=3 mid=-2 high=4"
+    },
+    {
+      "name": "Split mode disabled by default",
+      "ok": true,
+      "extra": "enabled=false point=60"
+    },
+    {
+      "name": "Enable split mode",
+      "ok": true,
+      "extra": "enabled=true"
+    },
+    {
+      "name": "Lower zone note spawns voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Lower zone note release",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Upper zone note spawns voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Split chord spawns 2 voices across zones",
+      "ok": true,
+      "extra": "active=2"
+    },
+    {
+      "name": "Split voices sustained by pedal",
+      "ok": true,
+      "extra": "active=2"
+    },
+    {
+      "name": "Split voices released when pedal lifted",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Lower octave and transpose update",
+      "ok": true,
+      "extra": "octave=-1 transpose=2"
+    },
+    {
+      "name": "Factory presets available",
+      "ok": true,
+      "extra": "count=11"
+    },
+    {
+      "name": "Preset load activates split mode",
+      "ok": true,
+      "extra": "enabled=true point=60"
+    },
+    {
+      "name": "Preset load activates dual mode",
+      "ok": true,
+      "extra": "dualEnabled=true"
+    },
+    {
+      "name": "Create user preset in LocalStorage",
+      "ok": true,
+      "extra": "id=user-1787681156915 name=Smoke Test Preset"
+    },
+    {
+      "name": "User preset appears in list",
+      "ok": true,
+      "extra": "userPresets=1"
+    },
+    {
+      "name": "Delete user preset",
+      "ok": true,
+      "extra": "deleted=true"
+    },
+    {
+      "name": "Final Phase 9 state clean",
+      "ok": true,
+      "extra": "active=0 dual=false split=false"
+    },
+    {
+      "name": "Instrument bank registers at least 8 instruments",
+      "ok": true,
+      "extra": "count=18 ids=demo-piano,electric-piano,synth-pad,drawbar-organ,string-ensemble,synth-brass,synth-bass,trumpet,brass-section,saxophone,oboe,tutti,pluck,dulcimer,bright-grand,warm-grand,fm-epiano,grand-piano"
+    },
+    {
+      "name": "Instrument \"demo-piano\" registered in bank",
+      "ok": true,
+      "extra": "id=demo-piano"
+    },
+    {
+      "name": "Instrument \"electric-piano\" registered in bank",
+      "ok": true,
+      "extra": "id=electric-piano"
+    },
+    {
+      "name": "Instrument \"synth-pad\" registered in bank",
+      "ok": true,
+      "extra": "id=synth-pad"
+    },
+    {
+      "name": "Instrument \"drawbar-organ\" registered in bank",
+      "ok": true,
+      "extra": "id=drawbar-organ"
+    },
+    {
+      "name": "Instrument \"string-ensemble\" registered in bank",
+      "ok": true,
+      "extra": "id=string-ensemble"
+    },
+    {
+      "name": "Instrument \"synth-brass\" registered in bank",
+      "ok": true,
+      "extra": "id=synth-brass"
+    },
+    {
+      "name": "Instrument \"synth-bass\" registered in bank",
+      "ok": true,
+      "extra": "id=synth-bass"
+    },
+    {
+      "name": "Instrument \"grand-piano\" registered in bank",
+      "ok": true,
+      "extra": "id=grand-piano"
+    },
+    {
+      "name": "Instrument \"electric-piano\" spawns sounding voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Instrument \"electric-piano\" note release drains cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Instrument \"synth-pad\" spawns sounding voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Instrument \"synth-pad\" note release drains cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Instrument \"drawbar-organ\" spawns sounding voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Instrument \"drawbar-organ\" note release drains cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Instrument \"string-ensemble\" spawns sounding voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Instrument \"string-ensemble\" note release drains cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Instrument \"synth-brass\" spawns sounding voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Instrument \"synth-brass\" note release drains cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Instrument \"synth-bass\" spawns sounding voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Instrument \"synth-bass\" note release drains cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Multi-instrument Dual Layer (EP + Strings) spawns 2 voices",
+      "ok": true,
+      "extra": "active=2"
+    },
+    {
+      "name": "Split zone lower Synth Bass spawns voice",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "Preset \"lush-strings-piano\" loads Grand Piano & String Ensemble",
+      "ok": true,
+      "extra": "main=Grand Piano dual=string-ensemble"
+    },
+    {
+      "name": "Final Phase 10 state clean",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Recorder initial state idle",
+      "ok": true,
+      "extra": "state=idle"
+    },
+    {
+      "name": "Recorder enters recording state",
+      "ok": true,
+      "extra": "state=recording"
+    },
+    {
+      "name": "Recorder stops recording and captures events",
+      "ok": true,
+      "extra": "state=idle count=6"
+    },
+    {
+      "name": "Export MIDI generates non-empty binary array",
+      "ok": true,
+      "extra": "bytesLength=57"
+    },
+    {
+      "name": "MIDI export contains valid MThd header chunk",
+      "ok": true,
+      "extra": "header=77,84,104,100"
+    },
+    {
+      "name": "MIDI export contains valid MTrk track chunk",
+      "ok": true,
+      "extra": "trackHeader=77,84,114,107"
+    },
+    {
+      "name": "Recorder enters playing state",
+      "ok": true,
+      "extra": "state=playing"
+    },
+    {
+      "name": "Recorder completes playback and returns to idle",
+      "ok": true,
+      "extra": "state=idle"
+    },
+    {
+      "name": "Recorder clear resets event timeline",
+      "ok": true,
+      "extra": "count=0"
+    },
+    {
+      "name": "Metronome initial state idle",
+      "ok": true,
+      "extra": "bpm=120"
+    },
+    {
+      "name": "Metronome BPM update",
+      "ok": true,
+      "extra": "bpm=140"
+    },
+    {
+      "name": "Metronome start activates scheduler",
+      "ok": true,
+      "extra": "running=true"
+    },
+    {
+      "name": "Metronome stop deactivates scheduler",
+      "ok": true,
+      "extra": "running=false"
+    },
+    {
+      "name": "Chord Detector identifies C Major triad",
+      "ok": true,
+      "extra": "name=C Major"
+    },
+    {
+      "name": "Chord Detector identifies C Minor triad",
+      "ok": true,
+      "extra": "name=C Minor"
+    },
+    {
+      "name": "Chord Detector identifies C maj7",
+      "ok": true,
+      "extra": "name=C maj7"
+    },
+    {
+      "name": "Chord Detector identifies C Major first inversion (C Major/E)",
+      "ok": true,
+      "extra": "name=C Major/E"
+    },
+    {
+      "name": "Final Phase 12 state clean",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Service Worker browser API supported",
+      "ok": true,
+      "extra": "sw=true"
+    },
+    {
+      "name": "Initial network state online",
+      "ok": true,
+      "extra": "onLine=true"
+    },
+    {
+      "name": "Offline status banner displays on offline event",
+      "ok": true,
+      "extra": "present=true"
+    },
+    {
+      "name": "Offline status banner clears on online event",
+      "ok": true,
+      "extra": "cleared=true"
+    },
+    {
+      "name": "Zero UI Error Boundaries triggered in healthy app state",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Audio output waveform is continuous and smooth (no step-click artifacts)",
+      "ok": true,
+      "extra": "zeroDiffRatio=0.000"
+    },
+    {
+      "name": "Page layout body allows vertical scrolling",
+      "ok": true,
+      "extra": "scrollable=true"
+    },
+    {
+      "name": "Final Phase 13 engine state clean",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Instrument \"trumpet\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=trumpet active=0"
+    },
+    {
+      "name": "Instrument \"trumpet\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=trumpet active=0"
+    },
+    {
+      "name": "Instrument \"brass-section\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=brass-section active=0"
+    },
+    {
+      "name": "Instrument \"brass-section\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=brass-section active=0"
+    },
+    {
+      "name": "Instrument \"saxophone\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=saxophone active=0"
+    },
+    {
+      "name": "Instrument \"saxophone\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=saxophone active=0"
+    },
+    {
+      "name": "Instrument \"oboe\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=oboe active=0"
+    },
+    {
+      "name": "Instrument \"oboe\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=oboe active=0"
+    },
+    {
+      "name": "Instrument \"tutti\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=tutti active=0"
+    },
+    {
+      "name": "Instrument \"tutti\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=tutti active=0"
+    },
+    {
+      "name": "Instrument \"pluck\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=pluck active=0"
+    },
+    {
+      "name": "Instrument \"pluck\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=pluck active=0"
+    },
+    {
+      "name": "Instrument \"dulcimer\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=dulcimer active=0"
+    },
+    {
+      "name": "Instrument \"dulcimer\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=dulcimer active=0"
+    },
+    {
+      "name": "Instrument \"bright-grand\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=bright-grand active=0"
+    },
+    {
+      "name": "Instrument \"bright-grand\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=bright-grand active=0"
+    },
+    {
+      "name": "Instrument \"warm-grand\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=warm-grand active=0"
+    },
+    {
+      "name": "Instrument \"warm-grand\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=warm-grand active=0"
+    },
+    {
+      "name": "Instrument \"fm-epiano\" switches and plays cleanly",
+      "ok": true,
+      "extra": "id=fm-epiano active=0"
+    },
+    {
+      "name": "Instrument \"fm-epiano\" note release drains cleanly",
+      "ok": true,
+      "extra": "id=fm-epiano active=0"
+    },
+    {
+      "name": "QWERTY manager state valid",
+      "ok": true,
+      "extra": "octave=0"
+    },
+    {
+      "name": "QWERTY Lower Range key \"z\" (C3) triggers Note On",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "QWERTY Middle Range key \"q\" (C4) triggers Note On",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "QWERTY Upper Range key \"i\" (C5) triggers Note On",
+      "ok": true,
+      "extra": "active=1"
+    },
+    {
+      "name": "QWERTY keys release and drain cleanly",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Preset \"trumpet-solo\" loads cleanly",
+      "ok": true,
+      "extra": "loaded"
+    },
+    {
+      "name": "Final Phase 14 state clean",
+      "ok": true,
+      "extra": "active=0"
+    },
+    {
+      "name": "Theme selector is rendered in top dock",
+      "extra": ""
+    },
+    {
+      "name": "Theme switching updates document data-theme attribute",
+      "extra": ""
+    },
+    {
+      "name": "Professional Brand Logo mark and wordmark render cleanly in top header",
+      "extra": ""
+    },
+    {
+      "name": "Portamento controls toggle and update engine state",
+      "extra": ""
+    },
+    {
+      "name": "Arpeggiator controls toggle and update engine state",
+      "extra": ""
+    },
+    {
+      "name": "Piano key visual highlight turns off immediately on keyup",
+      "extra": ""
+    },
+    {
+      "name": "Main Tone instrument dropdown updates engine state, note spawning, and remains synchronized",
+      "extra": ""
+    },
+    {
+      "name": "Split Lower Zone instrument dropdown updates lower zone engine state and leaves Main and Dual tones unchanged",
+      "extra": ""
+    },
+    {
+      "name": "Raw note input (e.g. C#4 = 61) plays exact pitch directly without scale-quantization",
+      "extra": ""
+    },
+    {
+      "name": "Attack and Release envelope parameters set and update main tone targets",
+      "extra": ""
+    },
+    {
+      "name": "Attack and Release envelope bounds are safely clamped",
+      "extra": ""
+    },
+    {
+      "name": "All 5 section reset buttons exist with accessible aria-labels",
+      "extra": ""
+    },
+    {
+      "name": "Main Tone Layer A Primary Sound reset acts independently and syncs slider DOM value",
+      "extra": ""
+    },
+    {
+      "name": "Main Tone Layer A Effects reset acts independently and syncs slider DOM value",
+      "extra": ""
+    },
+    {
+      "name": "Layer B Sound Control reset acts independently and syncs slider DOM value",
+      "extra": ""
+    },
+    {
+      "name": "Layer B Effects & Ambience reset acts independently and syncs slider DOM value",
+      "extra": ""
+    },
+    {
+      "name": "Keyboard Split reset acts independently and syncs slider DOM value",
+      "extra": ""
+    },
+    {
+      "name": "Mouse Performance toggle and harness functions exist",
+      "extra": ""
+    },
+    {
+      "name": "Disabled mouse performance: movement does nothing",
+      "extra": ""
+    },
+    {
+      "name": "Dwell-based settling: entry starts 350ms settling period without immediate origin or parameter jump",
+      "extra": ""
+    },
+    {
+      "name": "Jitter tolerance: movement > 5px during settling restarts 350ms dwell timer",
+      "extra": ""
+    },
+    {
+      "name": "Micro-jitter <= 5px tolerance does NOT restart dwell timer",
+      "extra": ""
+    },
+    {
+      "name": "Horizontal & vertical movement updates pitch and modulation relative to established origin",
+      "extra": ""
+    },
+    {
+      "name": "Smart mid-session re-centering: deliberate 550ms pause creates new origin",
+      "extra": ""
+    },
+    {
+      "name": "Pitch bend and modulation clamped strictly within bounds [-1.0, 1.0] and [0.0, 1.0]",
+      "extra": ""
+    },
+    {
+      "name": "Mouse leave safely cancels timers and resets pitch bend and modulation to 0",
+      "extra": ""
+    },
+    {
+      "name": "Critical Manual Test Flow: entry -> settling -> active -> short pause -> deliberate recenter -> exit -> re-entry",
+      "extra": ""
+    },
+    {
+      "name": "QWERTY and MIDI notes play simultaneously with mouse performance",
+      "extra": ""
+    },
+    {
+      "name": "Zero React re-renders on keyboard during mouse movement",
+      "extra": ""
+    },
+    {
+      "name": "Real DOM mouse dispatch: entry -> recenter on stationary pause -> continuous pitch move",
+      "extra": ""
+    },
+    {
+      "name": "no console errors",
+      "ok": true,
+      "extra": ""
+    }
+  ],
+  "failures": 0,
+  "serverLog": "  \u001b[32m➜\u001b[39m  \u001b[1mLocal\u001b[22m:   \u001b[36mhttp://localhost:\u001b[1m5199\u001b[22m/\u001b[39m\n\u001b[2m  \u001b[32m➜\u001b[39m  \u001b[1mNetwork\u001b[22m\u001b[2m: use \u001b[22m\u001b[1m--host\u001b[22m\u001b[2m to expose\u001b[22m\n"
+}

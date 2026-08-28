@@ -1,0 +1,15 @@
+Apianocraft — Grand Piano instrument
+
+Source: https://github.com/sfzinstruments/SalamanderGrandPiano
+Author: Alexander Holm
+License: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+         https://creativecommons.org/licenses/by/3.0/
+
+These samples are a subset of the "Salamander Grand Piano V3" sample set
+(Yamaha C5 concert grand, recorded with two AKG C414 microphones in an AB
+pairing, 48 kHz 24-bit FLAC). The subset ships 30 note zones across the full
+keyboard (sampled in minor thirds, MIDI 21..108) at 2 velocity layers.
+
+Redistribution and public deployment are permitted under the CC BY 3.0
+license provided this attribution is preserved. The samples are derived from
+the SFZ instrument at the source URL above.
